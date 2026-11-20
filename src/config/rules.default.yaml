@@ -1,0 +1,98 @@
+# Integrations-Cockpit rules configuration (draft v1.3)
+# Edit this file to change a rule; no code change needed.
+# Every value here is shown in the app's "Rules" panel. Values marked ASSUMPTION
+# are defaults until ASD answers the open questions (02_data/MISSING_AND_OPEN_QUESTIONS.md).
+
+version: "1.3"
+
+stichtag: auto                 # auto = export date; or "20.11.2026"
+at_risk_window_months: 6
+
+population:
+  require_open_responsibility: true      # Zuständigkeitsende >= Stichtag
+  exclude_handed_over: true              # Datum Übergang Gemeindezuständigkeit <= Stichtag -> not current (ASSUMPTION Q14)
+
+scope:
+  statuses: ["VA", "F-FL", "B-FL", "B-RSFL", "B-SL"]          # ASSUMPTION Q1
+  excluded_statuses: ["S", "N (Asylsuchende)", "VA+7", "F-FL+7", "B-FL+5", "B-RSFL+7", "B-SL+5"]   # ASSUMPTION Q9
+  min_age: 16
+  age_reference: stichtag                # stichtag | entry | deadline  (ASSUMPTION Q2)
+
+goal1:
+  years_from_entry: 3
+  entry_event: "Aufenthalt (Einreise)"
+  birth_event: "Aufenthalt (Geburt)"     # -> not applicable (ASSUMPTION Q11)
+  languages_counting: ["Deutsch"]        # ASSUMPTION Q10
+  min_level: "A1"
+  level_order: ["A0", "A1", "A2", "B1", "B2", "C1", "C2"]
+  accepted_proof:                        # map to exact Sprachstand "Art" values when template arrives (Q3)
+    - "Zertifikat"
+    - "telc"
+    - "fide"
+    - "Muttersprache"
+    - "Schulbildung CH"
+    - "abgeschlossene Ausbildung"
+  mother_tongue_counts: true
+  count_late_as_reached: false           # late = green with marker, not in payment (ASSUMPTION Q12)
+  active_course_softens_risk: true
+  language_course_keywords: ["Deutsch", "Sprachkurs", "A1", "fide", "telc"]
+
+goal2:
+  min_pensum: 60
+  months_uninterrupted: 6
+  combine_jobs: true                     # ASSUMPTION Q4
+  max_gap_days: 0
+  exclude_keywords: ["Programm", "Einsatzplatz", "Praktikum", "Beschäftigungsprogramm", "Arbeitsintegration"]   # ASSUMPTION Q4
+  education_types: ["Sek II", "Tertiär"]
+  education_counts_from: start           # start | completion (ASSUMPTION Q5)
+  count_self_employed: true              # selbstständig counts as work (ASSUMPTION Q4)
+
+goal3:
+  months_without_support: 12
+  support_types: ["Sozialhilfe", "Nothilfe"]   # ASSUMPTION Q6
+  deadline_from: head                    # head | latest_member | earliest_member (ASSUMPTION Q6)
+
+goal_mapping:                            # Integrationszielerreichung "Art (Ziel)" -> goal (ASSUMPTION Q13)
+  goal1_keywords: ["Sprach", "A1"]
+  goal2_keywords: ["Erwerb", "Ausbildung", "Arbeit"]
+  goal3_keywords: ["Sozialhilfe", "wirtschaftlich", "Ablösung"]
+  ignore_status_s_rows: true             # rows with "Ziel mit Status S erreicht" = yes are ignored (ASSUMPTION Q13)
+
+whatif_2027:
+  switch_date: "01.01.2027"
+  statuses: ["VA", "F-FL"]
+  new_years_from_entry: 5
+  interpretation: A                      # A = all current clients; B = only entries from switch date (Q7)
+
+payment:
+  lump_sum_chf:                          # unknown (Q8): leave empty to show counts only
+    goal1: null
+    goal2: null
+    goal3: null
+  forecast_quarters: 4
+
+calls:
+  top_n: 6
+  inactive_months: 6
+  transition_months: 9
+  rank_by_payout: false                  # never true
+
+patterns:
+  min_group_size: 10
+  confidence: 0.95
+  method: wilson
+
+dq:
+  date_tolerance_days: 31
+  employer_match_threshold: 0.8
+  legal_forms_to_strip: ["AG", "GmbH", "SA", "Sàrl", "Sagl", "KLG", "& Co."]
+
+ai:
+  provider: ollama                       # local only; never a cloud API with real data
+  endpoint: "http://localhost:11434"
+  model: "qwen2.5:7b-instruct"           # alternatives: llama3.1:8b, mistral-nemo
+  temperature: 0
+  use_cached_results_when_offline: true  # demo safety; UI must label cached results
+
+i18n:
+  default_language: de                   # de | en
