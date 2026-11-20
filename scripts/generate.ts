@@ -616,6 +616,12 @@ const inScopeAdults = () => all().filter((p) => !p.persona && p.entry !== undefi
 }
 
 // ---------------- export ----------------
+/** Per-row deterministic pseudo-random in [0,1), so both months export the same values for the same row. */
+function hr(key: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < key.length; i++) h = Math.imul(h ^ key.charCodeAt(i), 16777619);
+  return ((h >>> 0) % 100000) / 100000;
+}
 type Cell = string | number | Date | null | undefined;
 const asDate = (x: Day | undefined): Date | null => (x === undefined ? null : new Date(Date.UTC(1970, 0, 1 + x, 0, 0, 0)));
 const asText = (x: Day | undefined): string | null => (x === undefined ? null : fmt(x));
@@ -665,7 +671,7 @@ async function exportMonth(st: Day, label: string) {
   // Asylgeschäftsdaten (real dates)
   await writeTable(dir, 'asylgeschaeftsdaten', persons.flatMap(({ m }) => m.events.filter((e) => e.datum <= st && !(m.hideEntry && e.art === 'Aufenthalt (Einreise)')).map((e) => [Number(m.zemis), Number(m.knr), e.art, asDate(e.datum), e.erledigung ?? null, e.code ?? null, asDate(e.edatum)])), st);
   // Dossierperson
-  await writeTable(dir, 'dossierperson', persons.map(({ m }) => [m.dossier, Number(m.knr), Number(m.zemis), asDate(m.zBeginn), null, 'Dossiermitglied', m.role === 'head' ? 'Dossierträger/-in' : m.role === 'spouse' ? 'Ehefrau / -mann' : m.role === 'child' ? 'Tochter / Sohn' : pick(['Geschwister', 'Cousin / Cousine', 'Onkel / Tante'])]), st);
+  await writeTable(dir, 'dossierperson', persons.map(({ m }) => [m.dossier, Number(m.knr), Number(m.zemis), asDate(m.zBeginn), null, 'Dossiermitglied', m.role === 'head' ? 'Dossierträger/-in' : m.role === 'spouse' ? 'Ehefrau / -mann' : m.role === 'child' ? 'Tochter / Sohn' : ['Geschwister', 'Cousin / Cousine', 'Onkel / Tante'][Math.floor(hr(m.knr) * 3)]]), st);
   // Finanzielle Unterstützung (text dates, as in template '@' format)
   await writeTable(dir, 'finanz', hhs.flatMap((h) => cut(h.fin, st).map((f) => [h.dossier, f.art, asText(f.von), asText(f.bis), f.bis !== undefined ? (f.grund ?? null) : null])), st);
   // Unterbringung
@@ -676,11 +682,12 @@ async function exportMonth(st: Day, label: string) {
   await writeTable(dir, 'foerderung', persons.flatMap(({ m }) => m.courses.filter((c) => c.start <= st).map((c) => [m.zemis, Number(m.knr), asDate(c.start), asDate(c.end), c.art, c.bez, c.hours, c.inst, c.bem ?? null])), st);
   // Erwerb
   await writeTable(dir, 'erwerb', persons.flatMap(({ m }) => cut(m.jobs.filter((j) => !j.zemisOnly), st).map((j) => {
-    const income = Math.round(j.pensum * 44 + int(-300, 300));
-    return [Number(m.zemis), Number(m.knr), asDate(j.von), asDate(j.bis), j.ag, j.ort, j.pensum, j.status, income, chance(0.3) ? Math.round((income / (j.pensum * 1.8)) * 100) / 100 : null, chance(0.1) ? 'True' : 'False', chance(0.2) ? 'True' : 'False', j.bem ?? null];
+    const k = `${m.knr}|${j.von}`;
+    const income = Math.round(j.pensum * 44 + (hr(k + 'i') - 0.5) * 600);
+    return [Number(m.zemis), Number(m.knr), asDate(j.von), asDate(j.bis), j.ag, j.ort, j.pensum, j.status, income, hr(k + 's') < 0.3 ? Math.round((income / (j.pensum * 1.8)) * 100) / 100 : null, hr(k + 'u') < 0.1 ? 'True' : 'False', hr(k + 'a') < 0.2 ? 'True' : 'False', j.bem ?? null];
   })), st);
   // ZEMIS Tätigkeit (first labour market only; name variants; planted rows without Erwerb)
-  await writeTable(dir, 'zemis', persons.flatMap(({ m }) => cut(m.jobs.filter((j) => !j.noZemis && j.bem !== 'Nebenjob'), st).map((j) => [Number(m.zemis), Number(m.knr), asDate(addDays(j.von, j.zemisOnly ? 0 : int(0, 5))), asDate(j.bis), j.zemisName ?? j.ag])), st);
+  await writeTable(dir, 'zemis', persons.flatMap(({ m }) => cut(m.jobs.filter((j) => !j.noZemis && j.bem !== 'Nebenjob'), st).map((j) => [Number(m.zemis), Number(m.knr), asDate(addDays(j.von, j.zemisOnly ? 0 : Math.floor(hr(m.knr + j.von) * 6))), asDate(j.bis), j.zemisName ?? j.ag])), st);
   // Integrationszielerreichung
   await writeTable(dir, 'zielerreichung', persons.flatMap(({ m }) => m.proven.filter((x) => x.datum <= st).map((x) => [m.zemis, x.art, asDate(x.datum), 'ASD Stadt Bern', x.kohorte, 'False'])), st);
   return { persons: persons.length, households: hhs.length };
