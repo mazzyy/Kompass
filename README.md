@@ -26,9 +26,48 @@ The GIFs are cut from the 78-second pitch video (Qwen3-TTS voice), rendered loca
 
 </details>
 
+## How it works
+
+**Monthly workflow** – same clicks every month, everything in the browser:
+
+```mermaid
+flowchart LR
+    A["📂 Excel exports<br/>11 tables from the<br/>case system"] --> B["Detect tables<br/>by column headers"]
+    B --> C{"Renamed or<br/>missing column?"}
+    C -- yes --> D["👤 Confirm<br/>column mapping"]
+    C -- no --> E
+    D --> E["⚙️ Rules engine<br/>rules.yaml"]
+    E --> F["Goals 1–3 per client<br/>deadlines · traffic lights<br/>data quality"]
+    F --> I["📞 Weekly call list<br/>per social worker"]
+    F --> J["📊 Overview,<br/>patterns, totals"]
+    I --> K["📥 Excel workbooks<br/>management + one<br/>per social worker"]
+    J --> K
+```
+
+**Where AI is used** – rules decide, AI only reads and explains, a person confirms. All AI runs locally (Ollama), nothing leaves the computer:
+
+```mermaid
+flowchart LR
+    subgraph SA["Intake reports"]
+        direction LR
+        P["📄 PDF"] --> S["Split per person,<br/>number sentences"]
+        S --> M["Pseudonymize<br/>names & numbers"]
+        M --> L["🤖 Local model<br/>qwen2.5:7b"]
+        L --> X["Fields + exact<br/>sentence as evidence"]
+        X --> U["👤 Social worker<br/>confirms"]
+    end
+    subgraph RAG["Frag das Cockpit"]
+        direction LR
+        Q["❓ Question<br/>typed or spoken"] --> R["Search brief,<br/>rules.yaml, docs<br/>(no client data)"]
+        R --> AN["🤖 Local model<br/>answers with sources"]
+    end
+    U --> ENG["⚙️ Rules engine"]
+    ENG -. "totals only" .-> AN
+```
+
 ## Try it (judges)
 
-1. Open the hosted demo, or run it locally (below).
+1. Open the hosted demo: **https://kompass-demo-004f2f28db9c.herokuapp.com/** (or run it locally, below).
 2. *Monatslauf* → **November 2026** (sample data) → a renamed column is detected → **Zuordnung übernehmen** → **Berechnen**.
 3. *Anrufe diese Woche* → S. Keller: Amina is first (A1 deadline in 112 days). Open her row: reason, sources (table + row), talking points.
 4. *Situationsanalyse* → a report with the fields the local model extracted, evidence highlighted → **Bestätigen**.
