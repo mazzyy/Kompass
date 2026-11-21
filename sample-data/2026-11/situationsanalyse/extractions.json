@@ -1,0 +1,892 @@
+{
+ "SA_D12_8146.txt": {
+  "file": "SA_D12_8146.txt",
+  "model": "qwen2.5:7b-instruct",
+  "at": "2026-11-21T00:16:33.619Z",
+  "persons": [
+   {
+    "zemis": "37988676",
+    "name": "Amina Tesfay",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Die beiden Kinder (2 und 3 Jahre) werden zu Hause betreut; ein Kita-Platz ist noch nicht gefunden."
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisiert in Tigrinya und in lateinischer Schrift."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Versteht kein Schweizerdeutsch."
+     },
+     "learning_pace": {
+      "value": "good",
+      "status": "stated",
+      "evidence": "Lerntempo gut, Kursbesuch wegen Kinderbetreuung unregelmässig."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Keine gesundheitlichen Einschränkungen bekannt."
+     },
+     "availability_for_work_or_education": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "work_experience_years_origin": {
+      "value": 6,
+      "status": "stated",
+      "evidence": "In Eritrea 6 Jahre als Schneiderin tätig."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Keine Diplome."
+     },
+     "driving_licence": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "career_wish": {
+      "value": "im Bereich Textil oder Pflege arbeiten",
+      "status": "stated",
+      "evidence": "Möchte im Bereich Textil oder Pflege arbeiten, sobald die Kinder betreut sind."
+     }
+    },
+    "ms": 17523
+   },
+   {
+    "zemis": "26823063",
+    "name": "Filmon Tesfay",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisierung Zielsprache: ja."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Versteht kein Schweizerdeutsch."
+     },
+     "learning_pace": {
+      "value": "good",
+      "status": "stated",
+      "evidence": "Er lernt schnell und motiviert."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Keine gesundheitlichen Einschränkungen bekannt."
+     },
+     "availability_for_work_or_education": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "work_experience_years_origin": {
+      "value": 7,
+      "status": "stated",
+      "evidence": "Er hat 7 Jahre im Herkunftsland gearbeitet."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Keine Diplome."
+     },
+     "driving_licence": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "career_wish": {
+      "value": "Coiffeur",
+      "status": "stated",
+      "evidence": "Möchte im Bereich Coiffeur arbeiten."
+     }
+    },
+    "ms": 15112
+   }
+  ]
+ },
+ "SA_D12_7092.txt": {
+  "file": "SA_D12_7092.txt",
+  "model": "qwen2.5:7b-instruct",
+  "at": "2026-11-21T00:17:44.143Z",
+  "persons": [
+   {
+    "zemis": "35053658",
+    "name": "Habtom Mehari",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisiert in der Muttersprache und in lateinischer Schrift."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Deutsch mündlich A0."
+     },
+     "learning_pace": {
+      "value": "medium",
+      "status": "stated",
+      "evidence": "Er lernt in einem durchschnittlichen Tempo."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Keine gesundheitlichen Einschränkungen bekannt."
+     },
+     "availability_for_work_or_education": {
+      "value": "partial",
+      "status": "stated",
+      "evidence": "Verfügbarkeit für Arbeit oder Bildung: teilweise."
+     },
+     "work_experience_years_origin": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Diplome: nein."
+     },
+     "driving_licence": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "career_wish": {
+      "value": "Kinderbetreuung",
+      "status": "stated",
+      "evidence": "Berufliche Perspektive (Sicht Klient/in): Kinderbetreuung."
+     }
+    },
+    "ms": 14161
+   },
+   {
+    "zemis": "43849096",
+    "name": "Rahel Mehari",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisierung Zielsprache: ja."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Versteht kein Schweizerdeutsch."
+     },
+     "learning_pace": {
+      "value": "good",
+      "status": "stated",
+      "evidence": "Lerntempo gut."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit."
+     },
+     "availability_for_work_or_education": {
+      "value": "partial",
+      "status": "stated",
+      "evidence": "Sie ist nur teilzeitlich verfügbar."
+     },
+     "work_experience_years_origin": {
+      "value": 10,
+      "status": "stated",
+      "evidence": "Sie hat 10 Jahre im Herkunftsland gearbeitet."
+     },
+     "diplomas": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Ein Berufsdiplom aus dem Herkunftsland ist vorhanden."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Kein Führerschein."
+     },
+     "career_wish": {
+      "value": "Sie ist nur teilzeitlich verfügbar.",
+      "status": "stated",
+      "evidence": "Sie ist nur teilzeitlich verfügbar."
+     }
+    },
+    "ms": 16877
+   },
+   {
+    "zemis": "28281522",
+    "name": "Saba Mehari",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Sie liest und schreibt lateinische Schrift."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Versteht kein Schweizerdeutsch."
+     },
+     "learning_pace": {
+      "value": "slow",
+      "status": "stated",
+      "evidence": "Sie lernt langsam."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Keine gesundheitlichen Einschränkungen bekannt."
+     },
+     "availability_for_work_or_education": {
+      "value": "full",
+      "status": "stated",
+      "evidence": "Verfügbar für Arbeit oder Ausbildung: vollzeit."
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Bisher keine Arbeitserfahrung."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Keine Diplome."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Kein Führerschein."
+     },
+     "career_wish": {
+      "value": "im Bereich Detailhandel arbeiten",
+      "status": "stated",
+      "evidence": "Möchte im Bereich Detailhandel arbeiten."
+     }
+    },
+    "ms": 15980
+   },
+   {
+    "zemis": "46759362",
+    "name": "Yonas Mehari",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisierung Zielsprache: ja."
+     },
+     "understands_swiss_german": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Versteht Schweizerdeutsch im Alltag recht gut."
+     },
+     "learning_pace": {
+      "value": "good",
+      "status": "stated",
+      "evidence": "Lerntempo gut."
+     },
+     "health_limits_work": {
+      "value": "some",
+      "status": "stated",
+      "evidence": "Rückenbeschwerden schränken körperlich schwere Arbeit ein."
+     },
+     "availability_for_work_or_education": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Bisher keine Arbeitserfahrung."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Keine Diplome."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Kein Führerschein."
+     },
+     "career_wish": {
+      "value": "Coiffeur",
+      "status": "stated",
+      "evidence": "Berufliche Perspektive (Sicht Klient/in): Coiffeur."
+     }
+    },
+    "ms": 16186
+   }
+  ]
+ },
+ "SA_D12_5588.txt": {
+  "file": "SA_D12_5588.txt",
+  "model": "qwen2.5:7b-instruct",
+  "at": "2026-11-21T00:19:24.362Z",
+  "persons": [
+   {
+    "zemis": "54578923",
+    "name": "Firas Ibrahim",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisiert in der Muttersprache und in lateinischer Schrift."
+     },
+     "understands_swiss_german": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Schweizerdeutsch wird verstanden."
+     },
+     "learning_pace": {
+      "value": "slow",
+      "status": "stated",
+      "evidence": "Lerntempo langsam, braucht viele Wiederholungen."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit."
+     },
+     "availability_for_work_or_education": {
+      "value": "full",
+      "status": "stated",
+      "evidence": "Verfügbar für Arbeit oder Ausbildung: vollzeit."
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Bisher keine Arbeitserfahrung."
+     },
+     "diplomas": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Ein Berufsdiplom aus dem Herkunftsland ist vorhanden."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Führerschein aus dem Herkunftsland, in der Schweiz nicht anerkannt."
+     },
+     "career_wish": {
+      "value": "Bau",
+      "status": "stated",
+      "evidence": "Er wünscht sich eine Stelle in Bau."
+     }
+    },
+    "ms": 18193
+   },
+   {
+    "zemis": "33049934",
+    "name": "Rana Ibrahim",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisierung Zielsprache: ja."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Schweizerdeutsch versteht sie noch nicht."
+     },
+     "learning_pace": {
+      "value": "slow",
+      "status": "stated",
+      "evidence": "Lerntempo langsam, braucht viele Wiederholungen."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit."
+     },
+     "availability_for_work_or_education": {
+      "value": "full",
+      "status": "stated",
+      "evidence": "Verfügbar für Arbeit oder Ausbildung: vollzeit."
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Bisher keine Arbeitserfahrung."
+     },
+     "diplomas": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Führerschein: nein."
+     },
+     "career_wish": {
+      "value": "Coiffeur",
+      "status": "stated",
+      "evidence": "Sie wünscht sich eine Stelle in Coiffeur."
+     }
+    },
+    "ms": 18273
+   },
+   {
+    "zemis": "24199358",
+    "name": "Tarek Ibrahim",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisiert in der Muttersprache und in lateinischer Schrift."
+     },
+     "understands_swiss_german": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "learning_pace": {
+      "value": "good",
+      "status": "stated",
+      "evidence": "Lerntempo gut."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit."
+     },
+     "availability_for_work_or_education": {
+      "value": "full",
+      "status": "stated",
+      "evidence": "Verfügbar für Arbeit oder Ausbildung: vollzeit."
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Bisher keine Arbeitserfahrung."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Keine Diplome."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Führerschein: nein."
+     },
+     "career_wish": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     }
+    },
+    "ms": 21727
+   },
+   {
+    "zemis": "38636788",
+    "name": "Aya Ibrahim",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisiert in der Muttersprache und in lateinischer Schrift."
+     },
+     "understands_swiss_german": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Versteht Schweizerdeutsch im Alltag recht gut."
+     },
+     "learning_pace": {
+      "value": "medium",
+      "status": "stated",
+      "evidence": "Sie lernt in einem durchschnittlichen Tempo."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit."
+     },
+     "availability_for_work_or_education": {
+      "value": "partial",
+      "status": "stated",
+      "evidence": "Sie ist nur teilzeitlich verfügbar."
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Keine Berufserfahrung im Herkunftsland."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Diplome: nein."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Kein Führerschein."
+     },
+     "career_wish": {
+      "value": "Detailhandel",
+      "status": "stated",
+      "evidence": "Sie wünscht sich eine Stelle in Detailhandel."
+     }
+    },
+    "ms": 22699
+   },
+   {
+    "zemis": "22244952",
+    "name": "Hiba Ibrahim",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisierung Zielsprache: ja."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Versteht kein Schweizerdeutsch."
+     },
+     "learning_pace": {
+      "value": "medium",
+      "status": "stated",
+      "evidence": "Sie lernt in einem durchschnittlichen Tempo."
+     },
+     "health_limits_work": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "availability_for_work_or_education": {
+      "value": "full",
+      "status": "stated",
+      "evidence": "Sie ist voll verfügbar für Arbeit oder Bildung."
+     },
+     "work_experience_years_origin": {
+      "value": 18,
+      "status": "stated",
+      "evidence": "Sie hat 18 Jahre im Herkunftsland gearbeitet."
+     },
+     "diplomas": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Ein Berufsdiplom aus dem Herkunftsland ist vorhanden."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Kein Führerschein."
+     },
+     "career_wish": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     }
+    },
+    "ms": 19323
+   }
+  ]
+ },
+ "SA_D12_3004.txt": {
+  "file": "SA_D12_3004.txt",
+  "model": "qwen2.5:7b-instruct",
+  "at": "2026-11-21T00:20:03.507Z",
+  "persons": [
+   {
+    "zemis": "20866750",
+    "name": "Aya Ibrahim",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Sie liest und schreibt lateinische Schrift."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Versteht kein Schweizerdeutsch."
+     },
+     "learning_pace": {
+      "value": "good",
+      "status": "stated",
+      "evidence": "Lerntempo gut."
+     },
+     "health_limits_work": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "availability_for_work_or_education": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Berufliche Perspektive (Sicht Klient/in): Transport / Chauffeur."
+     },
+     "diplomas": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Diplome: ja."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Kein Führerschein."
+     },
+     "career_wish": {
+      "value": "Transport / Chauffeur",
+      "status": "stated",
+      "evidence": "Berufliche Perspektive (Sicht Klient/in): Transport / Chauffeur."
+     }
+    },
+    "ms": 19678
+   },
+   {
+    "zemis": "23730662",
+    "name": "Mahmoud Ibrahim",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Er ist in lateinischer Schrift nicht alphabetisiert."
+     },
+     "understands_swiss_german": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "learning_pace": {
+      "value": "slow",
+      "status": "stated",
+      "evidence": "Er lernt langsam."
+     },
+     "health_limits_work": {
+      "value": "some",
+      "status": "stated",
+      "evidence": "Rückenbeschwerden schränken körperlich schwere Arbeit ein."
+     },
+     "availability_for_work_or_education": {
+      "value": "partial",
+      "status": "stated",
+      "evidence": "Er ist nur teilzeitlich verfügbar."
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Bisher keine Arbeitserfahrung."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Keine Diplome."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Führerschein: nein."
+     },
+     "career_wish": {
+      "value": "Reinigung",
+      "status": "stated",
+      "evidence": "Er wünscht sich eine Stelle in Reinigung."
+     }
+    },
+    "ms": 19465
+   }
+  ]
+ },
+ "SA_D12_9007.txt": {
+  "file": "SA_D12_9007.txt",
+  "model": "qwen2.5:7b-instruct",
+  "at": "2026-11-21T00:20:46.131Z",
+  "persons": [
+   {
+    "zemis": "59358685",
+    "name": "Ubah Abdi",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisierung Zielsprache: ja."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Schweizerdeutsch versteht sie noch nicht."
+     },
+     "learning_pace": {
+      "value": "medium",
+      "status": "stated",
+      "evidence": "Lerntempo mittel."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit."
+     },
+     "availability_for_work_or_education": {
+      "value": "partial",
+      "status": "stated",
+      "evidence": "Sie ist nur teilzeitlich verfügbar."
+     },
+     "work_experience_years_origin": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Diplome: nein."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Führerschein: nein."
+     },
+     "career_wish": {
+      "value": "Coiffeur",
+      "status": "stated",
+      "evidence": "Berufliche Perspektive (Sicht Klient/in): Coiffeur."
+     }
+    },
+    "ms": 22793
+   },
+   {
+    "zemis": "33725691",
+    "name": "Ahmed Abdi",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisierung Zielsprache: ja."
+     },
+     "understands_swiss_german": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Versteht Schweizerdeutsch im Alltag recht gut."
+     },
+     "learning_pace": {
+      "value": "slow",
+      "status": "stated",
+      "evidence": "Er lernt langsam."
+     },
+     "health_limits_work": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "availability_for_work_or_education": {
+      "value": "full",
+      "status": "stated",
+      "evidence": "Verfügbar für Arbeit oder Ausbildung: vollzeit."
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Keine Berufserfahrung im Herkunftsland."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Diplome: nein."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Führerschein: nein."
+     },
+     "career_wish": {
+      "value": "Gastronomie",
+      "status": "stated",
+      "evidence": "Möchte im Bereich Gastronomie arbeiten."
+     }
+    },
+    "ms": 19829
+   }
+  ]
+ }
+}

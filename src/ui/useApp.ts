@@ -10,6 +10,7 @@ import { resolveStichtag, run } from '../engine/run';
 import { writeAll, type OutFile } from '../excel/write';
 import type { Lang } from '../i18n/messages';
 import { tr } from './strings';
+import { useSa } from './useSa';
 
 export type Screen = 'run' | 'overview' | 'calls' | 'clients' | 'quality' | 'export' | 'situation' | 'patterns';
 export type Role = { kind: 'mgmt' } | { kind: 'sw'; name: string };
@@ -83,6 +84,8 @@ export function useApp() {
     }
   }, [rulesText]);
 
+  const sa = useSa(rules.ai);
+
   const analyses: FileAnalysis[] = useMemo(() => analyzeFiles(raws, saved), [raws, saved]);
   const blocked = runBlocked(analyses);
   const autoStichtag = useMemo(() => resolveStichtag(rules, analyses), [rules, analyses]);
@@ -120,12 +123,13 @@ export function useApp() {
         }
         if (!out.length) throw new Error('sample data not found');
         await addFiles(out, true);
+        await sa.loadSample(month);
       } catch (e) {
         setError(String(e));
         setLoading(false);
       }
     },
-    [addFiles],
+    [addFiles, sa],
   );
 
   /** Confirm a column mapping (the suggested header, or another header the user chose). */
@@ -136,6 +140,7 @@ export function useApp() {
   };
 
   const clearLocal = () => {
+    sa.clear();
     setSaved({});
     setCalled({});
     setCustomRules(undefined);
@@ -260,6 +265,7 @@ export function useApp() {
     setSelected,
     callsSw,
     setCallsSw,
+    sa,
   };
 }
 

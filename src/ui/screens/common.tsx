@@ -3,7 +3,9 @@ import { TABLE_BY_ID } from '../../engine/import/signatures';
 import type { GoalId, Person, SourceRef } from '../../engine/model';
 import { msg } from '../../i18n/messages';
 import { StatusIcon } from '../icons';
+import { SA_FIELDS } from '../../ai/extract';
 import { statusLabel, tr } from '../strings';
+import { saValue } from './Situation';
 import type { App } from '../useApp';
 
 export function EmptyRun({ app }: { app: App }) {
@@ -62,6 +64,23 @@ export function PersonFacts({ app, p }: { app: App; p: Person }) {
             </div>
           );
         })}
+      </div>
+      <div className="detail-sec">
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+          <span className="sec-title">{tr(lang, 'sa.inClient')}</span>
+          <span className="tag ai">{tr(lang, 'sa.aiTag')}</span>
+        </div>
+        {(() => {
+          const c = app.sa.confirmed[p.zemis];
+          const rows = SA_FIELDS.filter((f) => c?.[f.id]?.status === 'confirmed');
+          if (!rows.length) return <span className="muted" style={{ fontSize: 13 }}>{tr(lang, 'sa.inClient.none')}</span>;
+          return rows.map((f) => (
+            <div key={f.id} style={{ display: 'flex', justifyContent: 'space-between', gap: 16, fontSize: 13 }} title={c![f.id].evidence}>
+              <span className="muted">{lang === 'de' ? f.de : f.en}</span>
+              <span style={{ fontWeight: 500, textAlign: 'right' }}>{saValue(lang, f.id, c![f.id].value)}</span>
+            </div>
+          ));
+        })()}
       </div>
       <div className="detail-sec">
         <span className="sec-title">{tr(lang, 'cl.detail.trace')}</span>
