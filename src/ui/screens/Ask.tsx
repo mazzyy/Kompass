@@ -21,6 +21,28 @@ interface Turn {
   spoken?: boolean; // asked by voice
 }
 
+// Chart types offered in the empty view panel: [label, question that shows it].
+const CANVAS_KINDS: Record<'de' | 'en', [string, string][]> = {
+  de: [
+    ['Ampel je Ziel', 'Gib mir eine Übersicht'],
+    ['Nach Fallführung', 'Ziel 1 nach Fallführung'],
+    ['Nach Einreisejahr', 'Ziel 1 nach Einreisejahr'],
+    ['Gründe für Rückstand', 'Warum sind Leute bei Ziel 1 im Rückstand?'],
+    ['Fristen', 'Zeig die Fristen für Ziel 1'],
+    ['Prognose', 'Zeig die Prognose'],
+    ['Jetzt abrechenbar', 'Was ist jetzt abrechenbar?'],
+  ],
+  en: [
+    ['Traffic light per goal', 'Give me an overview'],
+    ['By social worker', 'Goal 1 by social worker'],
+    ['By entry year', 'Goal 1 by entry year'],
+    ['Reasons for lagging', 'Why are people behind on goal 1?'],
+    ['Deadlines', 'Show the deadlines for goal 1'],
+    ['Forecast', 'Show the forecast'],
+    ['Claimable now', 'What is claimable now?'],
+  ],
+};
+
 // The conversation is kept for the session so it survives switching screens (never stored on disk).
 let CHAT: Turn[] = [];
 
@@ -192,9 +214,12 @@ export function AskScreen({ app }: { app: App }) {
 
   const sttError = (e: unknown) => {
     const st = (e as { status?: number }).status;
+    const name = (e as Error).name ?? '';
     const m = String((e as Error).message ?? e);
-    if (st === 401 || /401|permission|missing_permissions/i.test(m)) setErr(tr(lang, 'chat.err.stt401'));
-    else if (/NotAllowed|Permission denied|getUserMedia/i.test(m)) setErr(tr(lang, 'chat.err.mic'));
+    // Browser refused the microphone (NotAllowedError / NotFoundError) -> ask to allow it; only a real
+    // ElevenLabs answer about the key's permissions means the key needs "Speech to Text".
+    if (/NotAllowed|NotFound|NotReadable|Security/i.test(name) || /getUserMedia|Permission denied|Requested device not found/i.test(m)) setErr(tr(lang, 'chat.err.mic'));
+    else if (st === 401 || /missing_permissions|speech_to_text/i.test(m)) setErr(tr(lang, 'chat.err.stt401'));
     else setErr(tr(lang, 'chat.err.stt', { e: m }));
   };
 
@@ -303,14 +328,25 @@ export function AskScreen({ app }: { app: App }) {
           <div className="chat-thread" ref={thread} aria-live="polite">
             {chat.length === 0 && (
               <div className="chat-empty">
+                <span className="chat-empty-badge" aria-hidden="true">{Icon.wave()}</span>
                 <span className="chat-empty-title">{tr(lang, 'chat.empty.title')}</span>
-                <div className="chat-examples">
-                  {EXAMPLES[lang].map((e) => (
-                    <button key={e} type="button" className="chat-example" onClick={() => void ask(e)}>
-                      {e}
-                    </button>
-                  ))}
-                </div>
+                <span className="chat-empty-sub">{tr(lang, 'chat.empty.sub')}</span>
+                {([
+                  ['chat.ex.charts', EXAMPLES[lang].filter((e) => detectCharts(e).length > 0), Icon.chart],
+                  ['chat.ex.rules', EXAMPLES[lang].filter((e) => detectCharts(e).length === 0), Icon.doc],
+                ] as const).map(([label, list, icon]) => (
+                  <div key={label} className="chat-ex-group">
+                    <span className="sec-title">{tr(lang, label)}</span>
+                    <div className="chat-examples">
+                      {list.map((e) => (
+                        <button key={e} type="button" className="chat-example" onClick={() => void ask(e)}>
+                          <span className="chat-example-icon" aria-hidden="true">{icon()}</span>
+                          <span>{e}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
             {chat.map((t) => (
@@ -468,7 +504,27 @@ export function AskScreen({ app }: { app: App }) {
             {selTurn && <span className="muted" style={{ fontSize: 12, maxWidth: 320, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selTurn.q}</span>}
           </div>
           <div className="canvas-body">
-            {!selTurn && <p className="muted">{tr(lang, 'chat.canvas.empty')}</p>}
+            {!selTurn && (
+              <div className="canvas-empty">
+                <div className="canvas-skeleton" aria-hidden="true">
+                  {[72, 48, 88, 30, 60].map((w, i) => (
+                    <div key={i} className="sk-row">
+                      <span className="sk-label" />
+                      <span className="sk-bar" style={{ width: `${w}%`, animationDelay: `${i * 0.12}s` }} />
+                    </div>
+                  ))}
+                </div>
+                <span className="canvas-empty-title">{tr(lang, 'chat.canvas.title')}</span>
+                <span className="muted" style={{ fontSize: 13, textAlign: 'center', maxWidth: 380 }}>{tr(lang, 'chat.canvas.empty')}</span>
+                <div className="canvas-kinds">
+                  {CANVAS_KINDS[lang].map(([label, question]) => (
+                    <button key={label} type="button" className="chip-btn" disabled={!res} onClick={() => void ask(question)}>
+                      {Icon.chart()} {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             {selTurn && res && selTurn.charts.length > 0 && (
               <>
                 {selTurn.charts.map((s, i) => {
@@ -497,13 +553,16 @@ export function AskScreen({ app }: { app: App }) {
       </div>
 
       {convo && (
-        <div className="voice-orb" role="status" aria-live="polite">
-          <div className={`orb ${voice.phase}`} style={{ ['--lvl' as string]: String(voice.level) }}>
-            <span />
+        <div className={`voice-bar ${voice.phase === 'idle' ? 'thinking' : voice.phase}`} role="status" aria-live="polite">
+          <span className="voice-dot" aria-hidden="true" />
+          <div className="voice-viz" aria-hidden="true">
+            {[0.45, 0.7, 1, 0.8, 0.55, 0.9, 0.5].map((f, i) => (
+              <span key={i} style={voice.phase === 'listening' ? { height: `${6 + Math.min(1, voice.level * (0.6 + f)) * 26}px` } : { animationDelay: `${i * 0.09}s` }} />
+            ))}
           </div>
-          <span className="orb-text">{phaseText || tr(lang, 'chat.listening')}</span>
-          <button type="button" className="btn small" onClick={endConvo}>
-            {Icon.stop()} {tr(lang, 'chat.convo.on')}
+          <span className="voice-text">{phaseText || tr(lang, 'chat.listening')}</span>
+          <button type="button" className="voice-end" onClick={endConvo} aria-label={tr(lang, 'chat.convo.on')} title={tr(lang, 'chat.convo.on')}>
+            {Icon.stop()}
           </button>
         </div>
       )}
