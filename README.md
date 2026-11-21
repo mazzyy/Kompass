@@ -2,29 +2,20 @@
 
 AI for Access hackathon, Bern, 20–21 Nov 2026. **All data in this repo is synthetic. No real people.**
 
-<p align="center"><img src="docs/media/hit.gif" alt="Weekly call list: who to call this week, and why" width="760"></p>
+<p align="center"><img src="docs/media/overview.jpg" alt="Kompass overview: goals reached, at risk, never billed" width="900"></p>
 
 The Asylsozialdienst is paid only when refugees reach integration goals before deadlines. This tool reads the Excel exports of their case-management system (as they come: German headers, Swiss dates), computes each client's status with a tested rules engine, shows a weekly call list per social worker, and writes Excel files back. A **local** AI model (Ollama) reads the free-text *Situationsanalyse* and proposes fields with the exact sentence as evidence; a person confirms. **Rules set the traffic lights, AI only extracts, people decide. Nothing leaves the computer.**
 
 ## See it
 
-| Who to call this week, and why | Local AI reads every intake report | Ask the cockpit |
-|---|---|---|
-| ![Call list](docs/media/hit.gif) | ![Situationsanalyse](docs/media/proof.gif) | ![Assistant](docs/media/ask.gif) |
-
-The GIFs are cut from the 78-second pitch video (Qwen3-TTS voice), rendered locally to `video/out/Kompass_pitch_qwen.mp4` (not in git; rebuild with the scripts in `video/`).
-
-<details>
-<summary><b>Screenshots</b></summary>
-
 | | |
 |---|---|
-| **Overview** – goals reached, at risk, never billed<br>![Overview](docs/media/overview.jpg) | **Monatslauf** – renamed column detected, mapping proposed<br>![Column mapping](docs/media/run_mapping.jpg) |
-| **Anrufe diese Woche** – per social worker, deadline first<br>![Call list](docs/media/calls.jpg) | **Client** – reason, sources (table + row), talking points<br>![Client](docs/media/client.jpg) |
-| **Situationsanalyse** – extracted fields with the exact sentence as evidence<br>![Situationsanalyse](docs/media/situation.jpg) | **Muster** – patterns across the caseload<br>![Patterns](docs/media/patterns.jpg) |
-| **Frag das Cockpit** – answers from the rules and docs<br>![Assistant](docs/media/assistant_en.jpg) | **Excel-Exporte** – management + one workbook per social worker<br>![Export](docs/media/export.jpg) |
+| **Monatslauf** – renamed column detected, mapping proposed<br>![Column mapping](docs/media/run_mapping.jpg) | **Anrufe diese Woche** – per social worker, deadline first<br>![Call list](docs/media/calls.jpg) |
+| **Client** – reason, sources (table + row), talking points<br>![Client](docs/media/client.jpg) | **Situationsanalyse** – extracted fields with the exact sentence as evidence<br>![Situationsanalyse](docs/media/situation.jpg) |
+| **Muster** – patterns across the caseload<br>![Patterns](docs/media/patterns.jpg) | **Frag das Cockpit** – answers from the rules and docs<br>![Assistant](docs/media/assistant_en.jpg) |
+| **Excel-Exporte** – management + one workbook per social worker<br>![Export](docs/media/export.jpg) | **Overview** – goals reached, at risk, never billed<br>![Overview](docs/media/overview.jpg) |
 
-</details>
+The 78-second pitch video (Qwen3-TTS voice) is rendered locally to `video/out/Kompass_pitch_qwen.mp4` (not in git; rebuild with the scripts in `video/`).
 
 ## How it works
 
