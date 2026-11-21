@@ -154,6 +154,14 @@ export default function App() {
                   {result ? fmt(result.stichtag) : '–'}
                 </span>
               </span>
+              {app.source && app.source.kind !== 'files' && (
+                <button type="button" className="chip" title={tr(lang, 'src.locked.sub')} onClick={() => app.setScreen('run')}>
+                  {tr(lang, 'src.chip')}{' '}
+                  <span style={{ color: 'var(--ink)' }}>
+                    {app.source.kind === 'sample' ? tr(lang, 'src.sample', { month: app.source.month.split('-').reverse().join('.') }) : tr(lang, 'src.folder', { name: app.source.name })}
+                  </span>
+                </button>
+              )}
               <button type="button" className="chip" onClick={() => app.setRulesOpen(true)}>
                 rules.yaml{' '}
                 <span className="mono" style={{ color: 'var(--ink)' }}>

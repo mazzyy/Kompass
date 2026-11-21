@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { fmt, parseDate, type Day } from '../engine/dates';
 import { defaultRulesText } from '../engine/defaultRules';
 import { analyzeFiles, mappingKey, parseTables, runBlocked, type FileAnalysis, type MappingSuggestion, type RawTable, type SavedMappings } from '../engine/import/detect';
@@ -11,8 +11,18 @@ import { writeAll, type OutFile } from '../excel/write';
 import type { Lang } from '../i18n/messages';
 import { tr } from './strings';
 import { useSa } from './useSa';
+import { canRememberFolder, clearHandle, loadHandle, loadSource, permission, pickFolder, readFolder, saveHandle, saveSource, type DirHandle, type Source } from './source';
 
 export type Screen = 'run' | 'overview' | 'goal' | 'calls' | 'clients' | 'quality' | 'export' | 'situation' | 'patterns';
+const SCREENS: Screen[] = ['run', 'overview', 'goal', 'calls', 'clients', 'quality', 'export', 'situation', 'patterns'];
+
+/** Screens live in the URL hash (#/goal/2), so the browser's back and forward buttons move inside the app. */
+function parseHash(): { screen?: Screen; goal?: GoalId } {
+  const m = (typeof location !== 'undefined' ? location.hash : '').match(/^#\/(\w+)(?:\/([123]))?/);
+  const screen = m && SCREENS.includes(m[1] as Screen) ? (m[1] as Screen) : undefined;
+  return { screen, goal: m?.[2] ? (Number(m[2]) as GoalId) : undefined };
+}
+const hashFor = (s: Screen, g: GoalId) => `#/${s}${s === 'goal' ? `/${g}` : ''}`;
 export type Role = { kind: 'mgmt' } | { kind: 'sw'; name: string };
 export interface LogLine {
   t: string;
@@ -46,8 +56,23 @@ const clock = () => {
 
 export function useApp() {
   const [lang, setLangState] = useState<Lang>(() => load<Lang>('ic.lang', 'de'));
-  const [screen, setScreen] = useState<Screen>('run');
-  const [role, setRole] = useState<Role>({ kind: 'mgmt' });
+  const [screen, setScreenState] = useState<Screen>(() => parseHash().screen ?? 'run');
+  const [role, setRoleState] = useState<Role>(() => {
+    try {
+      const v = sessionStorage.getItem('ic.role');
+      return v ? (JSON.parse(v) as Role) : { kind: 'mgmt' };
+    } catch {
+      return { kind: 'mgmt' };
+    }
+  });
+  const setRole = (r: Role) => {
+    setRoleState(r);
+    try {
+      sessionStorage.setItem('ic.role', JSON.stringify(r));
+    } catch {
+      /* not remembered */
+    }
+  };
   const [raws, setRaws] = useState<RawTable[]>([]);
   const [saved, setSaved] = useState<SavedMappings>(() => load('ic.mappings', {}));
   const [isDemo, setIsDemo] = useState(false);
@@ -67,7 +92,35 @@ export function useApp() {
   const [callsSw, setCallsSw] = useState<string | undefined>();
   const [dqOpen, setDqOpen] = useState<string | undefined>();
   const [inScopeOnly, setInScopeOnly] = useState(false);
-  const [goalId, setGoalId] = useState<GoalId>(1);
+  const [goalId, setGoalIdState] = useState<GoalId>(() => parseHash().goal ?? 1);
+  const goalRef = useRef(goalId);
+  goalRef.current = goalId;
+  const [source, setSource] = useState<Source | undefined>(() => loadSource());
+  const [folderWaiting, setFolderWaiting] = useState<string | undefined>(); // remembered folder that needs one click to allow reading
+  const [autoRun, setAutoRun] = useState(false);
+
+  const setScreen = useCallback((s: Screen, g?: GoalId) => {
+    const goal = g ?? goalRef.current;
+    if (g) setGoalIdState(g);
+    setScreenState(s);
+    const h = hashFor(s, goal);
+    if (location.hash !== h) history.pushState(null, '', h);
+  }, []);
+  const setGoalId = useCallback((g: GoalId) => {
+    setGoalIdState(g);
+    if (location.hash.startsWith('#/goal')) history.replaceState(null, '', hashFor('goal', g));
+  }, []);
+  useEffect(() => {
+    if (!location.hash) history.replaceState(null, '', hashFor(screen, goalRef.current));
+    const on = () => {
+      const r = parseHash();
+      setScreenState(r.screen ?? 'run');
+      if (r.goal) setGoalIdState(r.goal);
+    };
+    window.addEventListener('popstate', on);
+    return () => window.removeEventListener('popstate', on);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const setLang = (l: Lang) => {
     setLangState(l);
@@ -93,7 +146,7 @@ export function useApp() {
   const blocked = runBlocked(analyses);
   const autoStichtag = useMemo(() => resolveStichtag(rules, analyses), [rules, analyses]);
 
-  const addFiles = useCallback(async (list: File[] | FileList, demo = false) => {
+  const addFiles = useCallback(async (list: File[] | FileList, demo = false, src: Source = { kind: 'files' }) => {
     setError(undefined);
     setLoading(true);
     try {
@@ -102,6 +155,10 @@ export function useApp() {
       for (const f of arr) read.push(readWorkbook(new Uint8Array(await f.arrayBuffer()), f.name, f.lastModified));
       setRaws(read);
       setIsDemo(demo);
+      setSource(src);
+      saveSource(src);
+      setFolderWaiting(undefined);
+      if (src.kind !== 'folder') void clearHandle();
       setResult(undefined);
       setFiles([]);
       setLog([]);
@@ -125,7 +182,7 @@ export function useApp() {
           out.push(new File([await r.arrayBuffer()], t.file));
         }
         if (!out.length) throw new Error('sample data not found');
-        await addFiles(out, true);
+        await addFiles(out, true, { kind: 'sample', month });
         await sa.loadSample(month);
       } catch (e) {
         setError(String(e));
@@ -134,6 +191,65 @@ export function useApp() {
     },
     [addFiles, sa],
   );
+
+  const openFolder = useCallback(
+    async (h: DirHandle) => {
+      setLoading(true);
+      try {
+        const files = await readFolder(h);
+        if (!files.length) throw new Error(tr(lang, 'src.empty', { name: h.name }));
+        await saveHandle(h);
+        await addFiles(files, false, { kind: 'folder', name: h.name });
+        return true;
+      } catch (e) {
+        setError(String(e instanceof Error ? e.message : e));
+        setLoading(false);
+        return false;
+      }
+    },
+    [addFiles, lang],
+  );
+
+  /** Choose a folder; it is remembered and loaded again every time the cockpit opens. */
+  const chooseFolder = useCallback(async () => {
+    const h = await pickFolder();
+    if (h && (await openFolder(h))) setAutoRun(true);
+  }, [openFolder]);
+
+  /** The remembered folder needs one click before the browser lets us read it again. */
+  const reopenFolder = useCallback(async () => {
+    const h = await loadHandle();
+    if (h && (await permission(h, true)) && (await openFolder(h))) setAutoRun(true);
+  }, [openFolder]);
+
+  const forgetSource = () => {
+    setSource(undefined);
+    saveSource(undefined);
+    setFolderWaiting(undefined);
+    void clearHandle();
+  };
+
+  // On open: load the remembered source again and calculate, so the cockpit shows the same data until another source is chosen.
+  const restored = useRef(false);
+  useEffect(() => {
+    if (restored.current) return;
+    restored.current = true;
+    const src = loadSource();
+    if (!src) return;
+    void (async () => {
+      if (src.kind === 'sample') {
+        await loadSample(src.month);
+        setAutoRun(true);
+      } else if (src.kind === 'folder') {
+        const h = await loadHandle();
+        if (!h) return;
+        if (await permission(h, false)) {
+          if (await openFolder(h)) setAutoRun(true);
+        } else setFolderWaiting(h.name);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /** Confirm a column mapping (the suggested header, or another header the user chose). */
   const acceptMapping = (s: MappingSuggestion) => {
@@ -144,6 +260,10 @@ export function useApp() {
 
   const clearLocal = () => {
     sa.clear();
+    setSource(undefined);
+    saveSource(undefined);
+    setFolderWaiting(undefined);
+    void clearHandle();
     setSaved({});
     setCalled({});
     setCustomRules(undefined);
@@ -228,6 +348,13 @@ export function useApp() {
     }
   }, [blocked, raws, analyses, rules, rulesText, windowMonths, stichtagOverride, autoStichtag, lang, sa.extr]);
 
+  useEffect(() => {
+    if (!autoRun || !raws.length || running) return;
+    setAutoRun(false);
+    if (!blocked) void doRun();
+    else setScreen('run'); // a renamed column needs a person to confirm it first
+  }, [autoRun, raws, blocked, running, doRun, setScreen]);
+
   // what the current role may see
   const visible = useMemo(() => {
     if (!result) return undefined;
@@ -285,10 +412,16 @@ export function useApp() {
     goalId,
     setGoalId,
     openGoal: (g: GoalId) => {
-      setGoalId(g);
-      setScreen('goal');
+      setScreen('goal', g);
       window.scrollTo?.(0, 0);
     },
+    source,
+    folderWaiting,
+    canRememberFolder,
+    chooseFolder,
+    reopenFolder,
+    openFolder,
+    forgetSource,
     sa,
   };
 }

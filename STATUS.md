@@ -49,3 +49,5 @@ Before the demo: *Lokale Daten löschen* on the Monatslauf screen so the column 
 - Live AI takes about 15 s per person on this laptop. For the demo use a short report (1 person) live; the rest are cached and labelled "cached result of the local model".
 - No hosted link: judges who want to try it themselves need the laptop (or a USB copy of `dist/` + `sample-data.zip`, which runs from any static web server).
 - Integrationszielerreichung is still provisional (template missing). Klient has no names: clients show by number unless their Situationsanalyse has been read.
+
+**21.11 later:** the cockpit remembers the chosen folder (or sample month) and loads + calculates it on every open until another source is chosen; browser back/forward move between screens without losing results. **Before the demo:** click "Nicht mehr merken" on Monatslauf (and "Lokale Daten löschen" if the renamed-column step should appear again), so the demo starts empty. The shared Word file was a project overview, not the Integrationszielerreichung template; the template is still missing.

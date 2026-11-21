@@ -79,6 +79,10 @@ Click a goal on the Overview (or "Ziel im Detail" in the menu; tabs switch betwe
 - Deadlines in the next 12 months (red = already at risk), by social worker and by entry year, and why people are not counted.
 - The Overview also has **Caseload per social worker** (clients, households, red, missed, on call list, data-quality items).
 
+**Remembered data source.** Choosing a folder ("Ordner wählen", or dropping a folder) remembers it: every time the cockpit opens, it reads the Excel files from that folder again, calculates, and shows the screen you were on, until you choose other files or another folder ("Nicht mehr merken" or "Lokale Daten löschen" forgets it). Only the browser's reference to the folder is kept (IndexedDB), never client data. If the browser wants permission again, one button "Ordner … wieder öffnen" appears. Sample months are remembered the same way. Single files cannot be remembered (the browser gives no lasting access to them). Needs Chrome or Edge.
+
+**Back button.** Each screen has its own address (`#/overview`, `#/goal/2`, `#/clients`, …), so the browser's back and forward buttons move between screens and keep the calculated results. A reload restores the remembered source and the same screen.
+
 The banner says "Sample data loaded · synthetic" only when the built-in sample data is loaded; with your own exports it says "Your own exports loaded". Both say everything runs on this computer.
 
 ### 4.4 Overview, Clients, Data quality

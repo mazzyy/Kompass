@@ -5,6 +5,7 @@ import { TABLES, TABLE_BY_ID } from '../../engine/import/signatures';
 import { msg } from '../../i18n/messages';
 import { Icon } from '../icons';
 import { tr } from '../strings';
+import { droppedFolder } from '../source';
 import type { App } from '../useApp';
 
 function Stepper({ app }: { app: App }) {
@@ -139,6 +140,8 @@ export function RunScreen({ app }: { app: App }) {
         </div>
       )}
 
+      <SourcePanel app={app} />
+
       {suggestions.map((s) => (
         <ColumnChange key={`${s.table}-${s.colKey}-${s.fileHeader}`} app={app} s={s} />
       ))}
@@ -150,10 +153,13 @@ export function RunScreen({ app }: { app: App }) {
           setOver(true);
         }}
         onDragLeave={() => setOver(false)}
-        onDrop={(e) => {
+        onDrop={async (e) => {
           e.preventDefault();
           setOver(false);
-          app.addFiles(e.dataTransfer.files);
+          const files = e.dataTransfer.files;
+          const dir = await droppedFolder(e.dataTransfer);
+          if (dir) void app.openFolder(dir);
+          else app.addFiles(files);
         }}
       >
         <span style={{ fontWeight: 600 }}>{tr(lang, 'run.drop')}</span>
@@ -164,7 +170,7 @@ export function RunScreen({ app }: { app: App }) {
           <button type="button" className="btn" onClick={() => fileRef.current?.click()}>
             {tr(lang, 'run.pickFiles')}
           </button>
-          <button type="button" className="btn" onClick={() => dirRef.current?.click()}>
+          <button type="button" className="btn" onClick={() => (app.canRememberFolder ? app.chooseFolder() : dirRef.current?.click())}>
             {tr(lang, 'run.pickFolder')}
           </button>
           <input ref={fileRef} type="file" multiple accept=".xlsx,.xls,.xlsm,.csv" className="sr" tabIndex={-1} aria-hidden="true" onChange={(e) => e.target.files && app.addFiles(e.target.files)} />
@@ -375,5 +381,42 @@ export function RunScreen({ app }: { app: App }) {
         </section>
       )}
     </>
+  );
+}
+
+function SourcePanel({ app }: { app: App }) {
+  const { lang, source } = app;
+  if (app.folderWaiting)
+    return (
+      <div className="note info" role="status" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
+        <span style={{ flex: '1 1 300px' }}>
+          <strong>{tr(lang, 'src.title')}:</strong> {tr(lang, 'src.folder', { name: app.folderWaiting })}. {tr(lang, 'src.reopen.sub')}
+        </span>
+        <button type="button" className="btn primary" onClick={app.reopenFolder}>
+          {tr(lang, 'src.reopen', { name: app.folderWaiting })}
+        </button>
+        <button type="button" className="btn" onClick={app.forgetSource}>
+          {tr(lang, 'src.forget')}
+        </button>
+      </div>
+    );
+  if (!source) return app.canRememberFolder ? null : <div className="note">{tr(lang, 'src.noDirApi')}</div>;
+  if (source.kind === 'files')
+    return (
+      <div className="note" role="status">
+        {tr(lang, 'src.files.note')}
+        {!app.canRememberFolder && ` ${tr(lang, 'src.noDirApi')}`}
+      </div>
+    );
+  const name = source.kind === 'sample' ? tr(lang, 'src.sample', { month: source.month === '2026-10' ? 'Oktober 2026' : 'November 2026' }) : tr(lang, 'src.folder', { name: source.name });
+  return (
+    <div className="note info" role="status" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
+      <span style={{ flex: '1 1 300px' }}>
+        <strong>{tr(lang, 'src.title')}:</strong> {name}. {tr(lang, 'src.locked.sub')}
+      </span>
+      <button type="button" className="btn" onClick={app.forgetSource}>
+        {tr(lang, 'src.forget')}
+      </button>
+    </div>
   );
 }
