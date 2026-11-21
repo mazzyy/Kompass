@@ -27,8 +27,13 @@ Local AI (optional, for live extraction):
 
 ```bash
 ollama pull qwen2.5:7b-instruct
+ollama pull nomic-embed-text   # local search for "Frag das Cockpit"
 ollama serve           # the app calls http://localhost:11434 only
 ```
+
+"Frag das Cockpit" (local RAG over the brief, rules.yaml, `docs/HILFE.md` and `docs/WHAT_WE_BUILT.md`): rebuild the index after changing those files with `npm run rag`.
+
+Optional cloud voice (ElevenLabs) for reading answers aloud: put `ELEVENLABS_API_KEY=...` in `.env.local` (git-ignored, never bundled; only the local dev/preview server reads it and calls ElevenLabs through `/api/tts`). Without it, the computer's own offline voice is used.
 
 Regenerate the synthetic data (deterministic): `npm run data`. Measure extraction accuracy: `npx tsx scripts/extract.ts accuracy 20`.
 

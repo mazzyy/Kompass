@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "data": "tsx scripts/generate.ts && tsx scripts/record-goals.ts && tsx scripts/shape-demo.ts && tsx scripts/reports.ts && python3 -I scripts/pdf.py sample-data/2026-11/situationsanalyse && npm run zip",
+    "rag": "tsx scripts/rag-index.ts",
     "zip": "cd sample-data && rm -f ../public/sample-data.zip && zip -qr ../public/sample-data.zip README.txt planted_effects.md 2026-10 2026-11 -x '*.txt' -x '*.json' && zip -q ../public/sample-data.zip README.txt"
   },
   "dependencies": {

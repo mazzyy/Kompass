@@ -13,8 +13,8 @@ import { tr } from './strings';
 import { useSa } from './useSa';
 import { canRememberFolder, clearHandle, loadHandle, loadSource, permission, pickFolder, readFolder, saveHandle, saveSource, type DirHandle, type Source } from './source';
 
-export type Screen = 'run' | 'overview' | 'goal' | 'calls' | 'clients' | 'client' | 'quality' | 'export' | 'situation' | 'patterns';
-const SCREENS: Screen[] = ['run', 'overview', 'goal', 'calls', 'clients', 'client', 'quality', 'export', 'situation', 'patterns'];
+export type Screen = 'run' | 'overview' | 'goal' | 'calls' | 'clients' | 'client' | 'ask' | 'quality' | 'export' | 'situation' | 'patterns';
+const SCREENS: Screen[] = ['run', 'overview', 'goal', 'calls', 'clients', 'client', 'ask', 'quality', 'export', 'situation', 'patterns'];
 
 /** Screens live in the URL hash (#/goal/2), so the browser's back and forward buttons move inside the app. */
 function parseHash(): { screen?: Screen; goal?: GoalId; client?: string } {

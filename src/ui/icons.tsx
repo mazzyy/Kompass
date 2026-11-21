@@ -44,6 +44,9 @@ export function StatusIcon({ status, size = 15, label }: { status: Status | unde
 const P = { width: 16, height: 16, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 1.5, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true };
 
 export const Icon = {
+  ask: () => (
+    <svg {...P}><path d="M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z" /><path d="M6.3 6a1.7 1.7 0 1 1 2.2 1.6c-.3.1-.5.4-.5.7v.2" /></svg>
+  ),
   target: () => (
     <svg {...P}><circle cx="8" cy="8" r="6" /><circle cx="8" cy="8" r="3" /><circle cx="8" cy="8" r="0.5" /></svg>
   ),
