@@ -125,6 +125,8 @@ export default defineConfig(({ mode }) => {
   return {
     base: './',
     plugins: [react(), csp(), tts(env.ELEVENLABS_API_KEY)],
+    // In the Docker image (Heroku) the preview server is reached via the app's public hostname.
+    preview: process.env.PREVIEW_ALLOWED_HOSTS === 'all' ? { allowedHosts: true } : undefined,
     test: {
       environment: 'node',
       include: ['tests/**/*.test.ts'],

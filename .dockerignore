@@ -1,0 +1,10 @@
+node_modules
+dist
+video
+.git
+.claude
+.env*
+*.local
+*.log
+docs/media
+.DS_Store
