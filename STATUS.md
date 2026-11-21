@@ -12,7 +12,7 @@
 | 4 Real local AI | Done. qwen2.5:7b-instruct via Ollama, structured output, evidence = the exact sentence (by number, so it can't be invented), "not stated" instead of guessing, a person confirms each field. **Names, numbers, dates, phones removed before the model; put back afterwards** (test proves no name/ID reaches the prompt). "What the model saw" is visible in the review screen |
 | 5 Goals 2 + 3 | Done. T2-01..10, T3-01..07, TD-01..04 pass |
 | 6 Hosted demo | **Kept local (your decision).** Judges test on the laptop. The static build (`npm run build`, folder `dist/`) and `public/sample-data.zip` are ready; `scripts/deploy-pages.sh` exists if you change your mind |
-| A Accuracy | Generated set: ACCURACY_PENDING. Your 3 hand-written reports: not measured yet (see "Your tasks") |
+| A Accuracy | Generated set: **97 % of fields correct (396 of 410; 20 synthetic reports, 41 people, qwen2.5:7b-instruct, names removed)**; every evidence sentence found verbatim. Weakest fields: work experience 90 %, career wish 90 %, driving licence 93 %. Your 3 hand-written reports: not measured yet (see "Your tasks") |
 | B Explained call list | Rule reason + confirmed (or clearly labelled proposed) Situationsanalyse barrier **with its evidence sentence**, source rows, talking points |
 | C Claimable now | Overview figure (18: goal 1: 11, goal 2: 5, goal 3: 2 households), list in Data quality, sheet `Abrechenbar` |
 | D Trust | Groups under 10 hidden (also when derivable), equity rows (gender, literacy) always shown, actionable factors first, nationality last and never the headline. Wording exactly as you gave it |
