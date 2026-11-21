@@ -928,5 +928,151 @@
     ]
    }
   ]
+ },
+ "SA_D12_9007.txt": {
+  "file": "SA_D12_9007.txt",
+  "model": "qwen2.5:7b-instruct",
+  "at": "2026-11-21T00:46:41.570Z",
+  "persons": [
+   {
+    "zemis": "59358685",
+    "name": "Ubah Abdi",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisierung Zielsprache: ja."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Schweizerdeutsch versteht sie noch nicht."
+     },
+     "learning_pace": {
+      "value": "medium",
+      "status": "stated",
+      "evidence": "Lerntempo mittel."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit."
+     },
+     "availability_for_work_or_education": {
+      "value": "partial",
+      "status": "stated",
+      "evidence": "Sie ist nur teilzeitlich verfügbar."
+     },
+     "work_experience_years_origin": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Diplome: nein."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Führerschein: nein."
+     },
+     "career_wish": {
+      "value": "Coiffeur",
+      "status": "stated",
+      "evidence": "Berufliche Perspektive (Sicht Klient/in): Coiffeur."
+     }
+    },
+    "ms": 39762,
+    "modelInput": [
+     "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit.",
+     "Muttersprache Somali.",
+     "Alphabetisierung Zielsprache: ja.",
+     "Deutsch mündlich A0.",
+     "Schweizerdeutsch versteht sie noch nicht.",
+     "Lerntempo mittel.",
+     "Diplome: nein.",
+     "Führerschein: nein.",
+     "Sie ist nur teilzeitlich verfügbar.",
+     "Berufliche Perspektive (Sicht Klient/in): Coiffeur."
+    ]
+   },
+   {
+    "zemis": "33725691",
+    "name": "Ahmed Abdi",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisierung Zielsprache: ja."
+     },
+     "understands_swiss_german": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Versteht Schweizerdeutsch im Alltag recht gut."
+     },
+     "learning_pace": {
+      "value": "slow",
+      "status": "stated",
+      "evidence": "Er lernt langsam."
+     },
+     "health_limits_work": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "availability_for_work_or_education": {
+      "value": "full",
+      "status": "stated",
+      "evidence": "Verfügbar für Arbeit oder Ausbildung: vollzeit."
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Keine Berufserfahrung im Herkunftsland."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Diplome: nein."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Führerschein: nein."
+     },
+     "career_wish": {
+      "value": "im Bereich Gastronomie arbeiten",
+      "status": "stated",
+      "evidence": "Möchte im Bereich Gastronomie arbeiten."
+     }
+    },
+    "ms": 46254,
+    "modelInput": [
+     "Muttersprache Somali.",
+     "Alphabetisierung Zielsprache: ja.",
+     "Deutsch mündlich A0.",
+     "Versteht Schweizerdeutsch im Alltag recht gut.",
+     "Er lernt langsam.",
+     "Keine Berufserfahrung im Herkunftsland.",
+     "Diplome: nein.",
+     "Führerschein: nein.",
+     "Verfügbar für Arbeit oder Ausbildung: vollzeit.",
+     "Möchte im Bereich Gastronomie arbeiten.",
+     "Braucht Unterstützung bei der Stellensuche."
+    ]
+   }
+  ]
  }
 }
