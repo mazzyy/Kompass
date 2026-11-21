@@ -1,7 +1,7 @@
 # Integrations-Cockpit: what we built and how it works
 
 AI for Access hackathon, Bern, 20–21 Nov 2026. Challenge owner: Asylsozialdienst (ASD) Stadt Bern.
-State: Sat 21.11.2026, 10:20. **All data is synthetic. No real people.**
+State: Sat 21.11.2026, 10:45. **All data is synthetic. No real people.**
 
 ---
 
@@ -35,7 +35,7 @@ Nothing leaves the computer.
 | Local AI | Ollama on `localhost:11434`, model `qwen2.5:7b-instruct` | `src/ai/extract.ts` |
 | PDF reading | pdf.js, bundled locally | `src/ai/pdf.ts` |
 | Synthetic data | Node + Python scripts, seeded (same input → same files) | `scripts/`, `sample-data/` |
-| Tests | Vitest, 87 tests | `tests/` |
+| Tests | Vitest, 90 tests | `tests/` |
 
 Single source of truth: one run produces one `RunResult`; every screen and every Excel sheet is drawn from it, so screen and Excel can never disagree. No number is hard-coded.
 
@@ -49,7 +49,8 @@ Single source of truth: one run produces one `RunResult`; every screen and every
 - **Renamed column** (November's Sprachstand has `Niveau (A0–C2)` instead of `Sprachniveau`): the app suggests the match from the header name and the values (they look like A0–C2), **blocks the run until a person confirms**, then remembers it in this browser. Next month: same clicks, no question.
 - Unknown dropdown values (e.g. a status not in the template) → data-quality alert, run continues.
 - Stichtag = export date (overridable); red window = 6 months (3/6/9/12 selectable).
-- The 5 tables without templates (Klient, Sprachstand, Integrationsförderung, Unterbringung, Integrationszielerreichung) use headers from the data model, all in **one file**: `src/engine/import/signatures.ts`.
+- **10 of 11 tables match ASD's templates byte for byte, in column order, with their dropdown values** (a test checks this against the template files in `templates/`). Only Integrationszielerreichung still uses headers from the data model (template not received). All headers live in **one file**: `src/engine/import/signatures.ts`.
+- The Klient export has **no name columns**. The app shows a client's name only from their own Situationsanalyse report when it has been read on this computer; otherwise the client number (K-10482). Names are never sent to the model.
 
 ### 4.2 Rules engine
 
@@ -68,7 +69,7 @@ Single source of truth: one run produces one `RunResult`; every screen and every
 
 ### 4.4 Overview, Clients, Data quality
 
-- Overview: key figures, target vs actual for all three goals, **Jetzt abrechenbar** (18: goal 1: 11, goal 2: 5, goal 3: 2 households), goal 1 by social worker and entry year, forecast (management), what-if 2027 (management).
+- Overview: key figures, target vs actual for all three goals, **Jetzt abrechenbar** (18: goal 1: 11, goal 2: 4, goal 3: 3 households), goal 1 by social worker and entry year, forecast (management), what-if 2027 (management).
 - Clients: search, filters, "only people in goal scope", per-person detail with goals, trace, source rows and confirmed Situationsanalyse fields.
 - Data quality: grouped alerts with severity, affected goal, count and the rows behind them (ZEMIS job missing in Erwerb, status mismatch, missing entry date, Bis before Von, …).
 
@@ -115,6 +116,7 @@ Speed: about 15 s per person on this laptop. Results for 85 reports are cached a
 ## 6. Synthetic data
 
 - Two months (Stichtag 20.10.2026 and 20.11.2026), 11 tables each, ~650 clients, ~260 households, 4 social workers. Headers of the 6 templates copied byte for byte.
+- Exact template format: headers, column order and dropdown values of the 10 received templates; no names in Klient.
 - 6 planted personas with exact facts (Yonas, Reza, Fatima, Amina, Mohammad, Sara).
 - Planted effects for Patterns and planted mistakes for Data quality, listed in `sample-data/planted_effects.md`.
 - 3 S. Keller households whose deadlines came earlier than Amina's were moved to other social workers, so the demo story's top three are the personas. Documented in `planted_effects.md`; the engine still computes every status.
@@ -122,13 +124,13 @@ Speed: about 15 s per person on this laptop. Results for 85 reports are cached a
 
 ## 7. Rule decisions
 
-`rules.yaml` v1.4. In the Rules panel every value carries its status:
+`rules.yaml` v1.5 (A1 proof and language courses use the template values: `Zertifizierung`, `Muttersprache`, `Beendigung obligatorische Schulzeit`, `Beendigung Ausbildung` count, `Weiteres` does not; language courses = `Förderangebot Sprache`). In the Rules panel every value carries its status:
 - **Organisers' answer, awaiting ASD confirmation**: age on the Stichtag (Q2), accepted A1 proof (Q3), only contract jobs count (Q4), Sek II / Tertiär on completion (Q5).
 - **Brief**: goal 2 = contract job ≥ 60 % for 6 months without a break.
 - **Assumption**: which statuses count (Q1), two contract jobs add up (Q4), Nothilfe counts as support and the household deadline is the head's (Q6), 2027 interpretation (Q7), lump sums unknown (Q8), `+5/+7` = past responsibility (Q9), and the smaller ones (Q10–Q14).
-Changing the organisers' answers did not change the call list, the claimable count (18) or the goal 2 totals on the November data; it added 9 info alerts "proven but not reproducible" (goal 2 recorded at apprenticeship start).
+After regenerating the synthetic data in the template format (apprenticeships recorded on completion), November shows: goal 2 counted 322, reached 90, on track 214, at risk 6, overdue 12; claimable 18. S. Keller's call list is unchanged (Reza → Fatima → Amina).
 
-## 8. Tests (87, all passing: `npm test`)
+## 8. Tests (90, all passing: `npm test`)
 
 | Area | Tests |
 |---|---|
@@ -144,6 +146,7 @@ Changing the organisers' answers did not change the call list, the claimable cou
 | What-if / forecast | TW-01..05 + quarterly forecast |
 | AI guardrails | report splitting, PDF line wrapping, evidence by sentence number, "not stated", **no names/IDs/dates reach the prompt** |
 | i18n | every message exists in German and English |
+| Templates | 10 templates recognised, headers byte for byte and in order, only Integrationszielerreichung provisional |
 
 ## 9. Not built (agreed)
 

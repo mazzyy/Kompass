@@ -1,6 +1,6 @@
 # Status for 06:00 (Sat 21.11.2026)
 
-**Goal 1 is complete and fully tested.** 83 automated tests pass (`npm test`). No risk to the 11:00 checkpoint.
+**Goal 1 is complete and fully tested.** 90 automated tests pass (`npm test`). No risk to the 11:00 checkpoint.
 
 ## What works (all checked in the browser, numbers from the engine, nothing hard-coded)
 
@@ -14,7 +14,7 @@
 | 6 Hosted demo | **Kept local (your decision).** Judges test on the laptop. The static build (`npm run build`, folder `dist/`) and `public/sample-data.zip` are ready; `scripts/deploy-pages.sh` exists if you change your mind |
 | A Accuracy | Generated set: **97 % of fields correct (396 of 410; 20 synthetic reports, 41 people, qwen2.5:7b-instruct, names removed)**; every evidence sentence found verbatim. Weakest fields: work experience 90 %, career wish 90 %, driving licence 93 %. Your 3 hand-written reports: not measured yet (see "Your tasks") |
 | B Explained call list | Rule reason + confirmed (or clearly labelled proposed) Situationsanalyse barrier **with its evidence sentence**, source rows, talking points |
-| C Claimable now | Overview figure (18: goal 1: 11, goal 2: 5, goal 3: 2 households), list in Data quality, sheet `Abrechenbar` |
+| C Claimable now | Overview figure (18: goal 1: 11, goal 2: 4, goal 3: 3 households), list in Data quality, sheet `Abrechenbar` |
 | D Trust | Groups under 10 hidden (also when derivable), equity rows (gender, literacy) always shown, actionable factors first, nationality last and never the headline. Wording exactly as you gave it |
 | E Same clicks | Month 2's renamed `Niveau (A0–C2)` → run blocked → confirm once → remembered next time |
 | Extras | What-if 2027 (TW-01..05, your tooltip text), forecast. "Show only in-scope" toggle on Clients |
@@ -37,11 +37,11 @@ Before the demo: *Lokale Daten löschen* on the Monatslauf screen so the column 
 ## Your tasks this morning
 
 1. **06:30 — 3 hand-written reports** (~45 min): instructions and facts in `docs/HUMAN_REPORTS.md`. Save over the 3 files named there, set the facts you left out to `"not_stated"` in `sample-data/labels/human_truth.json`, then run `npx tsx scripts/extract.ts human` (or tell me and I run it). That gives the second accuracy number.
-2. **Templates**: drop the 5 missing ones into `../integration-cockpit-handover/02_data/templates/`. I swap the headers in `src/engine/import/signatures.ts` (one file) and re-run the tests.
+2. **Templates**: 10 of 11 received and built in (10:45). Still missing: Integrationszielerreichung (needed to confirm the exact `Art (Ziel)` values).
 3. ~10:00 challenge owner test; ask about the open rule questions (Rules panel lists every assumption).
 
 ## Risks
 
 - Live AI takes about 15 s per person on this laptop. For the demo use a short report (1 person) live; the rest are cached and labelled "cached result of the local model".
 - No hosted link: judges who want to try it themselves need the laptop (or a USB copy of `dist/` + `sample-data.zip`, which runs from any static web server).
-- 5 table definitions are still provisional until the templates arrive.
+- Integrationszielerreichung is still provisional (template missing). Klient has no names: clients show by number unless their Situationsanalyse has been read.

@@ -631,8 +631,12 @@ function cut<T extends { von?: Day; bis?: Day }>(rows: T[], st: Day): T[] {
   return rows.filter((r) => r.von === undefined || r.von <= st).map((r) => (r.bis !== undefined && r.bis > st ? { ...r, bis: undefined } : r));
 }
 
-async function writeTable(dir: string, table: TableId, rows: Cell[][], st: Day, headerOverride?: Record<string, string>) {
-  const spec = TABLE_BY_ID[table];
+/** Rows given as positional arrays in `keys` order; written in the TEMPLATE's column order (extra columns skipped). */
+async function writeTable(dir: string, table: TableId, keys: string[], rows: Cell[][], st: Day, headerOverride?: Record<string, string>) {
+  const spec0 = TABLE_BY_ID[table];
+  const spec = { ...spec0, columns: spec0.columns.filter((c) => !c.extra) };
+  const idx = spec.columns.map((c) => keys.indexOf(c.key));
+  rows = rows.map((r) => idx.map((i) => (i < 0 ? null : (r[i] ?? null))));
   const wb = new ExcelJS.Workbook();
   wb.creator = 'ASD Fallführungssystem (SYNTHETISCH)';
   wb.created = new Date(Date.UTC(1970, 0, 1 + st, 6, 0, 0));
@@ -657,44 +661,67 @@ async function exportMonth(st: Day, label: string) {
   const persons = hhs.flatMap((h) => h.members.filter((m) => m.zBeginn <= st && (m.zEnde === undefined || m.zEnde >= addMonths(st, -3))).map((m) => ({ h, m })));
   const finOn = (h: HH) => cut(h.fin, st).find((f) => f.von <= st && (f.bis === undefined || f.bis >= st));
   // Klient (text dates, provisional headers)
-  await writeTable(dir, 'klient', persons.map(({ h, m }) => {
-    const statusNow = m.hist.filter((x) => x.von <= st).slice(-1)[0]?.status ?? m.status;
-    return [
-      m.knr, m.zemis, m.dossier, m.name, m.vorname, asText(m.zBeginn), asText(m.zEnde), asText(m.uebergang),
-      m.klientStatusOverride ?? statusNow, finOn(h)?.art ?? null, h.sw, asText(m.birth), m.sex === 'w' ? 'weiblich' : 'männlich', m.origin.land,
-      m.zivil, m.mutter, m.role === 'child' && ageAtDay(m.birth, st) < 16 ? 'keine' : m.ausbildung, m.role === 'child' ? null : m.school,
-      m.role === 'child' && ageAtDay(m.birth, st) < 16 ? null : m.latin ? 'ja' : m.school < 3 ? 'nein – primärer Analphabetismus' : 'nein – andere Schrift', m.role === 'child' ? null : m.workYears,
-    ];
-  }), st);
+  const AUSB: Record<string, string> = {
+    keine: '0 Keine in der Schweiz anerkannte Ausbildung',
+    'obligatorische Schule': '130 Obligatorische Schule',
+    Berufslehre: '22 Sekundarstufe II: Berufsbildung',
+    Mittelschule: '24 Sekundarstufe II: Allgemeinbildung',
+    'Universität / Hochschule': '32 Hochschule',
+  };
+  const cap = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
+  await writeTable(
+    dir,
+    'klient',
+    ['dossierNr', 'unterstuetzung', 'zemis', 'klientNr', 'zBeginn', 'zEnde', 'uebergang', 'status', 'geschlecht', 'nationalitaet', 'muttersprache', 'zivilstand', 'arbeitserfahrung', 'ausbildung', 'lateinisch', 'analphabetismus', 'schuljahre', 'fallfuehrung', 'geburtsdatum'],
+    persons.map(({ h, m }) => {
+      const statusNow = m.hist.filter((x) => x.von <= st).slice(-1)[0]?.status ?? m.status;
+      const kid = m.role === 'child' && ageAtDay(m.birth, st) < 16;
+      return [
+        m.dossier, finOn(h)?.art ?? null, m.zemis, m.knr, asText(m.zBeginn), asText(m.zEnde), asText(m.uebergang),
+        m.klientStatusOverride ?? statusNow, m.sex === 'w' ? 'Weiblich' : 'Männlich', m.origin.land, m.mutter, cap(m.zivil),
+        m.role === 'child' ? null : m.workYears, kid ? null : AUSB[m.ausbildung] ?? null,
+        kid ? null : m.latin ? 'Ja' : 'Nein', kid || m.latin ? null : m.school < 3 ? 'Primäranalphabet/-in' : 'Zweitschriftlernende/-r',
+        m.role === 'child' ? null : m.school, h.sw, asText(m.birth),
+      ];
+    }),
+    st,
+  );
   // Asylverfahrensstand (text dates)
-  await writeTable(dir, 'asylverfahrensstand', persons.flatMap(({ m }) => cut(m.hist, st).map((x) => [m.zemis, m.knr, m.dossier, asText(x.von), asText(x.bis), x.status])), st);
+  await writeTable(dir, 'asylverfahrensstand', ['zemis', 'klientNr', 'dossierNr', 'von', 'bis', 'status'], persons.flatMap(({ m }) => cut(m.hist, st).map((x) => [m.zemis, m.knr, m.dossier, asText(x.von), asText(x.bis), x.status])), st);
   // Asylgeschäftsdaten (real dates)
-  await writeTable(dir, 'asylgeschaeftsdaten', persons.flatMap(({ m }) => m.events.filter((e) => e.datum <= st && !(m.hideEntry && e.art === 'Aufenthalt (Einreise)')).map((e) => [Number(m.zemis), Number(m.knr), e.art, asDate(e.datum), e.erledigung ?? null, e.code ?? null, asDate(e.edatum)])), st);
+  await writeTable(dir, 'asylgeschaeftsdaten', ['zemis', 'klientNr', 'art', 'datum', 'erledigung', 'erledigungscode', 'erledigungsdatum'], persons.flatMap(({ m }) => m.events.filter((e) => e.datum <= st && !(m.hideEntry && e.art === 'Aufenthalt (Einreise)')).map((e) => [Number(m.zemis), Number(m.knr), e.art, asDate(e.datum), e.erledigung && e.erledigung !== '(Leer)' ? e.erledigung : null, e.code ?? null, asDate(e.edatum)])), st);
   // Dossierperson
-  await writeTable(dir, 'dossierperson', persons.map(({ m }) => [m.dossier, Number(m.knr), Number(m.zemis), asDate(m.zBeginn), null, 'Dossiermitglied', m.role === 'head' ? 'Dossierträger/-in' : m.role === 'spouse' ? 'Ehefrau / -mann' : m.role === 'child' ? 'Tochter / Sohn' : ['Geschwister', 'Cousin / Cousine', 'Onkel / Tante'][Math.floor(hr(m.knr) * 3)]]), st);
+  await writeTable(dir, 'dossierperson', ['dossierNr', 'klientNr', 'zemis', 'von', 'bis', 'rolle', 'beziehung'], persons.map(({ m }) => [m.dossier, Number(m.knr), Number(m.zemis), asDate(m.zBeginn), null, 'Dossiermitglied', m.role === 'head' ? 'Dossierträger/-in' : m.role === 'spouse' ? 'Ehefrau / -mann' : m.role === 'child' ? 'Tochter / Sohn' : ['Geschwister', 'Cousin / Cousine', 'Onkel / Tante'][Math.floor(hr(m.knr) * 3)]]), st);
   // Finanzielle Unterstützung (text dates, as in template '@' format)
-  await writeTable(dir, 'finanz', hhs.flatMap((h) => cut(h.fin, st).map((f) => [h.dossier, f.art, asText(f.von), asText(f.bis), f.bis !== undefined ? (f.grund ?? null) : null])), st);
+  await writeTable(dir, 'finanz', ['dossierNr', 'art', 'von', 'bis', 'grund'], hhs.flatMap((h) => cut(h.fin, st).map((f) => [h.dossier, f.art, asText(f.von), asText(f.bis), f.bis !== undefined ? (f.grund ?? null) : null])), st);
   // Unterbringung
-  await writeTable(dir, 'unterbringung', persons.flatMap(({ m }) => cut(m.housing, st).map((x) => [Number(m.knr), asDate(x.von), asDate(x.bis), x.art, x.ort])), st);
+  const UNT: Record<string, string> = { Kollektivunterkunft: 'Kollektivunterkunft', 'Wohnung (eigene)': 'Indiv. Wohnung', 'WG / Untermiete': 'Indiv. Wohnung', 'Wohnung (vermittelt)': 'Partner-Wohnung' };
+  await writeTable(dir, 'unterbringung', ['klientNr', 'von', 'bis', 'art', 'plz', 'ort'], persons.flatMap(({ m }) => cut(m.housing, st).map((x) => [Number(m.knr), asDate(x.von), asDate(x.bis), UNT[x.art] ?? x.art, Number(x.ort.split(' ')[0]), x.ort.split(' ').slice(1).join(' ')])), st);
   // Sprachstand (real dates; ZEMIS as text with apostrophe in some rows); header renamed in November (TI-03 demo)
-  await writeTable(dir, 'sprachstand', persons.flatMap(({ m }) => m.lang.filter((l) => l.datum <= st).map((l, i) => [i % 3 === 0 ? `'${m.zemis}` : m.zemis, Number(m.knr), l.sprache, l.niveau, l.art, asDate(l.datum), l.bem ?? null])), st, st === M2 ? { Sprachniveau: 'Niveau (A0–C2)' } : undefined);
+  const SPR: Record<string, [string, string | undefined]> = { Zertifikat: ['Zertifizierung', undefined], 'Schulbildung CH': ['Beendigung obligatorische Schulzeit', undefined], Kursbestätigung: ['Weiteres', 'Kursbestätigung'], Einstufung: ['Weiteres', 'Einstufungstest'] };
+  await writeTable(dir, 'sprachstand', ['zemis', 'klientNr', 'sprache', 'niveau', 'art', 'datum', 'bemerkungen'], persons.flatMap(({ m }) => m.lang.filter((l) => l.datum <= st).map((l, i) => { const [art, pre] = SPR[l.art] ?? [l.art, undefined]; return [i % 3 === 0 ? `'${m.zemis}` : m.zemis, Number(m.knr), l.sprache, l.niveau, art, asDate(l.datum), [pre, l.bem].filter(Boolean).join(', ') || null]; })), st, st === M2 ? { Sprachniveau: 'Niveau (A0–C2)' } : undefined);
   // Integrationsförderung und Ausbildung
-  await writeTable(dir, 'foerderung', persons.flatMap(({ m }) => m.courses.filter((c) => c.start <= st).map((c) => [m.zemis, Number(m.knr), asDate(c.start), asDate(c.end), c.art, c.bez, c.hours, c.inst, c.bem ?? null])), st);
+  const FOE = (c: Course) => (c.art === 'Deutschkurs' && /Asylsuchende/.test(c.bez) ? 'Sprachkurs im erweiterten Verfahren (N)' : c.art === 'Deutschkurs' || c.art === 'Alphabetisierung' ? 'Förderangebot Sprache' : c.art === 'Berufliches Integrationsprogramm' ? 'Förderangebot Arbeitsmarktfähigkeit oder Ausbildungsfähigkeit' : c.art);
+  await writeTable(dir, 'foerderung', ['zemis', 'klientNr', 'start', 'abschluss', 'art', 'bezeichnung', 'stunden', 'institution', 'bemerkungen'], persons.flatMap(({ m }) => m.courses.filter((c) => c.start <= st).map((c) => [m.zemis, Number(m.knr), asDate(c.start), asDate(c.end), FOE(c), c.bez, c.hours, c.inst, c.bem ?? null])), st);
   // Erwerb
-  await writeTable(dir, 'erwerb', persons.flatMap(({ m }) => cut(m.jobs.filter((j) => !j.zemisOnly), st).map((j) => {
+  await writeTable(dir, 'erwerb', ['zemis', 'klientNr', 'von', 'bis', 'arbeitgeber', 'ort', 'pensum', 'erwerbsstatus', 'einkommen', 'stundenlohn', 'unregelmaessig', 'abtretung', 'bemerkungen'], persons.flatMap(({ m }) => cut(m.jobs.filter((j) => !j.zemisOnly), st).map((j) => {
     const k = `${m.knr}|${j.von}`;
     const income = Math.round(j.pensum * 44 + (hr(k + 'i') - 0.5) * 600);
     return [Number(m.zemis), Number(m.knr), asDate(j.von), asDate(j.bis), j.ag, j.ort, j.pensum, j.status, income, hr(k + 's') < 0.3 ? Math.round((income / (j.pensum * 1.8)) * 100) / 100 : null, hr(k + 'u') < 0.1 ? 'True' : 'False', hr(k + 'a') < 0.2 ? 'True' : 'False', j.bem ?? null];
   })), st);
   // ZEMIS Tätigkeit (first labour market only; name variants; planted rows without Erwerb)
-  await writeTable(dir, 'zemis', persons.flatMap(({ m }) => cut(m.jobs.filter((j) => !j.noZemis && j.bem !== 'Nebenjob'), st).map((j) => [Number(m.zemis), Number(m.knr), asDate(addDays(j.von, j.zemisOnly ? 0 : Math.floor(hr(m.knr + j.von) * 6))), asDate(j.bis), j.zemisName ?? j.ag])), st);
+  await writeTable(dir, 'zemis', ['zemis', 'klientNr', 'von', 'bis', 'betrieb'], persons.flatMap(({ m }) => cut(m.jobs.filter((j) => !j.noZemis && j.bem !== 'Nebenjob'), st).map((j) => [Number(m.zemis), Number(m.knr), asDate(addDays(j.von, j.zemisOnly ? 0 : Math.floor(hr(m.knr + j.von) * 6))), asDate(j.bis), j.zemisName ?? j.ag])), st);
   // Integrationszielerreichung
-  await writeTable(dir, 'zielerreichung', persons.flatMap(({ m }) => m.proven.filter((x) => x.datum <= st).map((x) => [m.zemis, x.art, asDate(x.datum), 'ASD Stadt Bern', x.kohorte, 'False'])), st);
+  await writeTable(dir, 'zielerreichung', ['zemis', 'art', 'datum', 'partner', 'kohorte', 'statusS'], persons.flatMap(({ m }) => m.proven.filter((x) => x.datum <= st).map((x) => [m.zemis, x.art, asDate(x.datum), 'ASD Stadt Bern', x.kohorte, 'False'])), st);
   return { persons: persons.length, households: hhs.length };
 }
 
 async function main() {
-  fs.rmSync(OUT, { recursive: true, force: true });
+  // Remove only generated exports; keep the AI cache, accuracy results and hand-written labels.
+  for (const m of ['2026-10', '2026-11']) {
+    const dir = path.join(OUT, m);
+    if (fs.existsSync(dir)) for (const f of fs.readdirSync(dir)) if (f.endsWith('.xlsx')) fs.rmSync(path.join(dir, f));
+  }
   const a = await exportMonth(M1, '2026-10');
   const b = await exportMonth(M2, '2026-11');
   fs.mkdirSync(path.join(OUT, 'labels'), { recursive: true });
@@ -717,10 +744,9 @@ NOT REAL PEOPLE. All names, numbers and stories are invented.
 2026-11/  exports as of Stichtag 20.11.2026 (${b.persons} clients, ${b.households} households)
           In November the Sprachstand column "Sprachniveau" is exported as "Niveau (A0–C2)" (tests the column-mapping step).
 
-Headers of Asylgeschäftsdaten, Asylverfahrensstand, Dossierperson, Erwerb, Finanzielle Unterstützung and
-ZEMIS Tätigkeit are copied from ASD's templates. Klient, Sprachstand, Integrationsförderung und Ausbildung,
-Unterbringung and Integrationszielerreichung follow the data model (templates not yet received).
-Klient includes Name/Vorname columns (assumption: the real export has them).
+Headers, column order and dropdown values of 10 tables are copied from ASD's templates.
+Integrationszielerreichung follows the data model (template not yet received).
+Klient has no name columns (as in ASD's template); names appear only in the Situationsanalyse reports.
 Generated by scripts/generate.ts (seeded, deterministic).
 `);
   fs.writeFileSync(path.join(OUT, 'planted_effects.md'), `# Planted effects (synthetic data)

@@ -7,7 +7,7 @@ import { addPerson, Fx, lang } from './fixtures';
 function sample() {
   const fx = new Fx();
   const a = addPerson(fx, { entry: '01.01.2024', sw: 'S. Keller', vorname: 'Amina', name: 'Tesfay' });
-  lang(fx, a, 'A1', 'Zertifikat fide', '01.06.2025');
+  lang(fx, a, 'A1', 'Zertifizierung', '01.06.2025');
   addPerson(fx, { entry: '12.03.2024', sw: 'S. Keller' });
   addPerson(fx, { entry: '01.01.2022', sw: 'M. Rossi' });
   addPerson(fx, { status: 'S', sw: 'M. Rossi' });

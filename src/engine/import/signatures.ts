@@ -1,7 +1,7 @@
 // ALL export header strings live in this one file.
-// 6 tables are copied byte-for-byte from ASD's templates (provisional: false).
-// 5 tables come from the data-model diagram because the templates are missing (provisional: true):
-// swap in the exact headers here when ASD sends them.
+// 10 tables are copied byte-for-byte (and in column order) from ASD's templates (provisional: false).
+// Integrationszielerreichung comes from the data-model diagram because its template is still missing
+// (provisional: true): swap in the exact headers here when it arrives.
 
 export type TableId =
   | 'klient'
@@ -24,7 +24,8 @@ export interface ColSpec {
   alts?: string[]; // other spellings seen / expected
   type: ColType;
   required?: boolean; // needed by the rules engine
-  values?: string; // name of the dropdown list in TEMPLATE_VALUES (unknown_value check)
+  values?: string; // key "<table>.<header>" of the dropdown list in TEMPLATE_VALUES (unknown_value check)
+  extra?: boolean; // not in ASD's template: recognised if present, never required, not written to sample data
   profile?: 'level' | 'date' | 'percent' | 'zemis' | 'klientnr' | 'dossier'; // value profile for mapping suggestions
 }
 
@@ -54,28 +55,29 @@ export const TABLES: TableSpec[] = [
     name: 'Klient',
     nameEn: 'Client',
     file: 'Hackathon_Klient_Resultat.xlsx',
-    provisional: true,
+    provisional: false,
     columns: [
-      { ...knrCol, required: true },
-      zemisCol('Zemis Nummer'),
       { ...dossierCol, required: true },
-      { key: 'name', header: 'Name', alts: ['Nachname'], type: 'string' },
-      { key: 'vorname', header: 'Vorname', type: 'string' },
+      { key: 'unterstuetzung', header: 'Unterstützung', alts: ['Unterstützung (aktuell)'], type: 'string', values: 'klient.Unterstützung' },
+      zemisCol('Zemis Nummer'),
+      { ...knrCol, required: true },
       { key: 'zBeginn', header: 'Zuständigkeitsbeginn', type: 'date', profile: 'date' },
       { key: 'zEnde', header: 'Zuständigkeitsende', type: 'date', required: true, profile: 'date' },
       { key: 'uebergang', header: 'Datum Übergang Gemeindezuständigkeit', type: 'date', profile: 'date' },
-      { key: 'status', header: 'Verfahrensstand (aktuell)', alts: ['Verfahrensstand aktuell', 'Verfahrensstand'], type: 'string', required: true, values: 'Verfahrensstand' },
-      { key: 'unterstuetzung', header: 'Unterstützung (aktuell)', alts: ['Unterstützung aktuell'], type: 'string', values: 'Unterstützung' },
-      { key: 'fallfuehrung', header: 'Fallführung (Sozialarbeiter:in)', alts: ['Fallführung', 'Fallführung (Sozialarbeiter/-in)', 'Sozialarbeiter:in'], type: 'string', required: true },
-      { key: 'geburtsdatum', header: 'Geburtsdatum', alts: ['Geburtsdatum (für «ab 16 J.»)', 'Geburtsdatum (für "ab 16 J.")'], type: 'date', required: true, profile: 'date' },
-      { key: 'geschlecht', header: 'Geschlecht', type: 'string' },
+      { key: 'status', header: 'Verfahrensstand', alts: ['Verfahrensstand (aktuell)', 'Verfahrensstand aktuell'], type: 'string', required: true, values: 'asylverfahrensstand.Verfahrensstand' },
+      { key: 'geschlecht', header: 'Geschlecht', type: 'string', values: 'klient.Geschlecht' },
       { key: 'nationalitaet', header: 'Nationalität Land', alts: ['Nationalität'], type: 'string' },
-      { key: 'zivilstand', header: 'Zivilstand', type: 'string' },
       { key: 'muttersprache', header: 'Muttersprache', type: 'string' },
-      { key: 'ausbildung', header: 'Höchste abgeschlossene Ausbildung', type: 'string' },
-      { key: 'schuljahre', header: 'Schuljahre vor Einreise', type: 'number' },
-      { key: 'lateinisch', header: 'Lateinisch alphabetisiert / Art Analphabetismus', alts: ['Lateinisch alphabetisiert'], type: 'string' },
+      { key: 'zivilstand', header: 'Zivilstand', type: 'string', values: 'klient.Zivilstand' },
       { key: 'arbeitserfahrung', header: 'Jahre Arbeitserfahrung vor Einreise', type: 'number' },
+      { key: 'ausbildung', header: 'Höchste abgeschlossene Ausbildung', type: 'string', values: 'klient.Höchste abgeschlossene Ausbildung' },
+      { key: 'lateinisch', header: 'Lateinisch alphabetisiert', alts: ['Lateinisch alphabetisiert / Art Analphabetismus'], type: 'string', values: 'klient.Lateinisch alphabetisiert' },
+      { key: 'analphabetismus', header: 'Art Analphabetismus', type: 'string', values: 'klient.Art Analphabetismus' },
+      { key: 'schuljahre', header: 'Schuljahre vor Einreise', type: 'number' },
+      { key: 'fallfuehrung', header: 'Fallführung', alts: ['Fallführung (Sozialarbeiter:in)', 'Fallführung (Sozialarbeiter/-in)', 'Sozialarbeiter:in'], type: 'string', required: true },
+      { key: 'geburtsdatum', header: 'Geburtsdatum', alts: ['Geburtsdatum (für «ab 16 J.»)', 'Geburtsdatum (für "ab 16 J.")'], type: 'date', required: true, profile: 'date' },
+      { key: 'name', header: 'Name', alts: ['Nachname'], type: 'string', extra: true },
+      { key: 'vorname', header: 'Vorname', type: 'string', extra: true },
     ],
   },
   {
@@ -90,7 +92,7 @@ export const TABLES: TableSpec[] = [
       dossierCol,
       { key: 'von', header: 'Verfahrensstand Gültig ab', type: 'date', required: true, profile: 'date' },
       { key: 'bis', header: 'Verfahrensstand Gültig bis', type: 'date', profile: 'date' },
-      { key: 'status', header: 'Verfahrensstand', type: 'string', required: true, values: 'Verfahrensstand' },
+      { key: 'status', header: 'Verfahrensstand', type: 'string', required: true, values: 'asylverfahrensstand.Verfahrensstand' },
     ],
   },
   {
@@ -102,9 +104,9 @@ export const TABLES: TableSpec[] = [
     columns: [
       zemisCol('Klient/-in Zemis-Nr.'),
       knrCol,
-      { key: 'art', header: 'Asylgeschäftsart', type: 'string', required: true, values: 'Asylgeschäftsart' },
+      { key: 'art', header: 'Asylgeschäftsart', type: 'string', required: true, values: 'asylgeschaeftsdaten.Asylgeschäftsart' },
       { key: 'datum', header: 'Ereignisdatum', type: 'date', required: true, profile: 'date' },
-      { key: 'erledigung', header: 'Erledigung', type: 'string', values: 'Erledigung' },
+      { key: 'erledigung', header: 'Erledigung', type: 'string', values: 'asylgeschaeftsdaten.Erledigung' },
       { key: 'erledigungscode', header: 'Erledigungscode', type: 'string' },
       { key: 'erledigungsdatum', header: 'Erledigungsdatum', type: 'date', profile: 'date' },
     ],
@@ -121,8 +123,8 @@ export const TABLES: TableSpec[] = [
       zemisCol('Zemis Nummer'),
       { key: 'von', header: 'Dossierperson Von', type: 'date', profile: 'date' },
       { key: 'bis', header: 'Dossierperson Bis', type: 'date', profile: 'date' },
-      { key: 'rolle', header: 'Rolle', type: 'string', values: 'Rolle' },
-      { key: 'beziehung', header: 'Beziehung', type: 'string', values: 'Beziehung' },
+      { key: 'rolle', header: 'Rolle', type: 'string', values: 'dossierperson.Rolle' },
+      { key: 'beziehung', header: 'Beziehung', type: 'string', values: 'dossierperson.Beziehung' },
     ],
   },
   {
@@ -133,10 +135,10 @@ export const TABLES: TableSpec[] = [
     provisional: false,
     columns: [
       { ...dossierCol, required: true },
-      { key: 'art', header: 'Unterstützung', type: 'string', required: true, values: 'Unterstützung' },
+      { key: 'art', header: 'Unterstützung', type: 'string', required: true, values: 'finanz.Unterstützung' },
       { key: 'von', header: 'Finanzielle Unterstützung Gültig von', type: 'date', required: true, profile: 'date' },
       { key: 'bis', header: 'Finanzielle Unterstützung Gültig bis', type: 'date', profile: 'date' },
-      { key: 'grund', header: 'Hauptgrund Beendigung Unterstützung', type: 'string', values: 'Hauptgrund Beendigung Unterstützung' },
+      { key: 'grund', header: 'Hauptgrund Beendigung Unterstützung', type: 'string', values: 'finanz.Hauptgrund Beendigung Unterstützung' },
     ],
   },
   {
@@ -144,13 +146,14 @@ export const TABLES: TableSpec[] = [
     name: 'Unterbringung',
     nameEn: 'Accommodation',
     file: 'Hackathon_Unterbringung_Resultat.xlsx',
-    provisional: true,
+    provisional: false,
     columns: [
       { ...knrCol, required: true },
-      { key: 'von', header: 'Von', alts: ['Unterbringung Von'], type: 'date', profile: 'date' },
-      { key: 'bis', header: 'Bis', alts: ['Unterbringung Bis'], type: 'date', profile: 'date' },
-      { key: 'art', header: 'Unterbringung Art', alts: ['Art Unterbringung', 'Unterbringungsart'], type: 'string', required: true },
-      { key: 'ort', header: 'PLZ / Ort', alts: ['Ort', 'PLZ Ort'], type: 'string' },
+      { key: 'von', header: 'Unterbringung Von', alts: ['Von'], type: 'date', profile: 'date' },
+      { key: 'bis', header: 'Unterbringung Bis', alts: ['Bis'], type: 'date', profile: 'date' },
+      { key: 'art', header: 'Unterbringung Art', alts: ['Art Unterbringung', 'Unterbringungsart'], type: 'string', required: true, values: 'unterbringung.Unterbringung Art' },
+      { key: 'plz', header: 'PLZ', type: 'string' },
+      { key: 'ort', header: 'Ort', alts: ['PLZ / Ort'], type: 'string' },
     ],
   },
   {
@@ -158,15 +161,15 @@ export const TABLES: TableSpec[] = [
     name: 'Sprachstand',
     nameEn: 'Language level',
     file: 'Hackathon_Sprachstand_Resultat.xlsx',
-    provisional: true,
+    provisional: false,
     columns: [
       zemisCol('Klient/-in Zemis-Nr.'),
       knrCol,
-      { key: 'sprache', header: 'Sprache', type: 'string', required: true },
-      { key: 'niveau', header: 'Sprachniveau', type: 'string', required: true, profile: 'level' },
-      { key: 'art', header: 'Art', alts: ['Art (Nachweis)', 'Nachweis'], type: 'string', required: true },
-      { key: 'datum', header: 'Datum Erreichung', alts: ['Datum'], type: 'date', required: true, profile: 'date' },
+      { key: 'sprache', header: 'Sprache', type: 'string', required: true, values: 'sprachstand.Sprache' },
+      { key: 'niveau', header: 'Sprachniveau', type: 'string', required: true, profile: 'level', values: 'sprachstand.Sprachniveau' },
+      { key: 'art', header: 'Art', alts: ['Art (Nachweis)', 'Nachweis'], type: 'string', required: true, values: 'sprachstand.Art' },
       { key: 'bemerkungen', header: 'Bemerkungen', type: 'string' },
+      { key: 'datum', header: 'Datum Erreichung', alts: ['Datum'], type: 'date', required: true, profile: 'date' },
     ],
   },
   {
@@ -174,16 +177,16 @@ export const TABLES: TableSpec[] = [
     name: 'Integrationsförderung und Ausbildung',
     nameEn: 'Integration support and education',
     file: 'Hackathon_Integrationsförderung_und_Ausbildung_Resultat.xlsx',
-    provisional: true,
+    provisional: false,
     columns: [
       zemisCol('Klient/-in Zemis-Nr.'),
       knrCol,
       { key: 'start', header: 'Start', type: 'date', required: true, profile: 'date' },
       { key: 'abschluss', header: 'Abschluss', type: 'date', profile: 'date' },
-      { key: 'art', header: 'Art', type: 'string', required: true },
+      { key: 'institution', header: 'Institution Name', type: 'string' },
+      { key: 'art', header: 'Art', type: 'string', required: true, values: 'foerderung.Art' },
       { key: 'bezeichnung', header: 'Bezeichnung', type: 'string' },
       { key: 'stunden', header: 'Stunden pro Woche', type: 'number' },
-      { key: 'institution', header: 'Institution Name', type: 'string' },
       { key: 'bemerkungen', header: 'Bemerkungen', type: 'string' },
     ],
   },
@@ -201,7 +204,7 @@ export const TABLES: TableSpec[] = [
       { key: 'arbeitgeber', header: 'Arbeitgeber Name', type: 'string' },
       { key: 'ort', header: 'Arbeitgeber Ort', type: 'string' },
       { key: 'pensum', header: 'Pensum %', type: 'number', required: true, profile: 'percent' },
-      { key: 'erwerbsstatus', header: 'Erwerbsstatus', type: 'string', values: 'Erwerbsstatus' },
+      { key: 'erwerbsstatus', header: 'Erwerbsstatus', type: 'string', values: 'erwerb.Erwerbsstatus' },
       { key: 'einkommen', header: 'Monatseinkommen brutto CHF', type: 'number' },
       { key: 'stundenlohn', header: 'Stundenlohn', type: 'number' },
       { key: 'unregelmaessig', header: 'Unregelmässiges Einkommen', type: 'bool' },

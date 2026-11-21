@@ -1,10 +1,10 @@
-# Integrations-Cockpit rules configuration (draft v1.4, 21.11.2026)
+# Integrations-Cockpit rules configuration (draft v1.5, 21.11.2026)
 # Edit this file to change a rule; no code change needed.
 # Every value here is shown in the app's "Rules" panel. Values marked ASSUMPTION
 # are defaults until ASD answers the open questions (02_data/MISSING_AND_OPEN_QUESTIONS.md).
 # Values marked ORGANISERS follow the hackathon organisers' answers of 21.11.2026 (not yet confirmed by ASD directly).
 
-version: "1.4"
+version: "1.5"
 
 stichtag: auto                 # auto = export date; or "20.11.2026"
 at_risk_window_months: 6
@@ -26,11 +26,11 @@ goal1:
   languages_counting: ["Deutsch"]        # ASSUMPTION Q10
   min_level: "A1"
   level_order: ["A0", "A1", "A2", "B1", "B2", "C1", "C2"]
-  accepted_proof: ["Zertifikat", "telc", "fide", "Muttersprache", "Schulbildung CH", "abgeschlossene Ausbildung"]   # ORGANISERS Q3: certificate (telc/fide), mother tongue, Swiss schooling, completed education count; course attendance notes do not. Map exact Art values when the template arrives
+  accepted_proof: ["Zertifizierung", "Muttersprache", "Beendigung obligatorische Schulzeit", "Beendigung Ausbildung"]   # ORGANISERS Q3: certificate (telc/fide), mother tongue, Swiss schooling, completed education count; "Weiteres" (e.g. course attendance) does not. Values = Sprachstand template "Art"
   mother_tongue_counts: true
   count_late_as_reached: false           # late = green with marker, not in payment (ASSUMPTION Q12)
   active_course_softens_risk: true
-  language_course_keywords: ["Deutsch", "Sprachkurs", "A1", "fide", "telc"]
+  language_course_keywords: ["Förderangebot Sprache", "Sprachkurs", "Deutsch", "Alphabetisierung", "A1", "fide", "telc"]   # matched in Art or Bezeichnung (template Art: "Förderangebot Sprache", "Sprachkurs im erweiterten Verfahren (N)")
 
 goal2:
   min_pensum: 60                         # Brief: a job with a work contract, at least 60 %, for 6 months without a break

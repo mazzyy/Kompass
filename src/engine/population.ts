@@ -89,7 +89,7 @@ export function personScope(p: Person, ctx: Ctx, ageRef: Day | undefined): Scope
   const r = ctx.rules.scope;
   const s = p.status;
   if (!s) return { inScope: false, reason: { key: 'na.no_status' } };
-  const known = TEMPLATE_VALUES['Verfahrensstand'];
+  const known = TEMPLATE_VALUES['asylverfahrensstand.Verfahrensstand'];
   if (known && !known.includes(s)) return { inScope: false, reason: { key: 'na.unknown_status', p: { status: s } } };
   if (r.excluded_statuses.includes(s) || /\+\d$/.test(s)) {
     if (/\+\d$/.test(s)) return { inScope: false, reason: { key: 'na.past_responsibility', p: { status: s } } };

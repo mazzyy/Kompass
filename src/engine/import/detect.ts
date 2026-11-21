@@ -194,7 +194,7 @@ export function analyzeFile(raw: RawTable, saved: SavedMappings = {}): FileAnaly
     }
   }
   for (const col of spec.columns) {
-    if (base.mapping[col.key] !== undefined) continue;
+    if (base.mapping[col.key] !== undefined || col.extra) continue;
     // Suggest the best unused header for this column.
     let cand: MappingSuggestion | undefined;
     nheaders.forEach((h, i) => {

@@ -65,8 +65,8 @@ describe('Goal 1 (T1)', () => {
   it('T1-01 Amina: deadline 12.03.2027 -> at risk, reason has deadline and last course end', () => {
     const fx = new Fx();
     const p = addPerson(fx, { entry: '12.03.2024', status: 'VA' });
-    lang(fx, p, 'A0', 'Einstufung', '03.05.2024');
-    course(fx, p, 'Deutschkurs', 'Deutsch A1 Intensiv', '01.10.2025', '14.03.2026');
+    lang(fx, p, 'A0', 'Weiteres', '03.05.2024');
+    course(fx, p, 'Förderangebot Sprache', 'Deutsch A1 Intensiv', '01.10.2025', '14.03.2026');
     const r = g(fx.run(), p.knr).goals[1]!;
     expect(fmt(r.deadline)).toBe('12.03.2027');
     expect(r.status).toBe('at_risk');
@@ -76,7 +76,7 @@ describe('Goal 1 (T1)', () => {
   it('T1-02 Yonas: A1 Kursbestätigung, deadline passed -> missed + a1_without_accepted_proof', () => {
     const fx = new Fx();
     const p = addPerson(fx, { entry: '02.10.2023', status: 'B-FL' });
-    lang(fx, p, 'A1', 'Kursbestätigung', '20.09.2026');
+    lang(fx, p, 'A1', 'Weiteres', '20.09.2026');
     const res = fx.run();
     const r = g(res, p.knr).goals[1]!;
     expect(fmt(r.deadline)).toBe('02.10.2026');
@@ -87,8 +87,8 @@ describe('Goal 1 (T1)', () => {
   it('T1-03 Mohammad: A0, course ended 14.02.2026 -> on track, inactive 9 months in call list', () => {
     const fx = new Fx();
     const p = addPerson(fx, { entry: '09.08.2025', birth: '01.01.1974' });
-    lang(fx, p, 'A0', 'Einstufung', '20.09.2025');
-    course(fx, p, 'Deutschkurs', 'Deutsch Alpha', '01.10.2025', '14.02.2026');
+    lang(fx, p, 'A0', 'Weiteres', '20.09.2025');
+    course(fx, p, 'Förderangebot Sprache', 'Deutsch Alpha', '01.10.2025', '14.02.2026');
     const res = fx.run();
     const r = g(res, p.knr).goals[1]!;
     expect(fmt(r.deadline)).toBe('09.08.2028');
@@ -100,7 +100,7 @@ describe('Goal 1 (T1)', () => {
   it('T1-04 A1 fide on time -> reached', () => {
     const fx = new Fx();
     const p = addPerson(fx, { entry: '01.01.2024' });
-    lang(fx, p, 'A1', 'Zertifikat fide', '15.06.2025');
+    lang(fx, p, 'A1', 'Zertifizierung', '15.06.2025');
     const r = g(fx.run(), p.knr).goals[1]!;
     expect(r.status).toBe('reached');
     expect(r.late).toBe(false);
@@ -109,7 +109,7 @@ describe('Goal 1 (T1)', () => {
   it('T1-05 A1 telc after deadline -> reached late', () => {
     const fx = new Fx();
     const p = addPerson(fx, { entry: '01.01.2022' });
-    lang(fx, p, 'A1', 'Zertifikat telc', '10.03.2025');
+    lang(fx, p, 'A1', 'Zertifizierung', '10.03.2025');
     const r = g(fx.run(), p.knr).goals[1]!;
     expect(fmt(r.deadline)).toBe('01.01.2025');
     expect(r.status).toBe('reached');
@@ -147,7 +147,7 @@ describe('Goal 1 (T1)', () => {
   it('T1-09 active course ending before deadline softens risk -> on track', () => {
     const fx = new Fx();
     const p = addPerson(fx, { entry: '15.12.2023' });
-    course(fx, p, 'Deutschkurs', 'Deutsch A2', '01.09.2026', '30.11.2026');
+    course(fx, p, 'Förderangebot Sprache', 'Deutsch A2', '01.09.2026', '30.11.2026');
     const r = g(fx.run(), p.knr).goals[1]!;
     expect(fmt(r.deadline)).toBe('15.12.2026');
     expect(r.status).toBe('on_track');
@@ -178,7 +178,7 @@ describe('Goal 1 (T1)', () => {
   it('T1-13 A2 fide without proven row -> reached (computed) + reached_not_recorded', () => {
     const fx = new Fx();
     const p = addPerson(fx, { entry: '01.01.2024' });
-    lang(fx, p, 'A2', 'Zertifikat fide', '01.05.2025');
+    lang(fx, p, 'A2', 'Zertifizierung', '01.05.2025');
     const res = fx.run();
     const r = g(res, p.knr).goals[1]!;
     expect(r.status).toBe('reached');
@@ -188,13 +188,13 @@ describe('Goal 1 (T1)', () => {
   it('T1-14 French certificate -> not reached (German only)', () => {
     const fx = new Fx();
     const p = addPerson(fx, { entry: '01.01.2025' });
-    lang(fx, p, 'A1', 'Zertifikat telc', '01.05.2025', 'Französisch');
+    lang(fx, p, 'A1', 'Zertifizierung', '01.05.2025', 'Französisch');
     expect(g(fx.run(), p.knr).goals[1]!.status).toBe('on_track');
   });
   it('configurable: French counts when added to languages_counting', () => {
     const fx = new Fx();
     const p = addPerson(fx, { entry: '01.01.2025' });
-    lang(fx, p, 'A1', 'Zertifikat telc', '01.05.2025', 'Französisch');
+    lang(fx, p, 'A1', 'Zertifizierung', '01.05.2025', 'Französisch');
     const rules = defaultRules();
     rules.goal1.languages_counting.push('Französisch');
     expect(g(fx.run(rules), p.knr).goals[1]!.status).toBe('reached');
@@ -209,7 +209,7 @@ describe('Goal 1 (T1)', () => {
   it('Swiss schooling proof counts (Sara)', () => {
     const fx = new Fx();
     const p = addPerson(fx, { entry: '01.06.2024', status: 'B-FL', birth: '01.03.2009' });
-    lang(fx, p, 'A2', 'Schulbildung CH', '30.06.2025');
+    lang(fx, p, 'A2', 'Beendigung obligatorische Schulzeit', '30.06.2025');
     expect(g(fx.run(), p.knr).goals[1]!.status).toBe('reached');
   });
 });
@@ -218,7 +218,7 @@ describe('Totals', () => {
   it('per social worker and per entry year reconcile with person rows', () => {
     const fx = new Fx();
     const a = addPerson(fx, { entry: '01.01.2024', sw: 'S. Keller' });
-    lang(fx, a, 'A1', 'Zertifikat fide', '01.06.2025');
+    lang(fx, a, 'A1', 'Zertifizierung', '01.06.2025');
     addPerson(fx, { entry: '01.01.2023', sw: 'M. Rossi' }); // deadline 01.01.2026 -> missed
     addPerson(fx, { entry: '01.03.2024', sw: 'M. Rossi' }); // deadline 01.03.2027 -> at risk
     addPerson(fx, { status: 'S', sw: 'M. Rossi' });

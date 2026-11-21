@@ -148,7 +148,16 @@ function aminaSection(m: Member, idx: number, stated: Record<string, unknown>) {
 
 const reportTruth: Record<string, { dossier: string; persons: Record<string, Record<string, unknown>> }> = {};
 fs.mkdirSync(OUT, { recursive: true });
-for (const f of fs.readdirSync(OUT)) if (/^SA_.*\.(txt|pdf)$/.test(f)) fs.unlinkSync(path.join(OUT, f)); // keep extractions.json / accuracy.json
+// Hand-written reports (marked in labels/human_truth.json) are never overwritten.
+const humanFile = 'sample-data/labels/human_truth.json';
+const HUMAN = new Set(
+  fs.existsSync(humanFile)
+    ? Object.entries(JSON.parse(fs.readFileSync(humanFile, 'utf8')) as Record<string, { written_by_human?: boolean }>)
+        .filter(([k, v]) => !k.startsWith('_') && v.written_by_human === true)
+        .map(([k]) => k)
+    : [],
+);
+for (const f of fs.readdirSync(OUT)) if (/^SA_.*\.(txt|pdf)$/.test(f) && !HUMAN.has(f.replace(/\.pdf$/, '.txt'))) fs.unlinkSync(path.join(OUT, f)); // keep extractions.json / accuracy.json
 let n = 0;
 for (const hh of truth) {
   const head = hh.members.find((m) => m.role === 'head')!;
@@ -207,7 +216,7 @@ for (const hh of truth) {
     persons[m.zemis] = Object.fromEntries(FIELDS.map((f) => [f, stated[f] ?? 'not_stated']));
   });
   const file = `SA_${hh.dossier.replace('.', '_')}.txt`;
-  fs.writeFileSync(path.join(OUT, file), L.join('\n') + '\n');
+  if (!HUMAN.has(file)) fs.writeFileSync(path.join(OUT, file), L.join('\n') + '\n');
   reportTruth[file] = { dossier: hh.dossier, persons };
   n++;
 }

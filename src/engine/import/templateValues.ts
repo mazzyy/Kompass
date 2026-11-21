@@ -1,6 +1,7 @@
-// Generated from the 6 ASD templates (02_data/TEMPLATE_VALUES.md). Verbatim, including typos.
+// Generated from ASD's templates (10 of 11; Integrationszielerreichung still missing).
+// Key: "<table>.<header>". Verbatim, including typos. Black = allowed values; green example values are not listed.
 export const TEMPLATE_VALUES: Record<string, string[]> = {
- "Asylgeschäftsart": [
+ "asylgeschaeftsdaten.Asylgeschäftsart": [
   "ADAM eröffnet",
   "AIG Ausreiseorganisation Dublin",
   "AIG Identitätsabklärung",
@@ -120,7 +121,7 @@ export const TEMPLATE_VALUES: Record<string, string[]> = {
   "Wiedererwägung",
   "Wiedererwägungsgesuch vorübergehender Schutz"
  ],
- "Erledigung": [
+ "asylgeschaeftsdaten.Erledigung": [
   "(Teilweise) Gutheissung WEG",
   "Ablehnung",
   "Ablehnung Art. 3, 7",
@@ -252,10 +253,9 @@ export const TEMPLATE_VALUES: Record<string, string[]> = {
   "Widerruf Asyl + Aberkennung Flüchtling",
   "Zurückgeführt in Dublin-Staat",
   "Zurückgeführt in Heimatstaat",
-  "Zustimmung",
-  "(Leer)"
+  "Zustimmung"
  ],
- "Verfahrensstand": [
+ "asylverfahrensstand.Verfahrensstand": [
   "Abschreibung gem. Art. 8 Abs. 3bis",
   "AIG-Regelung",
   "B Ausweis",
@@ -279,7 +279,11 @@ export const TEMPLATE_VALUES: Record<string, string[]> = {
   "VA",
   "VA+7"
  ],
- "Beziehung": [
+ "dossierperson.Rolle": [
+  "Dossiermitglied",
+  "Weitere Person im Haushalt"
+ ],
+ "dossierperson.Beziehung": [
   "Adoptiveltern",
   "Adoptivsohn / -tochter",
   "Cousin / Cousine",
@@ -303,10 +307,18 @@ export const TEMPLATE_VALUES: Record<string, string[]> = {
   "Stiefsohn / -tochter",
   "Tochter / Sohn",
   "Urenkel",
-  "Verlobte / -r",
-  "(Leer)"
+  "Verlobte / -r"
  ],
- "Hauptgrund Beendigung Unterstützung": [
+ "erwerb.Erwerbsstatus": [
+  "selbstständig",
+  "unselbstständig"
+ ],
+ "finanz.Unterstützung": [
+  "Sozialhilfe",
+  "Keine Unterstützung",
+  "Nothilfe"
+ ],
+ "finanz.Hauptgrund Beendigung Unterstützung": [
   "Abmeldung trotz Anspruch",
   "Anderes",
   "Aufnahme einer Erwerbstätigkeit",
@@ -322,28 +334,103 @@ export const TEMPLATE_VALUES: Record<string, string[]> = {
   "Todesfall",
   "Verringerung der Ausgaben",
   "Wechsel des Wohnortes",
-  "Wechsel regionaler Partner",
-  "(Leer)"
+  "Wechsel regionaler Partner"
  ],
- "Rolle": [
-  "Dossiermitglied",
-  "Weitere Person im Haushalt"
+ "foerderung.Art": [
+  "Arbeitsvermittlung RAV",
+  "Beschäftigungsangebot (N)",
+  "Brückenangebot",
+  "Erstinformation",
+  "Förderangebot Arbeitsmarktfähigkeit oder Ausbildungsfähigkeit",
+  "Förderangebot frühkindliche Förderung",
+  "Förderangebot soziale Integration",
+  "Förderangebot Sprache",
+  "IV-Eingliederungsmassnahmen",
+  "Kurs Schlüsselkompetenzen",
+  "Sek II",
+  "Sprachkurs im erweiterten Verfahren (N)",
+  "Tertiär",
+  "Volksschule",
+  "Vorbildung Ausland"
  ],
- "Erwerbsstatus": [
-  "selbstständig",
-  "unselbstständig"
- ],
- "Unregelmässiges Einkommen": [
-  "False",
-  "True"
- ],
- "Abtretung Sozialdienst": [
-  "False",
-  "True"
- ],
- "Unterstützung": [
-  "Sozialhilfe",
+ "klient.Unterstützung": [
   "Keine Unterstützung",
+  "Sozialhilfe",
   "Nothilfe"
+ ],
+ "klient.Verfahrensstand": [
+  "AIG-Regelung",
+  "B Härtefallregelung",
+  "B-FL",
+  "B-FL+5",
+  "B-RSFL",
+  "B-RSFL+7",
+  "B-SL",
+  "B-SL+5",
+  "CH",
+  "F-FL",
+  "F-FL+7",
+  "Kein Verfahren",
+  "Mehrfachgesuch",
+  "N (Asylsuchende)",
+  "NEE",
+  "Negativer Entscheid",
+  "S",
+  "VA",
+  "VA+7"
+ ],
+ "klient.Geschlecht": [
+  "Männlich",
+  "Weiblich"
+ ],
+ "klient.Zivilstand": [
+  "Geschieden",
+  "In Eingetragener Partnerschaft",
+  "Ledig",
+  "Unbekannt",
+  "Unverheiratet",
+  "Verheiratet",
+  "Verwitwet"
+ ],
+ "klient.Höchste abgeschlossene Ausbildung": [
+  "0 Keine in der Schweiz anerkannte Ausbildung",
+  "130 Obligatorische Schule",
+  "22 Sekundarstufe II: Berufsbildung",
+  "24 Sekundarstufe II: Allgemeinbildung",
+  "31 Höhere Berufsbildung",
+  "32 Hochschule"
+ ],
+ "klient.Lateinisch alphabetisiert": [
+  "Nein",
+  "Ja"
+ ],
+ "klient.Art Analphabetismus": [
+  "Primäranalphabet/-in",
+  "Zweitschriftlernende/-r"
+ ],
+ "sprachstand.Sprache": [
+  "Deutsch",
+  "Französisch"
+ ],
+ "sprachstand.Sprachniveau": [
+  "A0",
+  "A1",
+  "A2",
+  "B1",
+  "B2",
+  "C1",
+  "C2"
+ ],
+ "sprachstand.Art": [
+  "Beendigung Ausbildung",
+  "Beendigung obligatorische Schulzeit",
+  "Muttersprache",
+  "Weiteres",
+  "Zertifizierung"
+ ],
+ "unterbringung.Unterbringung Art": [
+  "Indiv. Wohnung",
+  "Kollektivunterkunft",
+  "Partner-Wohnung"
  ]
 };

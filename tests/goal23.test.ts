@@ -104,7 +104,7 @@ describe('Goal 2 (T2)', () => {
   it('T2-08 Sara: Brückenangebot, ZE 14.06.2029 -> on track, transition in call list', () => {
     const fx = new Fx();
     const p = addPerson(fx, { status: 'B-FL', birth: '15.04.2009', ze: '14.06.2029', entry: '01.06.2024' });
-    lang(fx, p, 'A2', 'Schulbildung CH', '30.06.2025');
+    lang(fx, p, 'A2', 'Beendigung obligatorische Schulzeit', '30.06.2025');
     course(fx, p, 'Brückenangebot', 'BVS', '01.08.2026', '31.07.2027');
     const res = fx.run();
     expect(g(res, p.knr).goals[2]!.status).toBe('on_track');
@@ -213,23 +213,23 @@ describe('Call list TC-01 (all goals)', () => {
   it('Reza -> Fatima -> Amina -> Yonas -> Mohammad -> Sara', () => {
     const fx = new Fx();
     const reza = addPerson(fx, { knr: '10351', dossier: 'D12.4471', ze: '15.12.2027', zb: '01.10.2021', entry: '15.12.2020' });
-    lang(fx, reza, 'A1', 'Zertifikat fide', '14.06.2022');
+    lang(fx, reza, 'A1', 'Zertifizierung', '14.06.2022');
     fx.add('dossierperson', { dossierNr: 'D12.4471', klientNr: reza.knr, zemis: reza.zemis, von: '01.10.2021', beziehung: 'Dossierträger/-in' });
     support(fx, 'D12.4471', 'Sozialhilfe', '01.10.2021', '31.01.2026');
     support(fx, 'D12.4471', 'Sozialhilfe', '01.09.2026');
     job(fx, reza, '01.09.2026', 40);
     const fatima = addPerson(fx, { knr: '10633', status: 'F-FL', ze: '30.06.2027', entry: '30.06.2020', dossier: 'D12.7001' });
-    lang(fx, fatima, 'A1', 'Zertifikat telc', '15.03.2022');
+    lang(fx, fatima, 'A1', 'Zertifizierung', '15.03.2022');
     job(fx, fatima, '01.08.2026', 50);
     const amina = addPerson(fx, { knr: '10482', entry: '12.03.2024', ze: '12.03.2031', dossier: 'D12.7002' });
-    course(fx, amina, 'Deutschkurs', 'Deutsch A1 Intensiv', '01.10.2025', '14.03.2026');
+    course(fx, amina, 'Förderangebot Sprache', 'Deutsch A1 Intensiv', '01.10.2025', '14.03.2026');
     const yonas = addPerson(fx, { knr: '10217', status: 'B-FL', entry: '02.10.2023', ze: '05.10.2028', dossier: 'D12.7003' });
-    lang(fx, yonas, 'A1', 'Kursbestätigung', '20.09.2026');
+    lang(fx, yonas, 'A1', 'Weiteres', '20.09.2026');
     job(fx, yonas, '01.03.2025', 80);
     const moh = addPerson(fx, { knr: '10790', entry: '09.08.2025', ze: '09.08.2032', birth: '03.02.1974', dossier: 'D12.7004' });
-    course(fx, moh, 'Alphabetisierung', 'Deutsch Alpha', '01.10.2025', '14.02.2026');
+    course(fx, moh, 'Förderangebot Sprache', 'Deutsch Alpha', '01.10.2025', '14.02.2026');
     const sara = addPerson(fx, { knr: '10905', status: 'B-FL', entry: '01.06.2024', ze: '14.06.2029', birth: '15.04.2009', dossier: 'D12.7005' });
-    lang(fx, sara, 'A2', 'Schulbildung CH', '30.06.2025');
+    lang(fx, sara, 'A2', 'Beendigung obligatorische Schulzeit', '30.06.2025');
     course(fx, sara, 'Brückenangebot', 'BVS', '01.08.2026', '31.07.2027');
     for (const [d, z] of [['D12.7001', fatima], ['D12.7002', amina], ['D12.7003', yonas], ['D12.7004', moh], ['D12.7005', sara]] as const)
       support(fx, d, 'Sozialhilfe', '01.01.2024'), void z;

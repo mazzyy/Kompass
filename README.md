@@ -38,7 +38,7 @@ Regenerate the synthetic data (deterministic): `npm run data`. Measure extractio
 |---|---|
 | `src/config/rules.default.yaml` | every rule parameter and open assumption (shown in the app's Rules panel and the `Regeln` sheet) |
 | `src/engine/` | pure TypeScript rules engine: import + table detection by headers, population, goal 1, call list, totals, data quality |
-| `src/engine/import/signatures.ts` | all export header names in one place (5 tables are provisional until ASD's templates arrive) |
+| `src/engine/import/signatures.ts` | all export header names in one place (10 of 11 match ASD's templates in `templates/`; Integrationszielerreichung provisional) |
 | `src/excel/write.ts` | management + per-social-worker workbooks |
 | `src/ai/extract.ts` | local-model extraction; evidence is a numbered sentence, so it is always verbatim |
 | `scripts/generate.ts`, `scripts/reports.ts` | synthetic exports (2 months) and Situationsanalyse reports, with 6 planted personas |

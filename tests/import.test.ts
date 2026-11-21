@@ -42,7 +42,7 @@ describe('Import (TI)', () => {
   it('TI-03 renamed Sprachstand header: suggestion, run blocked, mapping remembered', () => {
     const fx = new Fx();
     const p = addPerson(fx, { entry: '01.01.2024' });
-    lang(fx, p, 'A1', 'Zertifikat fide', '01.06.2025');
+    lang(fx, p, 'A1', 'Zertifizierung', '01.06.2025');
     const raws = fx.raws();
     const sp = raws.find((r) => r.headers.includes('Sprachniveau'))!;
     sp.headers = sp.headers.map((h) => (h === 'Sprachniveau' ? 'Niveau (A0–C2)' : h));
@@ -99,7 +99,7 @@ describe('Import (TI)', () => {
     const fx = new Fx();
     const p = addPerson(fx, { zemis: '12345678', entry: '01.01.2024' });
     fx.t.klient![0].zemis = "'12345678";
-    fx.add('sprachstand', { zemis: 12345678, klientNr: p.knr, sprache: 'Deutsch', niveau: 'A1', art: 'Zertifikat telc', datum: '01.06.2025' });
+    fx.add('sprachstand', { zemis: 12345678, klientNr: p.knr, sprache: 'Deutsch', niveau: 'A1', art: 'Zertifizierung', datum: '01.06.2025' });
     expect(g(fx.run(), p.knr).goals[1]!.status).toBe('reached');
   });
 

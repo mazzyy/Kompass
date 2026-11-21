@@ -196,6 +196,16 @@ export function useApp() {
         stichtag: st,
         inputs: analyses.map((a) => ({ fileName: a.fileName, table: a.table, rows: a.rows })),
       });
+      // ASD's exports carry no names (Klient template has none). Show the name from the client's own
+      // Situationsanalyse report when it has been read on this computer; otherwise the client number.
+      const names = new Map<string, string>();
+      for (const r of Object.values(sa.extr)) for (const x of r.persons) names.set(x.zemis, x.name);
+      for (const p of res.persons) {
+        const n = p.displayName.startsWith('K-') ? names.get(p.zemis) : undefined;
+        if (!n) continue;
+        const w = n.split(/\s+/);
+        p.displayName = w.length > 1 ? `${w[0]} ${w[w.length - 1][0]}.` : w[0];
+      }
       await step(tr(lang, 'run.log.population', { n: res.persons.length, date: fmt(st) }));
       const t1 = res.totals[1];
       await step(tr(lang, 'run.log.goal1', { n: t1 ? t1.overall.counted + t1.overall.counts.no_data : 0 }));
@@ -215,7 +225,7 @@ export function useApp() {
     } finally {
       setRunning(false);
     }
-  }, [blocked, raws, analyses, rules, rulesText, windowMonths, stichtagOverride, autoStichtag, lang]);
+  }, [blocked, raws, analyses, rules, rulesText, windowMonths, stichtagOverride, autoStichtag, lang, sa.extr]);
 
   // what the current role may see
   const visible = useMemo(() => {

@@ -53,7 +53,7 @@ describe('Patterns (TP)', () => {
   it('TP-03 cohort = deadline before the Stichtag; result has no per-person values', () => {
     const fx = new Fx();
     const a = addPerson(fx, { entry: '01.01.2022' });
-    lang(fx, a, 'A1', 'Zertifikat fide', '01.06.2023');
+    lang(fx, a, 'A1', 'Zertifizierung', '01.06.2023');
     addPerson(fx, { entry: '01.01.2025' });
     const res = fx.run();
     const r = computePatterns(res.persons, new Map(Object.entries(res.features)), res.stichtag, 10);

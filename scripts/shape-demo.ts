@@ -32,7 +32,7 @@ async function reassign(dossiers: Map<string, string>) {
     const ws = wb.worksheets[0];
     const hdr = (ws.getRow(1).values as string[]).map(String);
     const cD = hdr.indexOf('Dossier-Nr.');
-    const cS = hdr.indexOf('Fallführung (Sozialarbeiter:in)');
+    const cS = hdr.indexOf(TABLE_BY_ID.klient.columns.find((c) => c.key === 'fallfuehrung')!.header);
     ws.eachRow((row, i) => {
       if (i === 1) return;
       const to = dossiers.get(String(row.getCell(cD).value));
