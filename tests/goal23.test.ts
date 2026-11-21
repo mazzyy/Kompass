@@ -78,16 +78,13 @@ describe('Goal 2 (T2)', () => {
       expect(r.trace.some((t) => t.rule === 'g2.excluded')).toBe(true);
     }
   });
-  it('min_pensum 0 (if ASD confirms "contract matters"): any contract for 6 months counts, no job never does', () => {
-    const rules = defaultRules();
-    rules.goal2.min_pensum = 0;
+  it('goal 2 = contract job of at least 60 % for 6 months: a 50 % job never counts, two contract jobs add up', () => {
     const fx = new Fx();
     const p = addPerson(fx);
-    job(fx, p, '01.01.2026', 20, '31.08.2026');
-    const q = addPerson(fx);
-    expect(g(fx.run(rules), p.knr).goals[2]!.status).toBe('reached');
-    expect(g(fx.run(rules), q.knr).goals[2]!.status).not.toBe('reached');
-    expect(g(fx.run(), p.knr).goals[2]!.status).not.toBe('reached'); // default 60 % unchanged
+    job(fx, p, '01.01.2025', 50, '31.12.2025');
+    expect(g(fx.run(), p.knr).goals[2]!.status).not.toBe('reached');
+    expect(defaultRules().goal2.min_pensum).toBe(60);
+    expect(defaultRules().goal2.combine_jobs).toBe(true);
   });
   it('T2-06 Beschäftigungsprogramm is excluded and shown in the trace', () => {
     const fx = new Fx();

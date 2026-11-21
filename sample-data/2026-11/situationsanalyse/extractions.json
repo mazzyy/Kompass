@@ -10375,7 +10375,7 @@
  "SA_D12_9008.txt": {
   "file": "SA_D12_9008.txt",
   "model": "qwen2.5:7b-instruct",
-  "at": "2026-11-21T09:00:41.777Z",
+  "at": "2026-11-21T09:11:52.783Z",
   "persons": [
    {
     "zemis": "22340975",
@@ -10432,7 +10432,7 @@
       "evidence": "Braucht Unterstützung bei der Stellensuche."
      }
     },
-    "ms": 38597,
+    "ms": 39022,
     "modelInput": [
      "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit.",
      "Muttersprache Arabisch.",

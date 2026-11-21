@@ -1,0 +1,23 @@
+{
+ "model": "qwen2.5:7b-instruct",
+ "measuredAt": "2026-11-21T09:11:52.788Z",
+ "reports": 3,
+ "persons": 5,
+ "fields": 50,
+ "correct": 43,
+ "accuracy": 0.86,
+ "evidenceFoundRate": 1,
+ "perField": {
+  "childcare_duty_without_care": 1,
+  "literate_latin_script": 1,
+  "understands_swiss_german": 0.8,
+  "learning_pace": 1,
+  "health_limits_work": 0.8,
+  "availability_for_work_or_education": 0.8,
+  "work_experience_years_origin": 0.8,
+  "diplomas": 1,
+  "driving_licence": 0.6,
+  "career_wish": 0.8
+ },
+ "note": "Reports hand-written by a person, labelled by the writer."
+}

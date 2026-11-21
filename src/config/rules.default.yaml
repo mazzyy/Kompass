@@ -33,9 +33,9 @@ goal1:
   language_course_keywords: ["Deutsch", "Sprachkurs", "A1", "fide", "telc"]
 
 goal2:
-  min_pensum: 60                         # ASSUMPTION 60 % from the brief; organisers said contract matters more; awaiting ASD confirmation. Set 0 to count any job with a contract
+  min_pensum: 60                         # Brief: a job with a work contract, at least 60 %, for 6 months without a break
   months_uninterrupted: 6
-  combine_jobs: true                     # ASSUMPTION Q4: part-time jobs with contracts add up
+  combine_jobs: true                     # ASSUMPTION two contract jobs are added up; awaiting ASD confirmation
   max_gap_days: 0
   exclude_keywords: ["Programm", "Einsatzplatz", "Praktikum", "Beschäftigungsprogramm", "Arbeitsintegration", "freiwillig", "Freiwilligenarbeit", "ehrenamtlich", "unbezahlt"]   # ORGANISERS Q4: only jobs with a work contract count; volunteering, unpaid internships and programme/placement work are excluded (matched in Bemerkungen or Arbeitgeber Name)
   education_types: ["Sek II", "Tertiär"]
