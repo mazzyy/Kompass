@@ -35,7 +35,7 @@ Nothing leaves the computer.
 | Local AI | Ollama on `localhost:11434`, model `qwen2.5:7b-instruct` | `src/ai/extract.ts` |
 | PDF reading | pdf.js, bundled locally | `src/ai/pdf.ts` |
 | Synthetic data | Node + Python scripts, seeded (same input → same files) | `scripts/`, `sample-data/` |
-| Tests | Vitest, 102 tests | `tests/` |
+| Tests | Vitest, 104 tests | `tests/` |
 
 Single source of truth: one run produces one `RunResult`; every screen and every Excel sheet is drawn from it, so screen and Excel can never disagree. No number is hard-coded.
 
@@ -49,7 +49,7 @@ Single source of truth: one run produces one `RunResult`; every screen and every
 - **Renamed column** (November's Sprachstand has `Niveau (A0–C2)` instead of `Sprachniveau`): the app suggests the match from the header name and the values (they look like A0–C2), **blocks the run until a person confirms**, then remembers it in this browser. Next month: same clicks, no question.
 - Unknown dropdown values (e.g. a status not in the template) → data-quality alert, run continues.
 - Stichtag = export date (overridable); red window = 6 months (3/6/9/12 selectable).
-- **10 of 11 tables match ASD's templates byte for byte, in column order, with their dropdown values** (a test checks this against the template files in `templates/`). Only Integrationszielerreichung still uses headers from the data model (template not received). All headers live in **one file**: `src/engine/import/signatures.ts`.
+- **All 11 tables match ASD's templates byte for byte, in column order, with their dropdown values** (a test checks this against the template files in `templates/`). Integrationszielerreichung: `Art` values map to the goals as `Sprachniveau A1` → goal 1, `Aufnahme Ausbildung / Erwerbstätigkeit` → goal 2, `Finanzielle Unabhängigkeit` → goal 3; `Grundpauschale Integration` is not one of the three goals and is ignored; rows with "Ziel mit Status S erreicht" = TRUE do not count. The data model's longer names (`Art (Ziel)`, `Partner (Region)`, `Jahr Grundgesamtheit (Kohorte)`) are accepted too. All headers live in **one file**: `src/engine/import/signatures.ts`.
 - The Klient export has **no name columns**. The app shows a client's name only from their own Situationsanalyse report when it has been read on this computer; otherwise the client number (K-10482). Names are never sent to the model.
 
 ### 4.2 Rules engine
@@ -148,7 +148,7 @@ Speed: about 15 s per person on this laptop. Results for 85 reports are cached a
 - **Assumption**: two contract jobs add up (Q4), Nothilfe counts as support and the household deadline is the head's (Q6), lump sums unknown (Q8), and the smaller ones (Q10–Q14).
 After regenerating the synthetic data in the template format (apprenticeships recorded on completion), November shows: goal 2 counted 322, reached 90, on track 214, at risk 6, overdue 12; claimable 18. S. Keller's call list is unchanged (Reza → Fatima → Amina). The payment-period rule (v1.6) changed none of these numbers: the synthetic Zuständigkeitsende already matched the period, except B-RSFL, which the generator now writes as 7 years (0 mismatches).
 
-## 8. Tests (102, all passing: `npm test`)
+## 8. Tests (104, all passing: `npm test`)
 
 | Area | Tests |
 |---|---|
@@ -165,7 +165,7 @@ After regenerating the synthetic data in the template format (apprenticeships re
 | What-if / forecast | TW-01..05 (TW-01..03, 05 with interpretation A; TW-04 default B) + quarterly forecast |
 | AI guardrails | report splitting, PDF line wrapping, evidence by sentence number, "not stated", **no names/IDs/dates reach the prompt** |
 | i18n | every message exists in German and English |
-| Templates | 10 templates recognised, headers byte for byte and in order, only Integrationszielerreichung provisional |
+| Templates | all 11 templates recognised, headers byte for byte and in order, none provisional; Integrationszielerreichung `Art` values map to goals 1/2/3, Grundpauschale and Status-S rows ignored |
 
 ## 9. Not built (agreed)
 

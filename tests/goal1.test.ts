@@ -167,7 +167,7 @@ describe('Goal 1 (T1)', () => {
   it('T1-12 proven row without Sprachstand -> reached (proven) + proven_not_reproduced', () => {
     const fx = new Fx();
     const p = addPerson(fx, { entry: '01.01.2024' });
-    fx.add('zielerreichung', { zemis: p.zemis, art: 'Sprachkompetenz A1', datum: '01.06.2025', kohorte: 2024 });
+    fx.add('zielerreichung', { zemis: p.zemis, art: 'Sprachniveau A1', datum: '01.06.2025', kohorte: 2024 });
     const res = fx.run();
     const r = g(res, p.knr).goals[1]!;
     expect(r.status).toBe('reached');

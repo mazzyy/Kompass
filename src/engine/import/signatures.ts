@@ -1,7 +1,6 @@
 // ALL export header strings live in this one file.
 // 10 tables are copied byte-for-byte (and in column order) from ASD's templates (provisional: false).
-// Integrationszielerreichung comes from the data-model diagram because its template is still missing
-// (provisional: true): swap in the exact headers here when it arrives.
+// All 11 tables follow ASD's templates exactly (headers, order, dropdown values).
 
 export type TableId =
   | 'klient'
@@ -231,13 +230,13 @@ export const TABLES: TableSpec[] = [
     name: 'Integrationszielerreichung',
     nameEn: 'Integration goals reached',
     file: 'Hackathon_Integrationszielerreichung_Resultat.xlsx',
-    provisional: true,
+    provisional: false,
     columns: [
       zemisCol('Klient/-in Zemis-Nr.'),
-      { key: 'art', header: 'Art (Ziel)', alts: ['Art Ziel', 'Ziel'], type: 'string', required: true },
+      { key: 'art', header: 'Art', alts: ['Art (Ziel)', 'Art Ziel', 'Ziel'], type: 'string', required: true, values: 'zielerreichung.Art' },
       { key: 'datum', header: 'Erreicht am', type: 'date', required: true, profile: 'date' },
-      { key: 'partner', header: 'Partner (Region)', type: 'string' },
-      { key: 'kohorte', header: 'Jahr Grundgesamtheit (Kohorte)', alts: ['Jahr Grundgesamtheit'], type: 'number' },
+      { key: 'partner', header: 'Partner', alts: ['Partner (Region)'], type: 'string', values: 'zielerreichung.Partner' },
+      { key: 'kohorte', header: 'Jahr Grundgesamtheit', alts: ['Jahr Grundgesamtheit (Kohorte)'], type: 'number' },
       { key: 'statusS', header: 'Ziel mit Status S erreicht', type: 'bool' },
     ],
   },

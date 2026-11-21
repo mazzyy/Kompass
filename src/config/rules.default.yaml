@@ -53,10 +53,10 @@ goal3:
   support_types: ["Sozialhilfe", "Nothilfe"]   # ASSUMPTION Q6
   deadline_from: head                    # head | latest_member | earliest_member (ASSUMPTION Q6)
 
-goal_mapping:                            # Integrationszielerreichung "Art (Ziel)" -> goal (ASSUMPTION Q13)
-  goal1_keywords: ["Sprach", "A1"]
-  goal2_keywords: ["Erwerb", "Ausbildung", "Arbeit"]
-  goal3_keywords: ["Sozialhilfe", "wirtschaftlich", "Ablösung"]
+goal_mapping:                            # Integrationszielerreichung "Art" -> goal. "Grundpauschale Integration" is not one of the three goals and is ignored
+  goal1_keywords: ["Sprachniveau A1", "Sprach", "A1"]   # TEMPLATE: Art "Sprachniveau A1" (other words: fallback for older exports)
+  goal2_keywords: ["Aufnahme Ausbildung / Erwerbstätigkeit", "Erwerb", "Ausbildung", "Arbeit"]   # TEMPLATE: Art "Aufnahme Ausbildung / Erwerbstätigkeit"
+  goal3_keywords: ["Finanzielle Unabhängigkeit", "Sozialhilfe", "wirtschaftlich", "Ablösung"]   # TEMPLATE: Art "Finanzielle Unabhängigkeit"
   ignore_status_s_rows: true             # rows with "Ziel mit Status S erreicht" = yes are ignored (ASSUMPTION Q13)
 
 whatif_2027:

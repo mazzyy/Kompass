@@ -175,7 +175,7 @@ function buildPersonas() {
     p.lang.push({ sprache: 'Deutsch', niveau: 'A0', art: 'Einstufung', datum: d('15.10.2021') });
     p.courses.push({ art: 'Deutschkurs', bez: 'Deutsch A1 Intensiv', start: d('01.11.2021'), end: d('30.04.2022'), hours: 15, inst: 'Bildungsinstitut Bern' });
     p.lang.push({ sprache: 'Deutsch', niveau: 'A1', art: 'Zertifikat', datum: d('14.06.2022'), bem: 'fide' });
-    p.proven.push({ art: 'Sprache A1', datum: d('14.06.2022'), kohorte: 2021 });
+    p.proven.push({ art: 'Sprachniveau A1', datum: d('14.06.2022'), kohorte: 2021 });
     p.jobs.push({ von: d('05.01.2026'), bis: d('30.06.2026'), ag: 'Hotel Bärengraben AG', ort: 'Bern', pensum: 70, status: 'unselbstständig', bem: 'Küchenhilfe, befristet' });
     p.jobs.push({ von: d('01.09.2026'), ag: 'Gastro Aare GmbH', ort: 'Bern', pensum: 40, status: 'unselbstständig', bem: 'Küchenassistent' });
     const w = newPerson(hh, IR, 'w', d('03.08.1988'), 'spouse', 'Hosseini');
@@ -184,7 +184,7 @@ function buildPersonas() {
     w.zBeginn = d('01.10.2021');
     w.courses.push({ art: 'Deutschkurs', bez: 'Deutsch A1', start: d('01.11.2021'), end: d('31.05.2022'), hours: 10, inst: 'Bildungsinstitut Bern' });
     w.lang.push({ sprache: 'Deutsch', niveau: 'A1', art: 'Zertifikat', datum: d('20.09.2022'), bem: 'telc' });
-    w.proven.push({ art: 'Sprache A1', datum: d('20.09.2022'), kohorte: 2021 });
+    w.proven.push({ art: 'Sprachniveau A1', datum: d('20.09.2022'), kohorte: 2021 });
     hh.members.push(p, w);
     for (const [b, sex] of [[d('10.05.2016'), 'm'], [d('02.02.2019'), 'w']] as [Day, 'm' | 'w'][]) {
       const c = newPerson(hh, IR, sex, b, 'child', 'Hosseini');
@@ -213,7 +213,7 @@ function buildPersonas() {
     p.courses.push({ art: 'Deutschkurs', bez: 'Deutsch A1', start: d('01.04.2021'), end: d('30.11.2021'), hours: 12, inst: 'Bildungsinstitut Bern' });
     p.lang.push({ sprache: 'Deutsch', niveau: 'A1', art: 'Zertifikat', datum: d('15.03.2022'), bem: 'telc' });
     p.lang.push({ sprache: 'Deutsch', niveau: 'A2', art: 'Zertifikat', datum: d('11.05.2025'), bem: 'fide' });
-    p.proven.push({ art: 'Sprache A1', datum: d('15.03.2022'), kohorte: 2021 });
+    p.proven.push({ art: 'Sprachniveau A1', datum: d('15.03.2022'), kohorte: 2021 });
     p.courses.push({ art: 'Berufliches Integrationsprogramm', bez: 'Pflegehelferin SRK', start: d('01.02.2026'), end: d('30.06.2026'), hours: 20, inst: 'SRK Kanton Bern' });
     p.jobs.push({ von: d('01.08.2026'), ag: 'Altersresidenz zur Wiese', ort: 'Heiligenschwendi', pensum: 50, status: 'unselbstständig', bem: 'Pflegehelferin', zemisName: 'Altersresidenz zur Wiese Heiligenschwendi' });
     p.housing.push({ von: d('01.03.2021'), art: 'Wohnung (eigene)', ort: '3013 Bern' });
@@ -518,7 +518,7 @@ function provenGoals(hh: HH) {
     if (cert && cert.datum <= dl && cert.datum < addDays(M2, -45)) {
       // recorded with a lag; a few are never recorded (claimable, planted)
       if (DQ.notRecorded < 4 && chance(0.06)) DQ.notRecorded++;
-      else p.proven.push({ art: 'Sprache A1', datum: addDays(cert.datum, int(0, 40)), kohorte });
+      else p.proven.push({ art: 'Sprachniveau A1', datum: addDays(cert.datum, int(0, 40)), kohorte });
     }
   }
 }
@@ -712,7 +712,7 @@ async function exportMonth(st: Day, label: string) {
   // ZEMIS Tätigkeit (first labour market only; name variants; planted rows without Erwerb)
   await writeTable(dir, 'zemis', ['zemis', 'klientNr', 'von', 'bis', 'betrieb'], persons.flatMap(({ m }) => cut(m.jobs.filter((j) => !j.noZemis && j.bem !== 'Nebenjob'), st).map((j) => [Number(m.zemis), Number(m.knr), asDate(addDays(j.von, j.zemisOnly ? 0 : Math.floor(hr(m.knr + j.von) * 6))), asDate(j.bis), j.zemisName ?? j.ag])), st);
   // Integrationszielerreichung
-  await writeTable(dir, 'zielerreichung', ['zemis', 'art', 'datum', 'partner', 'kohorte', 'statusS'], persons.flatMap(({ m }) => m.proven.filter((x) => x.datum <= st).map((x) => [m.zemis, x.art, asDate(x.datum), 'ASD Stadt Bern', x.kohorte, 'False'])), st);
+  await writeTable(dir, 'zielerreichung', ['zemis', 'art', 'datum', 'partner', 'kohorte', 'statusS'], persons.flatMap(({ m }) => m.proven.filter((x) => x.datum <= st).map((x) => [m.zemis, x.art, asDate(x.datum), 'Bern Stadt und Umgebung', x.kohorte, 'FALSCH'])), st);
   return { persons: persons.length, households: hhs.length };
 }
 
@@ -745,7 +745,7 @@ NOT REAL PEOPLE. All names, numbers and stories are invented.
           In November the Sprachstand column "Sprachniveau" is exported as "Niveau (A0–C2)" (tests the column-mapping step).
 
 Headers, column order and dropdown values of 10 tables are copied from ASD's templates.
-Integrationszielerreichung follows the data model (template not yet received).
+Integrationszielerreichung follows ASD's template (Art values: Sprachniveau A1, Aufnahme Ausbildung / Erwerbstätigkeit, Finanzielle Unabhängigkeit).
 Klient has no name columns (as in ASD's template); names appear only in the Situationsanalyse reports.
 Generated by scripts/generate.ts (seeded, deterministic).
 `);

@@ -38,7 +38,7 @@ for (const p of res.persons) {
       continue;
     }
     const date = addDays(r.reachedDate, Math.floor(rnd() * 40));
-    add.push([p.zemis, g === 2 ? 'Erwerbstätigkeit / Ausbildung' : 'Wirtschaftliche Selbständigkeit (Ablösung Sozialhilfe)', date, p.zBeginn ? new Date(p.zBeginn * 864e5).getUTCFullYear() : 2024]);
+    add.push([p.zemis, g === 2 ? 'Aufnahme Ausbildung / Erwerbstätigkeit' : 'Finanzielle Unabhängigkeit', date, p.zBeginn ? new Date(p.zBeginn * 864e5).getUTCFullYear() : 2024]);
   }
 }
 
@@ -50,9 +50,9 @@ async function append(month: string, st: Day) {
   // drop rows added by an earlier run of this script
   for (let i = ws.rowCount; i >= 2; i--) {
     const art = String(ws.getRow(i).getCell(2).value ?? '');
-    if (art.startsWith('Erwerb') || art.startsWith('Wirtschaftliche')) ws.spliceRows(i, 1);
+    if (art.startsWith('Aufnahme') || art.startsWith('Finanzielle') || art.startsWith('Erwerb') || art.startsWith('Wirtschaftliche')) ws.spliceRows(i, 1);
   }
-  for (const [z, art, date, k] of add) if (date <= st) ws.addRow([z, art, toJsDate(date), 'ASD Stadt Bern', k, 'False']);
+  for (const [z, art, date, k] of add) if (date <= st) ws.addRow([z, art, toJsDate(date), 'Bern Stadt und Umgebung', k, 'FALSCH']);
   ws.getColumn(3).numFmt = 'dd.mm.yyyy';
   await wb.xlsx.writeFile(file);
 }

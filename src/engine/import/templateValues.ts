@@ -1,6 +1,22 @@
-// Generated from ASD's templates (10 of 11; Integrationszielerreichung still missing).
+// Generated from ASD's templates (all 11).
 // Key: "<table>.<header>". Verbatim, including typos. Black = allowed values; green example values are not listed.
 export const TEMPLATE_VALUES: Record<string, string[]> = {
+ "zielerreichung.Art": [
+  "Aufnahme Ausbildung / Erwerbstätigkeit",
+  "Finanzielle Unabhängigkeit",
+  "Grundpauschale Integration",
+  "Sprachniveau A1"
+ ],
+ "zielerreichung.Partner": [
+  "Alt-Rechtlicher Partner",
+  "Bern Stadt und Umgebung",
+  "Berner Jura, Biel und Seeland",
+  "Berner Oberland",
+  "Bern-Mittelland",
+  "Emmental – Oberaargau",
+  "Rückkehr",
+  "Unbegleitete Minderjährige"
+ ],
  "asylgeschaeftsdaten.Asylgeschäftsart": [
   "ADAM eröffnet",
   "AIG Ausreiseorganisation Dublin",
