@@ -1,0 +1,80 @@
+{
+ "engine": "eleven",
+ "total": 64.901,
+ "scenes": [
+  {
+   "id": "p01_countdown",
+   "start": 0,
+   "dur": 4.2,
+   "voStart": 0.2,
+   "sfx": "tick",
+   "kind": "countdown"
+  },
+  {
+   "id": "p02_pain",
+   "start": 4.2,
+   "dur": 9.002,
+   "voStart": 4.4,
+   "sfx": "whoosh",
+   "kind": "excel"
+  },
+  {
+   "id": "p03_stakes",
+   "start": 13.202,
+   "dur": 6.123,
+   "voStart": 13.402,
+   "sfx": "impact",
+   "kind": "statement"
+  },
+  {
+   "id": "p04_reveal",
+   "start": 19.325,
+   "dur": 2.8,
+   "voStart": 19.525,
+   "sfx": "bell",
+   "kind": "logo"
+  },
+  {
+   "id": "p05_hit",
+   "start": 22.125,
+   "dur": 6.448,
+   "voStart": 22.325,
+   "sfx": "whoosh",
+   "wow": true,
+   "kind": "screen"
+  },
+  {
+   "id": "p06_proof",
+   "start": 28.573,
+   "dur": 10.627,
+   "voStart": 28.773,
+   "sfx": "whoosh",
+   "kind": "screen"
+  },
+  {
+   "id": "p07_ask",
+   "start": 39.2,
+   "dur": 10.095,
+   "voStart": 39.4,
+   "appStart": 42.258,
+   "sfx": "whoosh",
+   "kind": "screen"
+  },
+  {
+   "id": "p08_relief",
+   "start": 49.295,
+   "dur": 8.723,
+   "voStart": 49.495,
+   "sfx": "whoosh",
+   "kind": "statement"
+  },
+  {
+   "id": "p09_close",
+   "start": 58.018,
+   "dur": 6.883,
+   "voStart": 58.218,
+   "sfx": "bell",
+   "kind": "end"
+  }
+ ]
+}

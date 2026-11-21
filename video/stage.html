@@ -164,7 +164,9 @@ window.render = (t) => {
     } else if (s.kind === 'statement') {
       el.querySelectorAll('.st-line').forEach((l, i) => {
         const x = ease((lt - 0.3 - i * (s.dur * 0.6 / s.lines.length)) / 0.7);
-        l.style.cssText += `;opacity:${x};transform:translateY(${(1 - x) * 50}px);filter:blur(${(1 - x) * 14}px)`;
+        l.style.opacity = x;
+        l.style.transform = `translateY(${(1 - x) * 50}px)`;
+        l.style.filter = `blur(${(1 - x) * 14}px)`;
       });
     } else if (s.kind === 'logo' || s.kind === 'end') {
       const m = ease(lt / 0.9);

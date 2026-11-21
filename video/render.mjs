@@ -10,42 +10,29 @@ const DIR = new URL('./', import.meta.url).pathname;
 const FPS = 30;
 const preview = process.argv.includes('--preview');
 const script = JSON.parse(fs.readFileSync(`${DIR}script.json`, 'utf8'));
-const engines = ['eleven', 'kokoro', 'qwen'].filter((e) => fs.existsSync(`${DIR}audio/${e}/durations.json`));
-const durs = Object.fromEntries(engines.map((e) => [e, JSON.parse(fs.readFileSync(`${DIR}audio/${e}/durations.json`, 'utf8'))]));
-const LABEL = {
-  s04_run: 'Monthly run',
-  s05_overview: 'Overview',
-  s06_calls: 'Calls this week',
-  s07_ai: 'Local AI · Situationsanalyse',
-  s08_patterns: 'Patterns',
-  s09_assistant: 'Assistant',
-  s10_out: 'Excel out · Privacy',
-};
-const SHOTS = {
-  s04_run: { shots: ['run_mapping', 'run'], focus: [0.235, 0.1, 0.885, 0.72] },
-  s05_overview: { shots: ['overview'], focus: [0.237, 0.185, 0.884, 0.345] },
-  s06_calls: { shots: ['calls'], focus: [0.235, 0.2, 0.885, 0.5] },
-  s07_ai: { shots: ['situation'], focus: [0.585, 0.26, 0.885, 0.62] },
-  s08_patterns: { shots: ['patterns'], focus: [0.235, 0.2, 0.6, 0.68] },
-  s09_assistant: { shots: ['assistant'], focus: [0.55, 0.2, 0.885, 0.78] },
-  s10_out: { shots: ['export'], focus: [0.235, 0.1, 0.885, 0.62] },
-};
-const LEAD = 0.45; // voice starts this long after the scene starts
+// One cut per voice: scene lengths follow that voice exactly (no silent gaps).
+const engine = process.argv.find((x) => ['eleven', 'kokoro', 'qwen'].includes(x)) ?? 'eleven';
+const dur = JSON.parse(fs.readFileSync(`${DIR}audio/${engine}/durations.json`, 'utf8'));
+const appDur = fs.existsSync(`${DIR}audio/app/durations.json`) ? JSON.parse(fs.readFileSync(`${DIR}audio/app/durations.json`, 'utf8')) : {};
+const LEAD = 0.2; // voice starts this long after the scene starts
+const TAIL = 0.35; // and the scene ends this long after the voice
+const APP_GAP = 0.35; // pause between the narrator and the app's own voice
 let t = 0;
-let n = 0;
 const scenes = script.scenes.map((s) => {
-  const vo = Math.max(...engines.map((e) => durs[e][s.id] ?? 0));
-  let dur = vo + LEAD + 0.85;
-  if (s.kind === 'logo') dur = Math.max(dur, 3.4);
-  if (s.kind === 'end') dur = vo + LEAD + 4.2;
-  if (s.kind === 'title') dur = Math.max(dur, 6);
-  const out = { ...s, ...(SHOTS[s.id] ?? {}), label: LABEL[s.id], n: s.kind === 'screen' ? ++n : 0, start: +t.toFixed(3), dur: +dur.toFixed(3), voStart: +(t + LEAD).toFixed(3) };
-  t += dur;
+  const vo = dur[s.id] ?? 0;
+  const app = s.app ? appDur[s.id] ?? 0 : 0;
+  let d = LEAD + vo + (app ? APP_GAP + app : 0) + TAIL;
+  if (s.kind === 'countdown') d = Math.max(d, 4.2);
+  if (s.kind === 'logo') d = Math.max(d, 2.8);
+  if (s.kind === 'statement') d = Math.max(d, 2.4 + 0.6 * s.lines.length);
+  if (s.kind === 'end') d = LEAD + vo + 3.2;
+  const out = { ...s, start: +t.toFixed(3), dur: +d.toFixed(3), voStart: +(t + LEAD).toFixed(3), appStart: app ? +(t + LEAD + vo + APP_GAP).toFixed(3) : undefined };
+  t += d;
   return out;
 });
 const total = +t.toFixed(3);
-fs.writeFileSync(`${DIR}timings.json`, JSON.stringify({ engines, total, scenes: scenes.map(({ id, start, dur, voStart, sfx, wow, kind }) => ({ id, start, dur, voStart, sfx, wow, kind })) }, null, 1));
-console.log(`engines: ${engines.join(', ')} · total ${total.toFixed(1)} s`);
+fs.writeFileSync(`${DIR}timings_${engine}.json`, JSON.stringify({ engine, total, scenes: scenes.map(({ id, start, dur, voStart, appStart, sfx, wow, kind }) => ({ id, start, dur, voStart, appStart, sfx, wow, kind })) }, null, 1));
+console.log(`${engine} · total ${total.toFixed(1)} s`);
 
 const browser = await puppeteer.launch({
   executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
@@ -60,7 +47,7 @@ await page.evaluate(() => document.fonts.ready);
 await page.evaluate(() => Promise.all([...document.images].map((i) => (i.complete ? 1 : new Promise((r) => (i.onload = i.onerror = r))))));
 
 fs.mkdirSync(`${DIR}out`, { recursive: true });
-const outFile = `${DIR}out/${preview ? 'preview' : 'video'}_silent.mp4`;
+const outFile = `${DIR}out/${preview ? 'preview' : 'video'}_${engine}_silent.mp4`;
 const ff = spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-framerate', String(preview ? 1 : FPS), '-c:v', 'mjpeg', '-i', '-', '-c:v', 'libx264', '-preset', 'medium', '-crf', '18', '-pix_fmt', 'yuv420p', '-r', String(FPS), outFile], { stdio: ['pipe', 'inherit', 'inherit'] });
 const frames = preview ? Math.ceil(total / 1) : Math.ceil(total * FPS);
 const t0 = Date.now();
