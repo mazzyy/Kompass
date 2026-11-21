@@ -7,27 +7,41 @@ import { addPerson, Fx, g, job } from './fixtures';
 // ORGANISERS Q9: the federal payment period is 5 or 7 years depending on the permit.
 // ORGANISERS Q7: the 2027 rule (5 years for everyone) applies to people arriving from 01.01.2027.
 describe('Payment period by permit (TZ)', () => {
-  it('TZ-01 years per status match the "+5"/"+7" variants in the ASD status template', () => {
-    const years = defaultRules().payment_period.years_by_status;
+  it('TZ-01 brief: 7 years from entry for VA / F-FL, 5 years from the asylum application for B-FL / B-RSFL / B-SL', () => {
+    const pp = defaultRules().payment_period;
+    expect(pp.years_by_status).toEqual({ VA: 7, 'F-FL': 7, 'B-FL': 5, 'B-RSFL': 5, 'B-SL': 5 });
+    expect(pp.counted_from).toEqual({ VA: 'entry', 'F-FL': 'entry', 'B-FL': 'application', 'B-RSFL': 'application', 'B-SL': 'application' });
+    expect(Object.keys(pp.years_by_status).sort()).toEqual([...defaultRules().scope.statuses].sort());
+    // ASD's status list agrees for every permit except B-RSFL ("B-RSFL+7"): open question, the brief wins.
     const variants = TEMPLATE_VALUES['klient.Verfahrensstand'].filter((v) => /\+\d$/.test(v));
     const fromTemplate = Object.fromEntries(variants.map((v) => [v.replace(/\+\d$/, ''), Number(v.slice(-1))]));
-    expect(years).toEqual(fromTemplate);
-    expect(Object.keys(years).sort()).toEqual([...defaultRules().scope.statuses].sort());
+    expect({ ...fromTemplate, 'B-RSFL': 5 }).toEqual(pp.years_by_status);
   });
 
   it.each([
-    ['VA', 7, '01.03.2027'],
-    ['F-FL', 7, '01.03.2027'],
-    ['B-RSFL', 7, '01.03.2027'],
-    ['B-FL', 5, '01.03.2025'],
-    ['B-SL', 5, '01.03.2025'],
-  ])('TZ-02 %s entered 01.03.2020 -> %i years, ends %s', (status, years, end) => {
+    ['VA', 7, '01.03.2027', 'entry'],
+    ['F-FL', 7, '01.03.2027', 'entry'],
+    ['B-FL', 5, '10.03.2025', 'application'],
+    ['B-RSFL', 5, '10.03.2025', 'application'],
+    ['B-SL', 5, '10.03.2025', 'application'],
+  ])('TZ-02 %s entered 01.03.2020, asylum application 10.03.2020 -> %i years, ends %s', (status, years, end, from) => {
     const fx = new Fx();
     const p = addPerson(fx, { status, entry: '01.03.2020', ze: '31.12.2032' });
+    fx.add('asylgeschaeftsdaten', { zemis: p.zemis, klientNr: p.knr, art: 'Asylgesuch in CH (Kt normal, Kat. III)', datum: '10.03.2020' });
     const person = g(fx.run(), p.knr);
     expect(person.payYears).toBe(years);
+    expect(person.payFrom).toBe(from);
     expect(fmt(person.payEnd)).toBe(end);
     expect(fmt(person.deadline)).toBe(end); // earlier than Zuständigkeitsende -> payment period wins
+  });
+
+  it('TZ-02b B-FL without an asylum application event: counted from entry, and the trace says so', () => {
+    const fx = new Fx();
+    const p = addPerson(fx, { status: 'B-FL', entry: '01.03.2022', ze: '31.12.2032' });
+    const person = g(fx.run(), p.knr);
+    expect(person.payFrom).toBe('entry_fallback');
+    expect(fmt(person.payEnd)).toBe('01.03.2027');
+    expect(person.goals[2]!.trace.some((t) => t.msg.key === 'dl.period.fallback')).toBe(true);
   });
 
   it('TZ-03 goal 2 deadline follows the period: a B-FL job finishing after 5 years is missed, the same job as VA is reached', () => {

@@ -66,7 +66,7 @@ export function PersonFacts({ app, p }: { app: App; p: Person }) {
         })}
         {p.payEnd !== undefined && (
           <span className="muted" style={{ fontSize: 12 }}>
-            {tr(lang, p.pay2027 ? 'pf.pay2027' : 'pf.pay', { status: p.status, years: p.payYears ?? '', end: fmt(p.payEnd) })}
+            {tr(lang, p.pay2027 ? 'pf.pay2027' : p.payFrom === 'application' ? 'pf.pay.app' : 'pf.pay', { status: p.status, years: p.payYears ?? '', end: fmt(p.payEnd) })}
           </span>
         )}
       </div>

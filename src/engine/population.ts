@@ -2,6 +2,7 @@ import { addYears, ageAt, fmt, parseDate, type Day } from './dates';
 import type { Ctx } from './context';
 import type { Rec } from './import/detect';
 import { TEMPLATE_VALUES } from './import/templateValues';
+import { includesAny } from './context';
 import { day, srcRef, str, type Alert, type Msg, type Person } from './model';
 
 /** Is the Klient row a current client at the Stichtag (§1)? */
@@ -45,6 +46,11 @@ export function buildPerson(k: Rec, ctx: Ctx, alerts: Alert[]): Person {
     .map((e) => day(e.datum)!)
     .sort((a, b) => a - b);
   const entry = entries[0];
+  const apps = events
+    .filter((e) => includesAny(str(e.art), ctx.rules.payment_period?.application_events ?? []) && day(e.datum) !== undefined)
+    .map((e) => day(e.datum)!)
+    .sort((a, b) => a - b);
+  const application = apps[0];
   const name = [str(k.vorname), str(k.name)].filter(Boolean);
   const displayName = name.length
     ? `${str(k.vorname)} ${str(k.name) ? str(k.name)[0] + '.' : ''}`.trim()
@@ -60,14 +66,14 @@ export function buildPerson(k: Rec, ctx: Ctx, alerts: Alert[]): Person {
     });
   }
   const zEnde = day(k.zEnde);
-  const pay = paymentPeriod(status, entry, ctx);
+  const pay = paymentPeriod(status, entry, application, ctx);
   const deadline = pay && zEnde !== undefined ? Math.min(pay.end, zEnde) : pay?.end ?? zEnde;
   if (pay && zEnde !== undefined && Math.abs(pay.end - zEnde) > ctx.rules.dq.date_tolerance_days) {
     alerts.push({
       code: 'period_mismatch',
       severity: 'medium',
       personId: klientNr || zemis,
-      msg: { key: 'dq.period_mismatch', p: { ze: fmt(zEnde), status, years: pay.years, entry: fmt(entry), end: fmt(pay.end), deadline: fmt(deadline) } },
+      msg: { key: pay.from === 'application' ? 'dq.period_mismatch.app' : 'dq.period_mismatch', p: { ze: fmt(zEnde), status, years: pay.years, entry: fmt(pay.start), end: fmt(pay.end), deadline: fmt(deadline) } },
       sources: [srcRef(k, ['klientNr', 'zemis', 'status', 'zEnde'])],
     });
   }
@@ -88,6 +94,9 @@ export function buildPerson(k: Rec, ctx: Ctx, alerts: Alert[]): Person {
     payYears: pay?.years,
     payEnd: pay?.end,
     pay2027: pay?.rule2027,
+    payFrom: pay?.from,
+    payStart: pay?.start,
+    application,
     deadline,
     current: true,
     goals: {},
@@ -96,25 +105,40 @@ export function buildPerson(k: Rec, ctx: Ctx, alerts: Alert[]): Person {
 }
 
 /**
- * Federal payment period for a status (ORGANISERS Q9): years from entry, from rules.payment_period.
- * From the 2027 switch date, arrivals get new_years_from_entry (ORGANISERS Q7, interpretation B).
- * Status variants "+5"/"+7" are past the period and have none.
+ * Federal payment period for a status (brief + ORGANISERS Q9): years from entry (VA / F-FL) or from the
+ * asylum application (B-FL / B-RSFL / B-SL), from rules.payment_period. Without an application event the
+ * entry date is used (from = 'entry_fallback'). From the 2027 switch date, arrivals get new_years_from_entry
+ * (ORGANISERS Q7, interpretation B). Status variants "+5"/"+7" are past the period and have none.
  */
-export function paymentPeriod(status: string, entry: Day | undefined, ctx: Ctx): { years: number; end: Day; rule2027: boolean } | undefined {
-  const base = ctx.rules.payment_period?.years_by_status?.[status];
-  if (base === undefined || entry === undefined) return undefined;
+export function paymentPeriod(
+  status: string,
+  entry: Day | undefined,
+  application: Day | undefined,
+  ctx: Ctx,
+): { years: number; start: Day; end: Day; from: 'entry' | 'application' | 'entry_fallback'; rule2027: boolean } | undefined {
+  const pp = ctx.rules.payment_period;
+  const base = pp?.years_by_status?.[status];
+  if (base === undefined) return undefined;
+  const wantApp = pp.counted_from?.[status] === 'application';
+  const from = wantApp ? (application !== undefined ? 'application' : 'entry_fallback') : 'entry';
+  const start = from === 'application' ? application : entry;
+  if (start === undefined) return undefined;
   const w = ctx.rules.whatif_2027;
   const sw = parseDate(w.switch_date);
-  const rule2027 = w.interpretation === 'B' && sw !== undefined && entry >= sw && w.new_years_from_entry < base;
+  const arrival = entry ?? start;
+  const rule2027 = w.interpretation === 'B' && sw !== undefined && arrival >= sw && w.new_years_from_entry < base;
   const years = rule2027 ? w.new_years_from_entry : base;
-  return { years, end: addYears(entry, years), rule2027 };
+  return { years, start, end: addYears(start, years), from, rule2027 };
 }
 
 /** Trace line explaining where the deadline for goals 2/3 comes from. */
 export function deadlineMsg(p: Person): Msg {
   if (p.deadline === undefined) return { key: 'dl.none' };
   if (p.payEnd !== undefined && p.payEnd === p.deadline)
-    return { key: p.pay2027 ? 'dl.period2027' : 'dl.period', p: { deadline: fmt(p.deadline), status: p.status, years: p.payYears ?? '', entry: fmt(p.entry) } };
+    return {
+      key: p.pay2027 ? 'dl.period2027' : p.payFrom === 'application' ? 'dl.period.app' : p.payFrom === 'entry_fallback' ? 'dl.period.fallback' : 'dl.period',
+      p: { deadline: fmt(p.deadline), status: p.status, years: p.payYears ?? '', entry: fmt(p.payStart) },
+    };
   if (p.payEnd !== undefined) return { key: 'dl.ze_before', p: { deadline: fmt(p.deadline), pay: fmt(p.payEnd), status: p.status, years: p.payYears ?? '' } };
   return { key: 'dl.ze', p: { deadline: fmt(p.deadline) } };
 }

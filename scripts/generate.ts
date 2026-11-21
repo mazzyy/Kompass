@@ -68,16 +68,6 @@ function zEndeFor(status: string, entry: Day | undefined, app: Day | undefined):
   return undefined; // N: open
 }
 
-/**
- * Zuständigkeitsende as written to the Klient export. ORGANISERS Q9: B-RSFL has a 7-year payment period
- * (template "B-RSFL+7"), not 5. Applied only when writing, so the seeded world, and with it the
- * Situationsanalyse reports and the AI cache, stay exactly the same.
- */
-function writtenZEnde(m: P): Day | undefined {
-  if (m.status === 'B-RSFL' && m.entry !== undefined) return addYears(m.entry, 7);
-  return m.zEnde;
-}
-
 function decisionFor(status: string): [string | null, string] {
   // [extra Asylgeschäftsart event or null, Erledigung of the application]
   switch (status.replace(/\+\d$/, '')) {
@@ -687,7 +677,7 @@ async function exportMonth(st: Day, label: string) {
       const statusNow = m.hist.filter((x) => x.von <= st).slice(-1)[0]?.status ?? m.status;
       const kid = m.role === 'child' && ageAtDay(m.birth, st) < 16;
       return [
-        m.dossier, finOn(h)?.art ?? null, m.zemis, m.knr, asText(m.zBeginn), asText(writtenZEnde(m)), asText(m.uebergang),
+        m.dossier, finOn(h)?.art ?? null, m.zemis, m.knr, asText(m.zBeginn), asText(m.zEnde), asText(m.uebergang),
         m.klientStatusOverride ?? statusNow, m.sex === 'w' ? 'Weiblich' : 'Männlich', m.origin.land, m.mutter, cap(m.zivil),
         m.role === 'child' ? null : m.workYears, kid ? null : AUSB[m.ausbildung] ?? null,
         kid ? null : m.latin ? 'Ja' : 'Nein', kid || m.latin ? null : m.school < 3 ? 'Primäranalphabet/-in' : 'Zweitschriftlernende/-r',

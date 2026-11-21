@@ -54,6 +54,9 @@ export interface Person {
   /** Federal payment period for the current status (5 or 7 years from entry, 5 for entries from 2027). */
   payYears?: number;
   payEnd?: Day;
+  payFrom?: 'entry' | 'application' | 'entry_fallback'; // what the period is counted from
+  payStart?: Day;
+  application?: Day; // asylum application date (Asylgeschäftsdaten)
   pay2027?: boolean; // 5 years because of the 2027 rule (entry from the switch date)
   /** Deadline for goals 2 and 3: the earlier of payEnd and zEnde. */
   deadline?: Day;

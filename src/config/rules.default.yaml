@@ -32,10 +32,11 @@ goal1:
   active_course_softens_risk: true
   language_course_keywords: ["Förderangebot Sprache", "Sprachkurs", "Deutsch", "Alphabetisierung", "A1", "fide", "telc"]   # matched in Art or Bezeichnung (template Art: "Förderangebot Sprache", "Sprachkurs im erweiterten Verfahren (N)")
 
-payment_period:                          # goals 2 and 3 must be reached within the federal payment period
-  years_by_status: { "VA": 7, "F-FL": 7, "B-FL": 5, "B-RSFL": 7, "B-SL": 5 }   # ORGANISERS Q9: 5 or 7 years depending on the permit; which is which is read from the template statuses VA+7, F-FL+7, B-FL+5, B-RSFL+7, B-SL+5
-  counted_from: entry                    # ASSUMPTION: from the entry date (Aufenthalt (Einreise)); the federal rule may count refugees from the asylum application, usually a few days later
-  # Deadline for goals 2 and 3 = the earlier of (entry + years) and Zuständigkeitsende. If they differ by more than dq.date_tolerance_days, Data quality shows it.
+payment_period:                          # goals 2 and 3 must be reached within the federal payment period (= end of responsibility)
+  years_by_status: { "VA": 7, "F-FL": 7, "B-FL": 5, "B-RSFL": 5, "B-SL": 5 }   # Brief + ORGANISERS Q9: 7 years for VA / F-FL, 5 years for B-FL / B-RSFL / B-SL. ASD's status list has "B-RSFL+7", which contradicts the brief: ask ASD
+  counted_from: { "VA": "entry", "F-FL": "entry", "B-FL": "application", "B-RSFL": "application", "B-SL": "application" }   # Brief: VA / F-FL from entry, B-* from the asylum application
+  application_events: ["Asylgesuch"]     # Asylgeschäftsart starting with this = asylum application; if none, the entry date is used and the trace says so
+  # Deadline for goals 2 and 3 = the earlier of (start + years) and Zuständigkeitsende. If they differ by more than dq.date_tolerance_days, Data quality shows it.
 
 goal2:
   min_pensum: 60                         # Brief: a job with a work contract, at least 60 %, for 6 months without a break
