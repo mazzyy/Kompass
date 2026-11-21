@@ -33,7 +33,7 @@ goal1:
   language_course_keywords: ["Förderangebot Sprache", "Sprachkurs", "Deutsch", "Alphabetisierung", "A1", "fide", "telc"]   # matched in Art or Bezeichnung (template Art: "Förderangebot Sprache", "Sprachkurs im erweiterten Verfahren (N)")
 
 payment_period:                          # goals 2 and 3 must be reached within the federal payment period (= end of responsibility)
-  years_by_status: { "VA": 7, "F-FL": 7, "B-FL": 5, "B-RSFL": 5, "B-SL": 5 }   # Brief + ORGANISERS Q9: 7 years for VA / F-FL, 5 years for B-FL / B-RSFL / B-SL. ASD's status list has "B-RSFL+7", which contradicts the brief: ask ASD
+  years_by_status: { "VA": 7, "F-FL": 7, "B-FL": 5, "B-RSFL": 5, "B-SL": 5 }   # ASSUMPTION for B-RSFL: 5 years as in the brief, although ASD's status list has "B-RSFL+7". Otherwise brief + organisers: 7 years for VA / F-FL, 5 years for B-FL / B-SL
   counted_from: { "VA": "entry", "F-FL": "entry", "B-FL": "application", "B-RSFL": "application", "B-SL": "application" }   # Brief: VA / F-FL from entry, B-* from the asylum application
   application_events: ["Asylgesuch"]     # Asylgeschäftsart starting with this = asylum application; if none, the entry date is used and the trace says so
   # Deadline for goals 2 and 3 = the earlier of (start + years) and Zuständigkeitsende. If they differ by more than dq.date_tolerance_days, Data quality shows it.
@@ -65,10 +65,10 @@ whatif_2027:
   interpretation: B                      # ORGANISERS Q7: B = the rule applies to people arriving from 01.01.2027 (already in the deadlines); A = what-if: also for current 7-year clients
 
 payment:
-  lump_sum_chf:
-    goal1: null                          # ASSUMPTION Q8: lump sum unknown, counts only
-    goal2: null                          # ASSUMPTION Q8: lump sum unknown, counts only
-    goal3: null                          # ASSUMPTION Q8: lump sum unknown, counts only
+  lump_sum_chf:                          # paid per reached goal under ASD's service contract with the canton (GSI): a base lump sum per person plus a different lump sum per goal. The amounts are not public (each regional partner offered its own price): enter them from the contract, here or in Overview → Forecast
+    goal1: null                          # Sprachniveau A1. null = not set: counts only
+    goal2: null                          # Aufnahme Ausbildung / Erwerbstätigkeit. null = not set: counts only
+    goal3: null                          # Finanzielle Unabhängigkeit. null = not set: counts only
   forecast_quarters: 4
 
 calls:

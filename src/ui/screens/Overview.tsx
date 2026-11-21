@@ -256,40 +256,7 @@ export function OverviewScreen({ app }: { app: App }) {
         </section>
       )}
 
-      {!sw && res.forecast.length > 0 && (
-        <section className="panel" aria-label={tr(lang, 'fc.title')}>
-          <div className="panel-head" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
-            <span className="panel-title">{tr(lang, 'fc.title')}</span>
-            <span className="muted" style={{ fontSize: 12 }}>{tr(lang, 'fc.sub', { n: res.claimable.length })}</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, height: 150, padding: '16px 20px 0' }}>
-            {(() => {
-              const max = Math.max(1, ...res.forecast.map((q) => q.goal1 + q.goal2 + q.goal3));
-              return res.forecast.map((q) => {
-                const tot = q.goal1 + q.goal2 + q.goal3;
-                return (
-                  <div key={q.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', gap: 6, height: '100%' }} title={`${tr(lang, 'goal.1')}: ${q.goal1} · ${tr(lang, 'goal.2')}: ${q.goal2} · ${tr(lang, 'goal.3')}: ${q.goal3}`}>
-                    <span className="num" style={{ fontSize: 12, fontWeight: 500 }}>{tot}</span>
-                    <div style={{ width: '60%', maxWidth: 56, height: `${(tot / max) * 100}px`, minHeight: 2, background: '#1A7F45', borderRadius: '4px 4px 0 0' }} />
-                  </div>
-                );
-              });
-            })()}
-          </div>
-          <div style={{ display: 'flex', gap: 16, padding: '6px 20px 10px', borderTop: '1px solid var(--divider)' }}>
-            {res.forecast.map((q) => (
-              <span key={q.label} className="muted num" style={{ flex: 1, textAlign: 'center', fontSize: 12 }}>
-                {q.label}
-                <br />
-                {q.goal1} · {q.goal2} · {q.goal3}
-              </span>
-            ))}
-          </div>
-          <div className="muted" style={{ padding: '8px 20px 12px', fontSize: 12, borderTop: '1px solid var(--divider)' }}>
-            G1 · G2 · G3. {tr(lang, 'fc.nochf')}
-          </div>
-        </section>
-      )}
+      {!sw && res.forecast.length > 0 && <Forecast app={app} />}
 
       {t1 && !sw && (
         <section className="panel" aria-label={tr(lang, 'ov.bySw')}>
@@ -490,6 +457,88 @@ function Caseload({ app }: { app: App }) {
             ))}
           </tbody>
         </table>
+      </div>
+    </section>
+  );
+}
+
+const fmtChf = (n: number) => n.toLocaleString('de-CH');
+
+/** Forecast per quarter; in CHF once the lump sums per goal are entered (they come from ASD's contract, not public). */
+function Forecast({ app }: { app: App }) {
+  const { lang, result: res } = app;
+  const ls = app.rules.payment.lump_sum_chf as Record<string, number | null>;
+  const val = (g: number) => (typeof ls[`goal${g}`] === 'number' ? (ls[`goal${g}`] as number) : null);
+  const set = [1, 2, 3].every((g) => val(g) !== null);
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<Record<number, string>>({ 1: String(val(1) ?? ''), 2: String(val(2) ?? ''), 3: String(val(3) ?? '') });
+  if (!res) return null;
+  const chfOf = (q: { goal1: number; goal2: number; goal3: number }) => q.goal1 * (val(1) ?? 0) + q.goal2 * (val(2) ?? 0) + q.goal3 * (val(3) ?? 0);
+  const total = res.forecast.reduce((s, q) => s + chfOf(q), 0);
+  const now = res.claimable.reduce((s, c) => s + (val(c.goal) ?? 0), 0);
+  const metric = (q: { goal1: number; goal2: number; goal3: number }) => (set ? chfOf(q) : q.goal1 + q.goal2 + q.goal3);
+  const max = Math.max(1, ...res.forecast.map(metric));
+  const parse = (x: string) => {
+    const n = Number(String(x).replace(/['’\s]/g, '').replace(',', '.'));
+    return x.trim() === '' || !Number.isFinite(n) || n < 0 ? null : Math.round(n);
+  };
+  return (
+    <section className="panel" aria-label={tr(lang, 'fc.title')}>
+      <div className="panel-head">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: '1 1 400px' }}>
+          <span className="panel-title">{tr(lang, 'fc.title')}</span>
+          <span className="muted" style={{ fontSize: 12 }}>{tr(lang, 'fc.sub', { n: res.claimable.length })}</span>
+        </div>
+        <button type="button" className="btn small" aria-expanded={open} onClick={() => setOpen(!open)}>
+          {tr(lang, set ? 'fc.lump.change' : 'fc.lump.edit')}
+        </button>
+      </div>
+      {open && (
+        <form
+          style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-end', padding: '12px 20px', borderBottom: '1px solid var(--divider)', background: 'var(--bg-app)' }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            app.setLumpSums({ 1: parse(draft[1]), 2: parse(draft[2]), 3: parse(draft[3]) });
+            setOpen(false);
+          }}
+        >
+          <div style={{ flex: '1 1 100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <span style={{ fontWeight: 600, fontSize: 13 }}>{tr(lang, 'fc.lump.title')}</span>
+            <span className="muted" style={{ fontSize: 12 }}>{tr(lang, 'fc.lump.sub')}</span>
+          </div>
+          {[1, 2, 3].map((g) => (
+            <label key={g} style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12, flex: '1 1 160px' }}>
+              {tr(lang, `goal.${g}` as 'goal.1')}
+              <input className="input mono" inputMode="numeric" placeholder="CHF" value={draft[g]} onChange={(e) => setDraft({ ...draft, [g]: e.target.value })} />
+            </label>
+          ))}
+          <button type="submit" className="btn primary">
+            {tr(lang, 'fc.lump.save')}
+          </button>
+        </form>
+      )}
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, height: 150, padding: '16px 20px 0' }}>
+        {res.forecast.map((q) => {
+          const m = metric(q);
+          return (
+            <div key={q.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', gap: 6, height: '100%' }} title={`${tr(lang, 'goal.1')}: ${q.goal1} · ${tr(lang, 'goal.2')}: ${q.goal2} · ${tr(lang, 'goal.3')}: ${q.goal3}`}>
+              <span className="num" style={{ fontSize: 12, fontWeight: 500 }}>{set ? `CHF ${fmtChf(m)}` : m}</span>
+              <div style={{ width: '60%', maxWidth: 56, height: `${(m / max) * 100}px`, minHeight: 2, background: '#1A7F45', borderRadius: '4px 4px 0 0' }} />
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ display: 'flex', gap: 16, padding: '6px 20px 10px', borderTop: '1px solid var(--divider)' }}>
+        {res.forecast.map((q) => (
+          <span key={q.label} className="muted num" style={{ flex: 1, textAlign: 'center', fontSize: 12 }}>
+            {q.label}
+            <br />
+            {q.goal1} · {q.goal2} · {q.goal3}
+          </span>
+        ))}
+      </div>
+      <div className="muted" style={{ padding: '8px 20px 12px', fontSize: 12, borderTop: '1px solid var(--divider)' }}>
+        G1 · G2 · G3. {set ? tr(lang, 'fc.chf', { total: fmtChf(total), n: res.forecast.length, now: fmtChf(now) }) : tr(lang, 'fc.nochf')}
       </div>
     </section>
   );

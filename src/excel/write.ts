@@ -319,11 +319,20 @@ function whatIfSheet(wb: ExcelJS.Workbook, res: RunResult) {
   ws.autoFilter = undefined as unknown as ExcelJS.AutoFilter;
 }
 
-function forecastSheet(wb: ExcelJS.Workbook, res: RunResult) {
-  const rows: Row[] = res.forecast.map((q) => [q.label, q.goal1, q.goal2, q.goal3, q.goal1 + q.goal2 + q.goal3]);
-  rows.push([], ['Jetzt abrechenbar (siehe Blatt Abrechenbar)', null, null, null, res.claimable.length]);
-  rows.push(['Ziel 1: laufender Kurs endet vor der Frist (setzt bestandene Prüfung voraus). Ziel 2/3: Abschluss im Quartal. Nur Anzahl; CHF erst mit Pauschalen in rules.yaml.']);
-  const ws = addSheet(wb, 'Prognose', ['Quartal', 'Ziel 1', 'Ziel 2', 'Ziel 3 (Haushalte)', 'Total'], rows, [44, 10, 10, 16, 10]);
+function forecastSheet(wb: ExcelJS.Workbook, res: RunResult, lumpSums: Record<string, number | null>) {
+  const v = (g: number) => (typeof lumpSums[`goal${g}`] === 'number' ? (lumpSums[`goal${g}`] as number) : null);
+  const set = [1, 2, 3].every((g) => v(g) !== null);
+  const chf = (a: number, b: number, c: number) => (set ? a * v(1)! + b * v(2)! + c * v(3)! : null);
+  const rows: Row[] = res.forecast.map((q) => [q.label, q.goal1, q.goal2, q.goal3, q.goal1 + q.goal2 + q.goal3, chf(q.goal1, q.goal2, q.goal3)]);
+  const by = (g: number) => res.claimable.filter((c) => c.goal === g).length;
+  rows.push([], ['Jetzt abrechenbar (siehe Blatt Abrechenbar)', by(1), by(2), by(3), res.claimable.length, chf(by(1), by(2), by(3))]);
+  if (set) rows.push(['Pauschalen pro erreichtem Ziel (rules.yaml)', v(1), v(2), v(3)]);
+  rows.push([
+    set
+      ? 'Ziel 1: laufender Kurs endet vor der Frist (setzt bestandene Prüfung voraus). Ziel 2/3: Abschluss im Quartal. CHF = Anzahl × Pauschale aus dem Leistungsvertrag (in rules.yaml eingegeben).'
+      : 'Ziel 1: laufender Kurs endet vor der Frist (setzt bestandene Prüfung voraus). Ziel 2/3: Abschluss im Quartal. Nur Anzahl; CHF erst mit Pauschalen in rules.yaml.',
+  ]);
+  const ws = addSheet(wb, 'Prognose', ['Quartal', 'Ziel 1', 'Ziel 2', 'Ziel 3 (Haushalte)', 'Total', 'CHF'], rows, [44, 10, 10, 16, 10, 14]);
   ws.autoFilter = undefined as unknown as ExcelJS.AutoFilter;
 }
 
@@ -411,7 +420,7 @@ export async function writeManagement(res: RunResult, rulesText: string, created
   claimSheet(wb, res, lumpSums);
   patternsSheet(wb, res, 10);
   dqSheet(wb, res);
-  forecastSheet(wb, res);
+  forecastSheet(wb, res, lumpSums);
   whatIfSheet(wb, res);
   rulesSheet(wb, rulesText);
   runSheet(wb, res, createdIso);

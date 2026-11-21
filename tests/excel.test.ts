@@ -22,6 +22,16 @@ async function load(buf: ArrayBuffer) {
 }
 
 describe('Excel output (TE)', () => {
+  it('Prognose: CHF column only when all three lump sums are entered; claimable now = count x lump sum', async () => {
+    const res = sample();
+    const none = await load((await writeManagement(res, defaultRulesText)).buffer);
+    const nowRow = (wb: ExcelJS.Workbook) => wb.getWorksheet('Prognose')!.getRows(1, 40)!.find((r) => String(r.getCell(1).value).startsWith('Jetzt abrechenbar'))!;
+    expect(nowRow(none).getCell(6).value).toBeNull();
+    const ls = { goal1: 1000, goal2: 3000, goal3: 5000 };
+    const wb = await load((await writeManagement(res, defaultRulesText, '', ls)).buffer);
+    const want = res.claimable.reduce((s, c) => s + ls[`goal${c.goal}` as keyof typeof ls], 0);
+    expect(nowRow(wb).getCell(6).value).toBe(want);
+  });
   it('Claimable now: Abrechenbar sheet lists reached-but-not-recorded goals from our own rules', async () => {
     const res = sample();
     expect(res.claimable.length).toBe(res.alerts.filter((a) => a.code === 'reached_not_recorded').length);

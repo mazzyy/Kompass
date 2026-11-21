@@ -284,6 +284,13 @@ export function useApp() {
     save('ic.rules', text);
   };
 
+  /** Lump sums per reached goal, written into rules.yaml (so Excel's Regeln sheet shows them too); then recalculate. */
+  const setLumpSums = (v: Record<1 | 2 | 3, number | null>) => {
+    const text = rulesText.replace(/^(\s+goal([123]):\s*)(null|[\d.]+)/gm, (_m, pre: string, g: string) => `${pre}${v[Number(g) as 1 | 2 | 3] ?? 'null'}`);
+    setRulesText(text);
+    setAutoRun(true);
+  };
+
   const doRun = useCallback(async () => {
     if (blocked || !raws.length) return;
     setRunning(true);
@@ -378,6 +385,7 @@ export function useApp() {
     rulesText,
     customRules,
     setRulesText,
+    setLumpSums,
     autoStichtag,
     stichtagOverride,
     setStichtagOverride,

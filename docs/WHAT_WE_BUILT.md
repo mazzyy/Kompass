@@ -35,7 +35,7 @@ Nothing leaves the computer.
 | Local AI | Ollama on `localhost:11434`, model `qwen2.5:7b-instruct` | `src/ai/extract.ts` |
 | PDF reading | pdf.js, bundled locally | `src/ai/pdf.ts` |
 | Synthetic data | Node + Python scripts, seeded (same input → same files) | `scripts/`, `sample-data/` |
-| Tests | Vitest, 104 tests | `tests/` |
+| Tests | Vitest, 105 tests | `tests/` |
 
 Single source of truth: one run produces one `RunResult`; every screen and every Excel sheet is drawn from it, so screen and Excel can never disagree. No number is hard-coded.
 
@@ -121,7 +121,7 @@ Speed: about 15 s per person on this laptop. Results for 85 reports are cached a
 ### 4.8 What-if 2027 and forecast (management)
 
 - 2027 rule: the organisers said it applies to people **arriving from 01.01.2027** (interpretation B, the default). It is already built into every deadline, so the what-if shows 0 current clients affected and says why. Interpretation A (also for today's 7-year clients) can still be switched on in rules.yaml as a what-if: 316 clients would get an earlier deadline. Goals 2 and 3 recalculated, goal 1 unchanged.
-- Forecast: goals expected on time per quarter (running job, time without social assistance, course ending before the deadline). Counts only; CHF once lump sums are set in rules.yaml.
+- Forecast: goals expected on time per quarter (running job, time without social assistance, course ending before the deadline). **In CHF once the lump sums are entered** (Overview → Forecast → "Pauschalen eingeben", saved in rules.yaml; also the claimable total and the Excel Prognose sheet). How ASD is paid, from the City of Bern's public documents on its service contract with the canton (2020): costs of social assistance and housing are reimbursed, case management is paid by flat rates, and integration by a base lump sum per person plus a *different* lump sum for each reached goal (A1, training or work, leaving social assistance). The amounts are not public (each regional partner offered its own price in the tender), so the app ships without amounts and never shows invented CHF figures.
 
 ## 5. Data protection
 
@@ -148,7 +148,7 @@ Speed: about 15 s per person on this laptop. Results for 85 reports are cached a
 - **Assumption**: two contract jobs add up (Q4), Nothilfe counts as support and the household deadline is the head's (Q6), lump sums unknown (Q8), and the smaller ones (Q10–Q14).
 After regenerating the synthetic data in the template format (apprenticeships recorded on completion), November shows: goal 2 counted 322, reached 90, on track 214, at risk 6, overdue 12; claimable 18. S. Keller's call list is unchanged (Reza → Fatima → Amina). The payment-period rule (v1.6) changed none of these numbers: the synthetic Zuständigkeitsende already matched the period, except B-RSFL, which the generator now writes as 7 years (0 mismatches).
 
-## 8. Tests (104, all passing: `npm test`)
+## 8. Tests (105, all passing: `npm test`)
 
 | Area | Tests |
 |---|---|
