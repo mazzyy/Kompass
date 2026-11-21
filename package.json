@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "data": "tsx scripts/generate.ts && rm -rf public/sample-data && cp -R sample-data public/sample-data && cd sample-data && rm -f ../public/sample-data.zip && zip -qr ../public/sample-data.zip 2026-10 2026-11 README.txt planted_effects.md"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.3.0",

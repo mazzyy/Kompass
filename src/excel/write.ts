@@ -165,11 +165,6 @@ function overviewSheet(wb: ExcelJS.Workbook, res: RunResult) {
     rows.push(['Nach Einreisejahr']);
     titleRows.push(rows.length + 1);
     t.byEntryYear.forEach((r) => rows.push(totalsRow(r)));
-    if (t.byCohort.length) {
-      rows.push(['Nach Kohorte (Jahr Grundgesamtheit, nur belegte Ziele)']);
-      titleRows.push(rows.length + 1);
-      t.byCohort.forEach((r) => rows.push(totalsRow(r)));
-    }
     rows.push([]);
   }
   for (const n of res.notes) rows.push([msg('de', n)]);

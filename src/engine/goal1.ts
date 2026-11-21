@@ -1,7 +1,7 @@
 import { addMonths, addYears, fmt, monthsBetween, type Day } from './dates';
 import { includesAny, type Ctx } from './context';
 import type { Rec } from './import/detect';
-import { day, srcRef, str, type Alert, type GoalResult, type Person, type TraceStep } from './model';
+import { day, srcRef, str, type Alert, type GoalResult, type Msg, type Person, type TraceStep } from './model';
 import { personScope } from './population';
 
 export function levelIndex(level: unknown, order: string[]): number {
@@ -243,7 +243,7 @@ export function computeGoal1(p: Person, ctx: Ctx, alerts: Alert[]): GoalResult {
     } else key = 'g1.at_risk.no_course';
     return { ...base, status: 'at_risk', reason: { key, p: p2 } };
   }
-  const reason = activeCourse
+  const reason: Msg = activeCourse
     ? { key: 'g1.on_track.running', p: { deadline: fmt(deadline), months, course: str(activeCourse.bezeichnung) || str(activeCourse.art) } }
     : { key: 'g1.on_track', p: { deadline: fmt(deadline), months } };
   return { ...base, status: 'on_track', reason };
