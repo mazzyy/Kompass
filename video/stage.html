@@ -50,6 +50,16 @@
   .cap span { display: inline-block; }
   #badge { position: absolute; right: 34px; bottom: 26px; font-size: 15px; color: rgba(255,255,255,.55); letter-spacing: .08em; text-transform: uppercase; }
   #fade { position: absolute; inset: 0; background: #000; opacity: 0; }
+  .cd-num { position: absolute; left: 0; right: 0; top: 250px; text-align: center; font-size: 330px; font-weight: 800; letter-spacing: -.04em; font-variant-numeric: tabular-nums; line-height: 1; }
+  .cd-label { position: absolute; left: 0; right: 0; top: 610px; text-align: center; font-size: 34px; color: #b8c0cc; letter-spacing: .04em; }
+  .cd-final { position: absolute; left: 0; right: 0; top: 700px; text-align: center; font-size: 86px; font-weight: 800; color: #ff3b57; letter-spacing: -.02em; }
+  .cd-flash { position: absolute; inset: 0; background: radial-gradient(900px 600px at 50% 45%, rgba(213,0,37,.45), transparent 70%); opacity: 0; }
+  .st-lines { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; display: flex; flex-direction: column; gap: 18px; align-items: center; }
+  .st-line { font-size: 92px; font-weight: 800; letter-spacing: -.02em; line-height: 1.12; display: flex; align-items: center; gap: 28px; }
+  .st-line .chk { width: 70px; height: 70px; border-radius: 50%; background: #1a7f45; display: inline-flex; align-items: center; justify-content: center; font-size: 46px; flex: none; }
+  .theme-green .st-line { font-size: 78px; }
+  .glow-green { position: absolute; inset: 0; background: radial-gradient(1000px 700px at 50% 50%, rgba(26,127,69,.35), transparent 70%); }
+  .glow-red { position: absolute; inset: 0; background: radial-gradient(1000px 700px at 50% 50%, rgba(213,0,37,.28), transparent 70%); }
 </style>
 </head>
 <body>
@@ -80,10 +90,15 @@ window.setup = (cfg, excel) => {
         return `<div class="sheet" data-i="${i}"><div class="tab">${t.name}.xlsx</div><table>${rows}</table></div>`;
       }).join('');
       el.innerHTML = `${sheets}<div class="center-kicker">${s.kicker}</div><div class="center-title">${s.headline}</div><div class="stamp">Deadline missed</div>`;
+    } else if (s.kind === 'countdown') {
+      el.innerHTML = `<div class="cd-flash"></div><div class="cd-num">${s.from}</div><div class="cd-label">${s.label}</div><div class="cd-final">${s.final}</div>`;
+    } else if (s.kind === 'statement') {
+      el.className += ` theme-${s.theme}`;
+      el.innerHTML = `<div class="glow-${s.theme}"></div><div class="st-lines">${s.lines.map((l, i, arr) => `<div class="st-line" style="${s.theme === 'red' && i === arr.length - 1 ? 'color:#ff3b57' : ''}">${s.theme === 'green' ? '<span class="chk">✓</span>' : ''}<span>${l}</span></div>`).join('')}</div>`;
     } else if (s.kind === 'logo' || s.kind === 'end') {
       el.innerHTML = `<div class="mark">K</div><div class="wordmark">${s.headline}</div><div class="sub">${s.sub}</div><div class="sweep"></div>${s.credits ? `<div class="credits">${s.credits}</div>` : ''}`;
     } else {
-      el.innerHTML = `<div class="win"><div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><div class="url">localhost · Kompass</div></div><div class="view">${s.shots.map((sh) => `<img src="shots/${sh}.png">`).join('')}<div class="spot"></div></div></div><div class="tag"><b>${String(s.n).padStart(2, '0')}</b>${s.label}</div><div class="cap">${s.caption.split(' ').map((w) => `<span>${w}&nbsp;</span>`).join('')}</div>`;
+      el.innerHTML = `<div class="win"><div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><div class="url">localhost · Kompass</div></div><div class="view">${s.shots.map((sh) => `<img src="shots/${sh}.png">`).join('')}<div class="spot"></div></div></div>${s.captions.map((c) => `<div class="cap">${c.split(' ').map((w) => `<span>${w}&nbsp;</span>`).join('')}</div>`).join('')}`;
     }
     stage.appendChild(el);
     scenes.push({ s, el });
@@ -133,6 +148,24 @@ window.render = (t) => {
       el.querySelector('.center-title').style.cssText = `opacity:${k};transform:scale(${0.94 + 0.06 * k})`;
       const st = ease((lt - s.dur * 0.62) / 0.35);
       el.querySelector('.stamp').style.cssText = `opacity:${st};transform:translateX(-50%) rotate(-6deg) scale(${1.8 - 0.8 * st})`;
+    } else if (s.kind === 'countdown') {
+      const run = Math.max(1.5, s.dur * 0.62);
+      const k = clamp(lt / run);
+      const v = Math.round(s.from * (1 - Math.pow(k, 0.55)));
+      const num = el.querySelector('.cd-num');
+      num.textContent = String(v);
+      const done = lt >= run;
+      const shake = done ? Math.sin(lt * 60) * 8 * Math.max(0, 1 - (lt - run) / 0.4) : 0;
+      num.style.cssText = `color:${done ? '#ff3b57' : '#fff'};transform:translateX(${shake}px) scale(${done ? 1.04 : 1});opacity:${ease(lt / 0.5)}`;
+      el.querySelector('.cd-label').style.opacity = ease(lt / 0.8) * (done ? 0.4 : 1);
+      const f = ease((lt - run) / 0.35);
+      el.querySelector('.cd-final').style.cssText = `opacity:${f};transform:translateY(${(1 - f) * 30}px) scale(${1.25 - 0.25 * f})`;
+      el.querySelector('.cd-flash').style.opacity = done ? Math.max(0, 1 - (lt - run) / 1.2) : 0.15 + 0.12 * Math.sin(lt * 6);
+    } else if (s.kind === 'statement') {
+      el.querySelectorAll('.st-line').forEach((l, i) => {
+        const x = ease((lt - 0.3 - i * (s.dur * 0.6 / s.lines.length)) / 0.7);
+        l.style.cssText += `;opacity:${x};transform:translateY(${(1 - x) * 50}px);filter:blur(${(1 - x) * 14}px)`;
+      });
     } else if (s.kind === 'logo' || s.kind === 'end') {
       const m = ease(lt / 0.9);
       el.querySelector('.mark').style.cssText = `opacity:${m};transform:scale(${0.6 + 0.4 * m}) rotate(${(1 - m) * -12}deg);box-shadow:0 0 ${80 + 60 * Math.sin(lt * 2)}px rgba(213,0,37,.6)`;
@@ -144,37 +177,31 @@ window.render = (t) => {
       const cr = el.querySelector('.credits');
       if (cr) cr.style.opacity = ease((lt - 2) / 1);
     } else {
-      // browser window: tilted 3D entry -> flat -> slow zoom into the focus area, spotlight, caption
+      // browser window: tilted 3D entry (first shot), then for each shot: slow zoom into its focus, spotlight, caption
       const win = el.querySelector('.win');
-      const e = easeIO(lt / 1.4);
-      const [x0, y0, x1, y1] = s.focus;
+      const nS = s.shots.length, seg = s.dur / nS, k = Math.min(nS - 1, Math.floor(Math.max(0, lt) / seg)), st = lt - k * seg;
+      const e = k === 0 ? easeIO(lt / 1.2) : 1;
+      const [x0, y0, x1, y1] = s.focus[k];
       const fw = (x1 - x0) * 1920, fh = (y1 - y0) * 1080;
       const target = Math.min(1.75, Math.max(0.78, Math.min(1500 / fw, 860 / fh) * 0.62));
-      const z = ease((lt - 1.2) / Math.max(2, s.dur - 1.6));
-      const base = 0.7;
-      const sc = lerp(base, target, z) * lerp(0.78, 1, e);
+      const z = ease((st - (k === 0 ? 0.9 : 0.15)) / Math.max(1.6, seg - 1.0));
+      const sc = lerp(0.7, target, z) * lerp(0.78, 1, e);
       const cx = ((x0 + x1) / 2 - 0.5) * 1920, cy = ((y0 + y1) / 2 - 0.5) * 1080 + 20;
-      // pan towards the focus, but never past the window edge (no background showing through when zoomed in)
       const maxX = Math.max(0, (1920 * sc - 1920) / 2), maxY = Math.max(0, (1120 * sc - 1080) / 2);
       const tx = clamp(-cx * z * sc * 0.9, -maxX, maxX), ty = clamp(-cy * z * sc * 0.9, -maxY, maxY);
       win.style.transform = `perspective(2200px) rotateX(${(1 - e) * 16}deg) rotateY(${(1 - e) * -22}deg) translate(${tx}px, ${ty + (1 - e) * 120}px) scale(${sc})`;
-      const imgs = el.querySelectorAll('.view img');
-      imgs.forEach((im, i) => {
-        if (imgs.length === 1) return (im.style.opacity = 1);
-        const sw = s.dur * 0.5;
-        im.style.opacity = i === 0 ? 1 - clamp((lt - sw) / 0.6) : clamp((lt - sw) / 0.6);
-      });
+      el.querySelectorAll('.view img').forEach((im, i) => (im.style.opacity = i === k ? clamp(st / 0.3) || (k === 0 ? 1 : 0) : i === k - 1 ? 1 - clamp(st / 0.3) : 0));
       const spot = el.querySelector('.spot');
-      const sp = ease((lt - 1.9) / 0.7) * (1 - ease((lt - s.dur + 0.4) / 0.4));
+      const sp = ease((st - (k === 0 ? 1.3 : 0.6)) / 0.5) * (1 - ease((st - seg + 0.3) / 0.3));
       spot.style.cssText = `left:${x0 * 1920 - 10}px;top:${y0 * 1080 - 10}px;width:${fw + 20}px;height:${fh + 20}px;opacity:${sp}`;
-      const tg = el.querySelector('.tag');
-      tg.style.cssText = `opacity:${ease((lt - 0.3) / 0.8)};transform:translateY(${(1 - ease((lt - 0.3) / 0.8)) * -16}px)`;
-      const cap = el.querySelector('.cap');
-      const c = ease((lt - 0.9) / 0.7);
-      cap.style.cssText = `opacity:${c};transform:translateY(${(1 - c) * 40}px)`;
-      cap.querySelectorAll('span').forEach((w, i) => {
-        const k = ease((lt - 1.0 - i * 0.07) / 0.45);
-        w.style.cssText = `opacity:${k};transform:translateY(${(1 - k) * 18}px)`;
+      el.querySelectorAll('.cap').forEach((cap, i) => {
+        if (i !== k) return (cap.style.opacity = 0);
+        const c = ease((st - (k === 0 ? 0.7 : 0.2)) / 0.5) * (1 - ease((st - seg + 0.25) / 0.25));
+        cap.style.cssText = `opacity:${c};transform:translateY(${(1 - c) * 30}px)`;
+        cap.querySelectorAll('span').forEach((w, j) => {
+          const q = ease((st - (k === 0 ? 0.8 : 0.3) - j * 0.06) / 0.4);
+          w.style.cssText = `opacity:${q};transform:translateY(${(1 - q) * 16}px)`;
+        });
       });
     }
   }

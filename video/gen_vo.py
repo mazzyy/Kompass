@@ -2,6 +2,9 @@
 import json, os, sys, time, urllib.request, urllib.error
 import numpy as np, soundfile as sf
 engine = sys.argv[1]
+# 'app' = the app's own voice (ElevenLabs 'Alice', as in the assistant) for scenes with an 'app' line
+field = 'app' if engine == 'app' else 'vo'
+voice_id = 'Xb7hH8MSUJpSbSDYk0k2' if engine == 'app' else 'JBFqnCBsd6RMkjVDRZzb'
 script = json.load(open('script.json'))
 out = f'audio/{engine}'; os.makedirs(out, exist_ok=True)
 dur = {}
@@ -13,13 +16,14 @@ if engine == 'qwen':
     from qwen_tts import Qwen3TTSModel
     dev = 'mps' if torch.backends.mps.is_available() else 'cpu'
     m = Qwen3TTSModel.from_pretrained('Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice', device_map=dev, dtype=torch.float32)
-if engine == 'eleven':
+if engine in ('eleven', 'app'):
     key = [l.split('=', 1)[1].strip() for l in open('../.env.local') if l.startswith('ELEVENLABS_API_KEY=')][0]
 for s in script['scenes']:
-    text = s['vo']; f = f"{out}/{s['id']}.wav"; t = time.time()
-    if engine == 'eleven':
+    if field not in s: continue
+    text = s[field]; f = f"{out}/{s['id']}.wav"; t = time.time()
+    if engine in ('eleven', 'app'):
         req = urllib.request.Request(
-            'https://api.elevenlabs.io/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb?output_format=mp3_44100_128',
+            f'https://api.elevenlabs.io/v1/text-to-speech/{voice_id}?output_format=mp3_44100_128',
             data=json.dumps({'text': text, 'model_id': 'eleven_multilingual_v2', 'language_code': 'en',
                              'voice_settings': {'stability': 0.45, 'similarity_boost': 0.8, 'style': 0.25, 'use_speaker_boost': True}}).encode(),
             headers={'xi-api-key': key, 'Content-Type': 'application/json'})
@@ -36,7 +40,7 @@ for s in script['scenes']:
     else:
         wavs, sr = m.generate_custom_voice(text=text, speaker=os.environ.get('QWEN_SPEAKER', 'ryan'), language='english')
         a = np.asarray(wavs[0])
-    if engine != 'eleven': sf.write(f, a, sr)
+    if engine not in ('eleven', 'app'): sf.write(f, a, sr)
     dur[s['id']] = round(len(a) / sr, 3)
     print(engine, s['id'], dur[s['id']], 's', f'({time.time()-t:.1f}s)', flush=True)
 json.dump(dur, open(f'{out}/durations.json', 'w'), indent=1)
