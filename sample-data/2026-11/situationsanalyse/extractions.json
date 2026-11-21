@@ -888,5 +888,304 @@
     "ms": 19829
    }
   ]
+ },
+ "SA_D12_7239.txt": {
+  "file": "SA_D12_7239.txt",
+  "model": "qwen2.5:7b-instruct",
+  "at": "2026-11-21T00:22:15.260Z",
+  "persons": [
+   {
+    "zemis": "46522796",
+    "name": "Tamana Popal",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisierung Zielsprache: ja."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Versteht kein Schweizerdeutsch."
+     },
+     "learning_pace": {
+      "value": "medium",
+      "status": "stated",
+      "evidence": "Lerntempo mittel."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit."
+     },
+     "availability_for_work_or_education": {
+      "value": "partial",
+      "status": "stated",
+      "evidence": "Verfügbarkeit für Arbeit oder Bildung: teilweise."
+     },
+     "work_experience_years_origin": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "diplomas": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Ein Berufsdiplom aus dem Herkunftsland ist vorhanden."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Kein Führerschein."
+     },
+     "career_wish": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     }
+    },
+    "ms": 22404
+   },
+   {
+    "zemis": "34501179",
+    "name": "Mustafa Popal",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Schweizerdeutsch versteht er noch nicht."
+     },
+     "learning_pace": {
+      "value": "good",
+      "status": "stated",
+      "evidence": "Er lernt schnell und motiviert."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Keine gesundheitlichen Einschränkungen bekannt."
+     },
+     "availability_for_work_or_education": {
+      "value": "full",
+      "status": "stated",
+      "evidence": "Er ist voll verfügbar für Arbeit oder Bildung."
+     },
+     "work_experience_years_origin": {
+      "value": 3,
+      "status": "stated",
+      "evidence": "Im Herkunftsland 3 Jahre Berufserfahrung."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Keine Diplome."
+     },
+     "driving_licence": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "career_wish": {
+      "value": "Informatik",
+      "status": "stated",
+      "evidence": "Berufliche Perspektive (Sicht Klient/in): Informatik."
+     }
+    },
+    "ms": 21797
+   },
+   {
+    "zemis": "42541974",
+    "name": "Shabnam Popal",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Sie liest und schreibt lateinische Schrift."
+     },
+     "understands_swiss_german": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Versteht Schweizerdeutsch im Alltag recht gut."
+     },
+     "learning_pace": {
+      "value": "medium",
+      "status": "stated",
+      "evidence": "Sie lernt in einem durchschnittlichen Tempo."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit."
+     },
+     "availability_for_work_or_education": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Keine Berufserfahrung im Herkunftsland."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Keine Diplome."
+     },
+     "driving_licence": {
+      "value": "yes_not_recognised",
+      "status": "stated",
+      "evidence": "Führerschein aus dem Herkunftsland, in der Schweiz nicht anerkannt."
+     },
+     "career_wish": {
+      "value": "Pflege (FaGe)",
+      "status": "stated",
+      "evidence": "Möchte im Bereich Pflege (FaGe) arbeiten."
+     }
+    },
+    "ms": 23676
+   },
+   {
+    "zemis": "34188133",
+    "name": "Tamana Popal",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisiert in der Muttersprache und in lateinischer Schrift."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Versteht kein Schweizerdeutsch."
+     },
+     "learning_pace": {
+      "value": "medium",
+      "status": "stated",
+      "evidence": "Lerntempo mittel."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit."
+     },
+     "availability_for_work_or_education": {
+      "value": "partial",
+      "status": "stated",
+      "evidence": "Verfügbarkeit für Arbeit oder Bildung: teilweise."
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Bisher keine Arbeitserfahrung."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Keine Diplome."
+     },
+     "driving_licence": {
+      "value": "yes_not_recognised",
+      "status": "stated",
+      "evidence": "Führerschein aus dem Herkunftsland, in der Schweiz nicht anerkannt."
+     },
+     "career_wish": {
+      "value": "Informatik",
+      "status": "stated",
+      "evidence": "Berufliche Perspektive (Sicht Klient/in): Informatik."
+     }
+    },
+    "ms": 21249
+   }
+  ]
+ },
+ "SA_D12_2415.txt": {
+  "file": "SA_D12_2415.txt",
+  "model": "qwen2.5:7b-instruct",
+  "at": "2026-11-21T00:22:35.356Z",
+  "persons": [
+   {
+    "zemis": "56542129",
+    "name": "Deniz Kaya",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisierung Zielsprache: ja."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Schweizerdeutsch versteht er noch nicht."
+     },
+     "learning_pace": {
+      "value": "good",
+      "status": "stated",
+      "evidence": "Er lernt schnell und motiviert."
+     },
+     "health_limits_work": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "availability_for_work_or_education": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "work_experience_years_origin": {
+      "value": 11,
+      "status": "stated",
+      "evidence": "Er hat 11 Jahre im Herkunftsland gearbeitet."
+     },
+     "diplomas": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Diplome: ja."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Führerschein: nein."
+     },
+     "career_wish": {
+      "value": "Gastronomie",
+      "status": "stated",
+      "evidence": "Berufliche Perspektive (Sicht Klient/in): Gastronomie."
+     }
+    },
+    "ms": 20094
+   }
+  ]
  }
 }

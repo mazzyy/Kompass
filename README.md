@@ -1,32 +1,51 @@
-# React + TypeScript + Vite
+# Integrations-Cockpit (Asylsozialdienst Stadt Bern)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+AI for Access hackathon, Bern, 20–21 Nov 2026. **All data in this repo is synthetic. No real people.**
 
-Currently, two official plugins are available:
+The Asylsozialdienst is paid only when refugees reach integration goals before deadlines. This tool reads the Excel exports of their case-management system (as they come: German headers, Swiss dates), computes each client's status with a tested rules engine, shows a weekly call list per social worker, and writes Excel files back. A **local** AI model (Ollama) reads the free-text *Situationsanalyse* and proposes fields with the exact sentence as evidence; a person confirms. **Rules set the traffic lights, AI only extracts, people decide. Nothing leaves the computer.**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Try it (judges)
 
-## React Compiler
+1. Open the hosted demo, or run it locally (below).
+2. *Monatslauf* → **November 2026** (sample data) → a renamed column is detected → **Zuordnung übernehmen** → **Berechnen**.
+3. *Anrufe diese Woche* → S. Keller: Amina is first (A1 deadline in 112 days). Open her row: reason, sources (table + row), talking points.
+4. *Situationsanalyse* → a report with the fields the local model extracted, evidence highlighted → **Bestätigen**.
+5. *Excel-Exporte* → download the management workbook and one per social worker.
+6. Or download `sample-data.zip`, change values in Excel, upload the files yourself. Every number is recomputed.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+DE/EN toggle top right. *Ansicht als* switches between management and one social worker (who then sees only their own clients).
 
-## Expanding the Oxlint configuration
+## Run locally
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev            # http://localhost:5173
+npm test               # rules engine acceptance tests (Vitest)
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Local AI (optional, for live extraction):
+
+```bash
+ollama pull qwen2.5:7b-instruct
+ollama serve           # the app calls http://localhost:11434 only
+```
+
+Regenerate the synthetic data (deterministic): `npm run data`. Measure extraction accuracy: `npx tsx scripts/extract.ts accuracy 20`.
+
+## What is where
+
+| Path | What |
+|---|---|
+| `src/config/rules.default.yaml` | every rule parameter and open assumption (shown in the app's Rules panel and the `Regeln` sheet) |
+| `src/engine/` | pure TypeScript rules engine: import + table detection by headers, population, goal 1, call list, totals, data quality |
+| `src/engine/import/signatures.ts` | all export header names in one place (5 tables are provisional until ASD's templates arrive) |
+| `src/excel/write.ts` | management + per-social-worker workbooks |
+| `src/ai/extract.ts` | local-model extraction; evidence is a numbered sentence, so it is always verbatim |
+| `scripts/generate.ts`, `scripts/reports.ts` | synthetic exports (2 months) and Situationsanalyse reports, with 6 planted personas |
+| `tests/` | acceptance tests from the spec (TI, TS, T1, TC, TE) |
+
+## Data protection
+
+Runs entirely in the browser. A Content-Security-Policy blocks every network request except the app itself and the local model on `localhost:11434`. Fonts are bundled. Browser storage holds only column mappings, call marks, confirmed report fields and the language; *Lokale Daten löschen* clears it. No per-person scores or predictions.
+
+MIT licence.

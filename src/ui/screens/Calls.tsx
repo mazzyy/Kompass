@@ -7,6 +7,17 @@ import { Icon } from '../icons';
 import { tr } from '../strings';
 import { download, type App } from '../useApp';
 import { EmptyRun, GoalPills, PersonFacts } from './common';
+import { SA_FIELDS } from '../../ai/extract';
+import { saValue } from './Situation';
+
+// Confirmed Situationsanalyse facts that can explain a flag (shown, never used to set a light).
+const BARRIER: Record<string, (v: unknown) => boolean> = {
+  childcare_duty_without_care: (v) => v === 'yes',
+  literate_latin_script: (v) => v === 'no',
+  health_limits_work: (v) => v === 'some' || v === 'strong',
+  availability_for_work_or_education: (v) => v === 'partial' || v === 'none',
+  learning_pace: (v) => v === 'slow',
+};
 
 const LEAD_COLOR: Record<CallItem['category'], string> = { 1: 'var(--risk)', 2: 'var(--missed)', 3: 'var(--track-text)', 4: 'var(--accent-hover)', 5: 'var(--ink-2)' };
 
@@ -116,6 +127,17 @@ export function CallsScreen({ app }: { app: App }) {
                   <span className="tag">{tr(lang, 'calls.rulesDecide')}</span>
                 </div>
                 <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55 }}>{msg(lang, sel.lead)}</p>
+                {(() => {
+                  const c = app.sa.confirmed[p.zemis];
+                  const b = SA_FIELDS.filter((f) => c?.[f.id]?.status === 'confirmed' && BARRIER[f.id]?.(c[f.id].value));
+                  if (!b.length) return null;
+                  return (
+                    <div style={{ fontSize: 13, color: 'var(--ink-2)', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'baseline' }}>
+                      <span className="tag ai">{tr(lang, 'calls.saConfirmed')}</span>
+                      {b.map((f) => `${lang === 'de' ? f.de : f.en}: ${saValue(lang, f.id, c![f.id].value)}`).join(' · ')}
+                    </div>
+                  );
+                })()}
                 {sel.reasons.filter((r) => JSON.stringify(r) !== JSON.stringify(sel.lead)).length > 0 && (
                   <div style={{ fontSize: 13, color: 'var(--ink-2)' }}>
                     {tr(lang, 'calls.more')}:{' '}

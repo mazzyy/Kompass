@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
-    "data": "tsx scripts/generate.ts && rm -rf public/sample-data && cp -R sample-data public/sample-data && cd sample-data && rm -f ../public/sample-data.zip && zip -qr ../public/sample-data.zip 2026-10 2026-11 README.txt planted_effects.md"
+    "data": "tsx scripts/generate.ts && tsx scripts/reports.ts && python3 -I scripts/pdf.py sample-data/2026-11/situationsanalyse && npm run zip",
+    "zip": "cd sample-data && rm -f ../public/sample-data.zip && zip -qr ../public/sample-data.zip README.txt planted_effects.md 2026-10 2026-11 -x '*.txt' -x '*.json' && zip -q ../public/sample-data.zip README.txt"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.3.0",
