@@ -35,7 +35,7 @@ Nothing leaves the computer.
 | Local AI | Ollama on `localhost:11434`, model `qwen2.5:7b-instruct` | `src/ai/extract.ts` |
 | PDF reading | pdf.js, bundled locally | `src/ai/pdf.ts` |
 | Synthetic data | Node + Python scripts, seeded (same input → same files) | `scripts/`, `sample-data/` |
-| Tests | Vitest, 109 tests | `tests/` |
+| Tests | Vitest, 114 tests | `tests/` |
 
 Single source of truth: one run produces one `RunResult`; every screen and every Excel sheet is drawn from it, so screen and Excel can never disagree. No number is hard-coded.
 
@@ -125,14 +125,13 @@ Speed: about 15 s per person on this laptop. Results for 85 reports are cached a
 - `Cockpit_<date>.xlsx` (management): Übersicht (with a check row that the totals equal the person rows), Ziel1_Personen, Ziel2_Personen, Ziel3_Haushalte, Anrufliste, Abrechenbar, Muster, Datenqualität, Prognose, WhatIf_2027, Regeln, Lauf.
 - `Anrufliste_<Name>_<date>.xlsx` per social worker: their call list, their clients, their data-quality items, rules.
 
-### 4.7b Frag das Cockpit (local RAG) and voice
+### 4.7b Assistant: conversation, charts and voice
 
-- New screen **"Frag das Cockpit"** for social workers and management (German and English). Questions about rules, goals and this month's figures, e.g. "Warum zählt ein Praktikum nicht für Ziel 2?", "Ab wann gilt die 2027-Regel?", "Wie viele sind bei Ziel 1 im Rückstand, und warum?".
-- **Knowledge**: the challenge brief (text pages), `rules.yaml` with its notes, a German plain-language help text `docs/HILFE.md`, and this document. 73 passages, embedded with the local model `nomic-embed-text` (`npm run rag`). No client data in the index.
-- **Answer**: the local model (qwen2.5:7b) writes 2–5 sentences from the 5 best passages plus this run's key figures **without client names** (counts, reasons for lagging behind, per social worker, claimable, data quality, forecast), with citations [1]…[K]; the sources can be opened. If the answer is not in the sources it says so. If Ollama is offline, the closest passages are shown (keyword search).
-- **Questions about one person** (a client's name, client or Zemis number) are not sent to the model: the app links to that person's page, where the rules show status, reasons and source rows.
-- **Voice**: "Vorlesen" reads an answer aloud. Default is the computer's own voice (offline). **ElevenLabs** (voice "Alice", model eleven_multilingual_v2) can be chosen: the browser sends the answer to our own server (`/api/tts`), which holds the key from `.env.local` and calls ElevenLabs, but only if the text contains no client names, social-worker names, client/Zemis/dossier numbers or birth dates (checked in the browser and again on the server); otherwise the computer voice reads it and the app says why. The API key is not in the built app (checked).
-- Speech-to-text is deliberately not used (it would send recordings to a cloud service).
+- Screen **"Assistent"**: a conversation like ChatGPT or Claude, in German or English, for social workers and management. Left the chat (follow-up questions keep the context, e.g. "Visualisiere Ziel 2" → "und nach Einreisejahr?"), right the **view** with the charts and sources of the selected reply. On narrower screens the charts appear inside the reply.
+- **Charts**: the question decides which chart fits (status, by social worker, by entry year, reasons for lagging behind, deadlines in the next 12 months, forecast, claimable now, all goals); **the numbers come from the rules engine's run, never from the AI**. The chart numbers (without client names; social workers only as ranks) are given to the local model, which describes the chart in 2–4 sentences.
+- **Rule questions** (e.g. "Warum zählt ein Praktikum nicht für Ziel 2?") are answered by local RAG over the brief (text pages), `rules.yaml`, the German help `docs/HILFE.md` and this document (`npm run rag`, model `nomic-embed-text`), with sources [1]…[K].
+- **Questions about one person** are not sent to the model; the app links to that person's page.
+- **Voice** (icons in the input field): 🎤 speak one question; 🔊 read replies aloud; 〰 **conversation mode** (listen → answer → speak → listen again, stops after a pause, with a voice indicator); ⚙ voice and privacy. Speech to text: **ElevenLabs Scribe** (the team's choice; the spoken question goes to ElevenLabs, the UI says so and asks not to say client names). Speaking: **ElevenLabs** ("Alice", eleven_multilingual_v2) for replies without names or numbers, otherwise the computer's own voice. Both go through our own local server (`/api/stt`, `/api/tts`), which holds the key from `.env.local`; the key is not in the built app (checked). The key needs the permissions Text to Speech, Speech to Text, Voices (read), Models.
 
 ### 4.8 What-if 2027 and forecast (management)
 
@@ -146,7 +145,7 @@ Speed: about 15 s per person on this laptop. Results for 85 reports are cached a
 - The built app has a Content-Security-Policy that blocks every network request except the app itself and the local model on `localhost:11434`. Fonts are bundled.
 - Browser storage only holds column mappings, "called" marks, confirmed report fields and the language; *Lokale Daten löschen* clears it.
 - No per-person score or prediction anywhere. Rules decide the traffic lights; AI only extracts; people confirm.
-- Exception by choice: if a user selects the ElevenLabs voice in "Frag das Cockpit", the text of an answer (rules and totals only, no names or numbers) is sent to ElevenLabs. The default is the offline computer voice.
+- Exception by choice (voice in the assistant): spoken questions are turned into text by ElevenLabs (cloud), and replies without names or numbers are spoken by ElevenLabs. Typing and the offline computer voice need no cloud. Client data from the exports is never sent.
 
 ## 6. Synthetic data
 
@@ -165,7 +164,7 @@ Speed: about 15 s per person on this laptop. Results for 85 reports are cached a
 - **Assumption**: two contract jobs add up (Q4), Nothilfe counts as support and the household deadline is the head's (Q6), lump sums unknown (Q8), and the smaller ones (Q10–Q14).
 After regenerating the synthetic data in the template format (apprenticeships recorded on completion), November shows: goal 2 counted 322, reached 90, on track 214, at risk 6, overdue 12; claimable 18. S. Keller's call list is unchanged (Reza → Fatima → Amina). The payment-period rule (v1.6) changed none of these numbers: the synthetic Zuständigkeitsende already matched the period, except B-RSFL, which the generator now writes as 7 years (0 mismatches).
 
-## 8. Tests (109, all passing: `npm test`)
+## 8. Tests (114, all passing: `npm test`)
 
 | Area | Tests |
 |---|---|

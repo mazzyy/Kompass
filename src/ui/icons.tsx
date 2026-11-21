@@ -44,6 +44,33 @@ export function StatusIcon({ status, size = 15, label }: { status: Status | unde
 const P = { width: 16, height: 16, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 1.5, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true };
 
 export const Icon = {
+  mic: () => (
+    <svg {...P}><rect x="5.5" y="1.75" width="5" height="8" rx="2.5" /><path d="M3 7.5a5 5 0 0 0 10 0M8 12.5v2" /></svg>
+  ),
+  send: () => (
+    <svg {...P}><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5" /></svg>
+  ),
+  speaker: () => (
+    <svg {...P}><path d="M2.5 6v4h2.5l3.5 3V3L5 6z" /><path d="M11 5.5a3.5 3.5 0 0 1 0 5M12.8 3.8a6 6 0 0 1 0 8.4" /></svg>
+  ),
+  speakerOff: () => (
+    <svg {...P}><path d="M2.5 6v4h2.5l3.5 3V3L5 6z" /><path d="m11 6 3.5 4M14.5 6 11 10" /></svg>
+  ),
+  wave: () => (
+    <svg {...P}><path d="M2 7v2M4.5 5v6M7 3v10M9.5 5v6M12 6.5v3M14.5 7.5v1" /></svg>
+  ),
+  gear: () => (
+    <svg {...P}><circle cx="8" cy="8" r="2.2" /><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4" /></svg>
+  ),
+  stop: () => (
+    <svg {...P}><rect x="4" y="4" width="8" height="8" rx="1.5" /></svg>
+  ),
+  plus: () => (
+    <svg {...P}><path d="M8 3v10M3 8h10" /></svg>
+  ),
+  chart: () => (
+    <svg {...P}><path d="M2.5 13.5h11M4.5 11V7.5M8 11V4M11.5 11V9" /></svg>
+  ),
   ask: () => (
     <svg {...P}><path d="M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z" /><path d="M6.3 6a1.7 1.7 0 1 1 2.2 1.6c-.3.1-.5.4-.5.7v.2" /></svg>
   ),

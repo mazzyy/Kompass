@@ -34,6 +34,7 @@ const csp = (): Plugin => ({
 const PERSONAL = [/\b\d{5,}\b/, /\bD\d{2}\.\d{3,}\b/i, /zemis/i, /\bK-\d+/, /geburtsdatum|date of birth/i]
 const tts = (key: string | undefined): Plugin => {
   const handler: Connect.NextHandleFunction = (req: IncomingMessage, res: ServerResponse, next) => {
+    if (req.url?.split('?')[0] === '/api/stt') return stt(req, res, next)
     if (req.url?.split('?')[0] !== '/api/tts') return next()
     if (req.method === 'GET') {
       res.setHeader('Content-Type', 'application/json')
@@ -69,6 +70,48 @@ const tts = (key: string | undefined): Plugin => {
       }
     })
   }
+  /**
+   * Speech to text: POST /api/stt?lang=de (body = recorded audio) -> {text}. Uses ElevenLabs Speech to Text
+   * (the user chose this over a local model). The spoken question goes to ElevenLabs; the UI says so.
+   */
+  const stt: Connect.NextHandleFunction = (req, res, next) => {
+    if (req.method !== 'POST') return next()
+    const chunks: Buffer[] = []
+    let size = 0
+    req.on('data', (c: Buffer) => {
+      size += c.length
+      if (size <= 10 * 1024 * 1024) chunks.push(c)
+    })
+    req.on('end', async () => {
+      const fail = (code: number, msg: string) => {
+        res.statusCode = code
+        res.setHeader('Content-Type', 'application/json')
+        res.end(JSON.stringify({ error: msg }))
+      }
+      try {
+        if (!key) return fail(503, 'no ELEVENLABS_API_KEY in .env.local')
+        if (size > 10 * 1024 * 1024 || size < 1000) return fail(400, 'recording too long or too short')
+        const u = new URL(req.url ?? '', 'http://x')
+        const lang = u.searchParams.get('lang') === 'en' ? 'en' : 'de'
+        const model = /^[a-z0-9_]{3,40}$/.test(u.searchParams.get('model') ?? '') ? u.searchParams.get('model')! : 'scribe_v1'
+        const type = String(req.headers['content-type'] || 'audio/webm')
+        const fd = new FormData()
+        fd.append('file', new Blob([Buffer.concat(chunks)], { type }), type.includes('mp4') ? 'speech.mp4' : type.includes('mpeg') ? 'speech.mp3' : 'speech.webm')
+        fd.append('model_id', model)
+        fd.append('language_code', lang)
+        fd.append('tag_audio_events', 'false')
+        const r = await fetch('https://api.elevenlabs.io/v1/speech-to-text', { method: 'POST', headers: { 'xi-api-key': key }, body: fd })
+        if (!r.ok) return fail(r.status === 401 ? 401 : 502, `ElevenLabs ${r.status}: ${(await r.text()).slice(0, 300)}`)
+        const j = (await r.json()) as { text?: string }
+        res.setHeader('Content-Type', 'application/json')
+        res.setHeader('Cache-Control', 'no-store')
+        res.end(JSON.stringify({ text: (j.text ?? '').trim() }))
+      } catch (e) {
+        fail(500, String(e))
+      }
+    })
+  }
+
   return {
     name: 'local-tts',
     configureServer: (s) => void s.middlewares.use(handler),

@@ -1,40 +1,32 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { fmt } from '../../engine/dates';
 import type { GoalId, Person, RunResult, Status } from '../../engine/model';
-import { buildMessages, embedQuery, INDEX_INFO, retrieve, streamAnswer, type Passage } from '../../rag/ask';
+import { buildMessages, embedQuery, retrieve, streamAnswer, type Passage } from '../../rag/ask';
+import { ChartView, chartData, detectCharts, goalIn, type ChartSpec } from '../charts';
+import { Icon } from '../icons';
 import { hasUi, pct, statusLabel, tr, type UiKey } from '../strings';
 import type { App } from '../useApp';
 import { useVoice } from '../useVoice';
 
-interface QA {
+interface Turn {
   id: string;
   q: string;
   lang: 'de' | 'en';
   a: string;
   passages: Passage[];
+  charts: ChartSpec[];
   state: 'search' | 'write' | 'done' | 'offline' | 'error' | 'person';
   err?: string;
   people?: { id: string; name: string; sw: string }[];
+  spoken?: boolean; // asked by voice
 }
 
-// Kept for the session so answers survive switching screens (never stored on disk).
-let HISTORY: QA[] = [];
+// The conversation is kept for the session so it survives switching screens (never stored on disk).
+let CHAT: Turn[] = [];
 
 const EXAMPLES: Record<'de' | 'en', string[]> = {
-  de: [
-    'Warum zählt ein Praktikum nicht für Ziel 2?',
-    'Ab wann gilt die 2027-Regel und für wen?',
-    'Was zählt als A1-Nachweis?',
-    'Wie viele sind bei Ziel 1 im Rückstand, und warum?',
-    'Wie schützt das Cockpit die Daten?',
-  ],
-  en: [
-    "Why doesn't an internship count for goal 2?",
-    'When does the 2027 rule apply, and to whom?',
-    'What counts as A1 proof?',
-    'How many are behind on goal 1, and why?',
-    'How does the cockpit protect the data?',
-  ],
+  de: ['Visualisiere Ziel 2', 'Ziel 1 nach Fallführung', 'Warum sind Leute bei Ziel 1 im Rückstand?', 'Zeig die Prognose', 'Warum zählt ein Praktikum nicht für Ziel 2?', 'Ab wann gilt die 2027-Regel?'],
+  en: ['Visualise goal 2', 'Goal 1 by social worker', 'Why are people behind on goal 1?', 'Show the forecast', "Why doesn't an internship count for goal 2?", 'When does the 2027 rule apply?'],
 };
 
 /** This month's figures for the model, without client names (social worker names only in management view). */
@@ -99,190 +91,422 @@ function matchPeople(text: string, persons: Person[]): { id: string; name: strin
   return out;
 }
 
+
 export function AskScreen({ app }: { app: App }) {
   const { lang, result: res } = app;
   const [q, setQ] = useState('');
-  const [list, setList] = useState<QA[]>(HISTORY);
-  const [openSrc, setOpenSrc] = useState<Record<string, boolean>>({});
+  const [chat, setChat] = useState<Turn[]>(CHAT);
+  const [sel, setSel] = useState<string | undefined>(() => [...CHAT].reverse().find((t) => t.charts.length || t.passages.length)?.id);
+  const [autoSpeak, setAutoSpeak] = useState(false);
+  const [convo, setConvo] = useState(false);
+  const [settings, setSettings] = useState(false);
+  const [err, setErr] = useState<string | undefined>();
   const voice = useVoice(app.rules);
   const abort = useRef<AbortController | null>(null);
-  useEffect(() => () => abort.current?.abort(), []);
+  const convoRef = useRef(false);
+  const thread = useRef<HTMLDivElement>(null);
+  useEffect(
+    () => () => {
+      abort.current?.abort();
+      convoRef.current = false;
+    },
+    [],
+  );
+  useEffect(() => {
+    thread.current?.scrollTo({ top: thread.current.scrollHeight, behavior: 'smooth' });
+  }, [chat]);
 
-  const update = (id: string, patch: Partial<QA>) => {
-    HISTORY = HISTORY.map((x) => (x.id === id ? { ...x, ...patch } : x));
-    setList(HISTORY);
+  const update = (id: string, patch: Partial<Turn>) => {
+    CHAT = CHAT.map((x) => (x.id === id ? { ...x, ...patch } : x));
+    setChat(CHAT);
   };
 
-  // Names that must never be read by the cloud voice: clients (first and last names) and social workers.
-  const blockNames = (() => {
+  // Names that must never be spoken by the cloud voice: clients (first and last names) and social workers.
+  const blockNames = useMemo(() => {
     const out = new Set<string>();
     for (const p of res?.persons ?? []) if (!p.displayName.startsWith('K-')) out.add(p.displayName.split(/\s+/)[0]);
     for (const r of Object.values(app.sa.extr)) for (const x of r.persons) for (const w of x.name.split(/\s+/)) if (w.length > 2) out.add(w);
     for (const s of res?.socialWorkers ?? []) for (const w of s.split(/[\s.]+/)) if (w.length > 2) out.add(w);
     return [...out];
-  })();
+  }, [res, app.sa.extr]);
 
-  const ask = async (question: string) => {
+  /** Ask one question; resolves with the answer text when it is complete. */
+  const ask = async (question: string, spoken = false): Promise<string> => {
     const text = question.trim();
-    if (!text) return;
+    if (!text) return '';
+    setErr(undefined);
     abort.current?.abort();
     const ctl = new AbortController();
     abort.current = ctl;
     const id = String(Date.now());
+    const prev = [...CHAT].reverse().find((t) => t.state === 'done' || t.state === 'offline');
+    setQ('');
+
     // Questions about one person go to that person's page (rules, sources), never to the AI model.
     const people = res ? matchPeople(text, app.visible!.persons) : [];
     if (people.length) {
-      HISTORY = [{ id, q: text, lang, a: '', passages: [], state: 'person', people }, ...HISTORY];
-      setList(HISTORY);
-      setQ('');
-      return;
+      CHAT = [...CHAT, { id, q: text, lang, a: '', passages: [], charts: [], state: 'person', people, spoken }];
+      setChat(CHAT);
+      return tr(lang, 'ask.person');
     }
-    HISTORY = [{ id, q: text, lang, a: '', passages: [], state: 'search' }, ...HISTORY];
-    setList(HISTORY);
-    setQ('');
+
+    // Which charts fit (a follow-up like "and by social worker?" stays on the previous goal).
+    const prevGoal = prev?.charts.find((c) => c.goal)?.goal ?? (prev ? goalIn(prev.q) : undefined);
+    const specs = res ? detectCharts(text, prevGoal).filter((s) => chartData(s, app, res)) : [];
+    CHAT = [...CHAT, { id, q: text, lang, a: '', passages: [], charts: specs, state: 'search', spoken }];
+    setChat(CHAT);
+    if (specs.length) setSel(id);
+
     const ai = app.rules.ai;
+    const query = text.length < 40 && prev ? `${prev.q} ${text}` : text;
     let qv: number[] | undefined;
     try {
-      qv = await embedQuery(text, ai.endpoint, ai.embed_model ?? 'nomic-embed-text');
+      qv = await embedQuery(query, ai.endpoint, ai.embed_model ?? 'nomic-embed-text');
     } catch {
       qv = undefined;
     }
-    const passages = retrieve(text, qv, 5);
-    if (!qv) return update(id, { passages, state: 'offline' });
+    // Chart questions: the chart numbers carry the answer, so fewer passages (shorter prompt, faster reply).
+    const passages = retrieve(query, qv, specs.length ? 2 : 5);
+    if (!specs.length) setSel(id);
+    if (!qv) {
+      update(id, { passages, state: 'offline' });
+      return '';
+    }
     update(id, { passages, state: 'write' });
     try {
-      const totals = res ? totalsText(app, res) : '';
-      const a = await streamAnswer(ai.endpoint, ai.model, buildMessages(lang, text, passages, totals), (t) => update(id, { a: t }), ctl.signal);
+      const totals = res && !specs.length ? totalsText(app, res) : '';
+      const charts = res ? specs.map((s) => chartData(s, app, res)!.summary).join('\n') : '';
+      const history = CHAT.filter((t) => t.id !== id && t.state === 'done').map((t) => ({ q: t.q, a: t.a }));
+      const a = await streamAnswer(ai.endpoint, ai.model, buildMessages(lang, text, passages, totals, history, charts), (t) => update(id, { a: t }), ctl.signal);
       update(id, { a, state: 'done' });
+      return a;
     } catch (e) {
       if ((e as Error).name !== 'AbortError') update(id, { state: 'error', err: String(e) });
+      return '';
     }
   };
 
-  const renderAnswer = (x: QA) => {
-    const parts = x.a.split(/(\[(?:\d+|K)\])/g);
-    return parts.map((p, i) => {
-      const m = p.match(/^\[(\d+|K)\]$/);
+  const say = async (id: string, text: string) => {
+    if (text) await voice.speak(text, lang, id, blockNames);
+  };
+
+  const sttError = (e: unknown) => {
+    const st = (e as { status?: number }).status;
+    const m = String((e as Error).message ?? e);
+    if (st === 401 || /401|permission|missing_permissions/i.test(m)) setErr(tr(lang, 'chat.err.stt401'));
+    else if (/NotAllowed|Permission denied|getUserMedia/i.test(m)) setErr(tr(lang, 'chat.err.mic'));
+    else setErr(tr(lang, 'chat.err.stt', { e: m }));
+  };
+
+  /** Mic button: speak one question, it is sent as soon as you stop talking. */
+  const mic = async () => {
+    if (voice.phase === 'listening') return voice.stopListening();
+    try {
+      const text = await voice.listen(lang);
+      if (!text) return;
+      const a = await ask(text, true);
+      const last = CHAT[CHAT.length - 1];
+      if (autoSpeak && a && last) await say(last.id, a);
+    } catch (e) {
+      sttError(e);
+    }
+  };
+
+  /** Conversation mode: listen -> answer -> speak -> listen again, until ended. */
+  const startConvo = async () => {
+    convoRef.current = true;
+    setConvo(true);
+    let empty = 0;
+    while (convoRef.current) {
+      let text = '';
+      try {
+        text = await voice.listen(lang);
+      } catch (e) {
+        sttError(e);
+        break;
+      }
+      if (!convoRef.current) break;
+      if (!text) {
+        if (++empty >= 2) break;
+        continue;
+      }
+      empty = 0;
+      voice.setPhase('transcribing');
+      const a = await ask(text, true);
+      voice.setPhase('idle');
+      if (!convoRef.current) break;
+      const last = CHAT[CHAT.length - 1];
+      await say(last.id, a || (last.state === 'offline' ? tr(lang, 'ask.offline') : ''));
+    }
+    convoRef.current = false;
+    setConvo(false);
+    voice.setPhase('idle');
+  };
+  const endConvo = () => {
+    convoRef.current = false;
+    voice.cancelListening();
+    voice.stop();
+    setConvo(false);
+  };
+
+  const submit = async () => {
+    const text = q;
+    const a = await ask(text);
+    const last = CHAT[CHAT.length - 1];
+    if (autoSpeak && a && last) await say(last.id, a);
+  };
+
+  const selTurn = chat.find((t) => t.id === sel);
+  const busy = chat.some((t) => t.state === 'search' || t.state === 'write');
+
+  const renderAnswer = (t: Turn) =>
+    t.a.split(/(\[(?:\d+|K|G)\])/g).map((p, i) => {
+      const m = p.match(/^\[(\d+|K|G)\]$/);
       if (!m) return <span key={i}>{p}</span>;
       const n = m[1];
-      const title = n === 'K' ? tr(lang, 'ask.k') : x.passages[Number(n) - 1] ? `${x.passages[Number(n) - 1].source} · ${x.passages[Number(n) - 1].title}` : '';
+      const title = n === 'K' ? tr(lang, 'ask.k') : n === 'G' ? tr(lang, 'chat.computed') : t.passages[Number(n) - 1] ? `${t.passages[Number(n) - 1].source} · ${t.passages[Number(n) - 1].title}` : '';
       return (
         <sup key={i} className="cite" title={title}>
-          {n}
+          {n === 'G' ? '▮' : n}
         </sup>
       );
     });
-  };
+
+  const phaseText = voice.phase === 'listening' ? tr(lang, 'chat.listening') : voice.phase === 'transcribing' ? tr(lang, 'chat.transcribing') : voice.phase === 'speaking' ? tr(lang, 'chat.speaking') : busy ? tr(lang, 'chat.thinking') : '';
 
   return (
     <>
       <div className="page-head">
         <div>
-          <h1>{tr(lang, 'ask.title')}</h1>
-          <p className="sub">{tr(lang, 'ask.sub', { n: INDEX_INFO.size })}</p>
+          <h1>{tr(lang, 'chat.title')}</h1>
+          <p className="sub">{tr(lang, 'chat.sub')}</p>
         </div>
+        {chat.length > 0 && (
+          <button
+            type="button"
+            className="btn small"
+            onClick={() => {
+              endConvo();
+              abort.current?.abort();
+              CHAT = [];
+              setChat([]);
+              setSel(undefined);
+            }}
+          >
+            {Icon.plus()} {tr(lang, 'chat.new')}
+          </button>
+        )}
       </div>
 
-      <section className="panel" aria-label={tr(lang, 'ask.title')}>
-        <form
-          className="panel-body"
-          style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
-          onSubmit={(e) => {
-            e.preventDefault();
-            void ask(q);
-          }}
-        >
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <label htmlFor="ask-q" className="sr">
-              {tr(lang, 'ask.placeholder')}
-            </label>
-            <input id="ask-q" className="input" style={{ flex: '1 1 320px', height: 42, fontSize: 15 }} placeholder={tr(lang, 'ask.placeholder')} value={q} onChange={(e) => setQ(e.target.value)} />
-            <button type="submit" className="btn primary" style={{ height: 42 }} disabled={!q.trim()}>
-              {tr(lang, 'ask.button')}
-            </button>
-          </div>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {EXAMPLES[lang].map((e) => (
-              <button key={e} type="button" className="btn small" onClick={() => void ask(e)}>
-                {e}
-              </button>
-            ))}
-          </div>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', fontSize: 12, borderTop: '1px solid var(--divider)', paddingTop: 10 }}>
-            <span className="muted">{tr(lang, 'ask.voice')}</span>
-            <div className="lang-toggle" role="group" aria-label={tr(lang, 'ask.voice')}>
-              <button type="button" aria-pressed={voice.mode === 'local'} onClick={() => voice.setMode('local')}>
-                {tr(lang, 'ask.voice.local')}
-              </button>
-              <button type="button" aria-pressed={voice.mode === 'elevenlabs'} onClick={() => voice.setMode('elevenlabs')} disabled={voice.cloud === false} title={voice.cloud === false ? tr(lang, 'ask.voice.noKey') : undefined}>
-                ElevenLabs
-              </button>
-            </div>
-            <span className="muted" style={{ flex: '1 1 300px' }}>
-              {voice.mode === 'elevenlabs' ? tr(lang, 'ask.voice.cloudNote') : tr(lang, 'ask.voice.localNote')}
-            </span>
-          </div>
-        </form>
-      </section>
-
-      {voice.note && (
-        <div className="note" role="status">
-          {tr(lang, `ask.note.${voice.note}` as UiKey)}
-        </div>
-      )}
-
-      {list.map((x) => (
-        <section key={x.id} className="panel" aria-label={x.q}>
-          <div className="panel-head">
-            <span className="panel-title">{x.q}</span>
-            {(x.state === 'done' || x.state === 'write') && x.a && (
-              <button type="button" className="btn small" onClick={() => (voice.speaking === x.id ? voice.stop() : void voice.speak(x.a, x.lang, x.id, blockNames))}>
-                {voice.speaking === x.id ? tr(lang, 'ask.stop') : tr(lang, 'ask.read')}
-              </button>
-            )}
-          </div>
-          <div className="panel-body" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {x.state === 'search' && <span className="muted">{tr(lang, 'ask.searching')}</span>}
-            {x.state === 'write' && !x.a && <span className="muted">{tr(lang, 'ask.writing')}</span>}
-            {x.a && <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6 }}>{renderAnswer(x)}</p>}
-            {x.state === 'offline' && <div className="note">{tr(lang, 'ask.offline')}</div>}
-            {x.state === 'person' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <span>{tr(lang, 'ask.person')}</span>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {x.people!.map((p) => (
-                    <button key={p.id} type="button" className="btn small" onClick={() => app.openClient(p.id)}>
-                      {p.name} · {p.id} · {p.sw} →
+      <div className="chat-layout">
+        <section className="panel chat-pane" aria-label={tr(lang, 'chat.title')}>
+          <div className="chat-thread" ref={thread} aria-live="polite">
+            {chat.length === 0 && (
+              <div className="chat-empty">
+                <span className="chat-empty-title">{tr(lang, 'chat.empty.title')}</span>
+                <div className="chat-examples">
+                  {EXAMPLES[lang].map((e) => (
+                    <button key={e} type="button" className="chat-example" onClick={() => void ask(e)}>
+                      {e}
                     </button>
                   ))}
                 </div>
               </div>
             )}
-            {x.state === 'error' && <div className="note">{tr(lang, 'ask.error', { e: x.err ?? '' })}</div>}
-            {x.passages.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, borderTop: '1px solid var(--divider)', paddingTop: 8 }}>
-                <button type="button" className="btn link" style={{ alignSelf: 'flex-start', fontSize: 13 }} aria-expanded={!!openSrc[x.id] || x.state === 'offline'} onClick={() => setOpenSrc({ ...openSrc, [x.id]: !openSrc[x.id] })}>
-                  {tr(lang, 'ask.sources', { n: x.passages.length })}
-                </button>
-                {(openSrc[x.id] || x.state === 'offline') &&
-                  x.passages.map((p, i) => (
-                    <div key={p.id} style={{ fontSize: 13, display: 'flex', flexDirection: 'column', gap: 2, padding: '6px 0', borderBottom: '1px solid var(--divider-2)' }}>
-                      <span style={{ fontWeight: 600 }}>
-                        [{i + 1}] {p.source} · <span className="muted">{p.title}</span>
-                      </span>
-                      <span style={{ color: 'var(--ink-2)', whiteSpace: 'pre-wrap' }}>{p.text.length > 420 ? `${p.text.slice(0, 420)} …` : p.text}</span>
+            {chat.map((t) => (
+              <div key={t.id} className="chat-turn">
+                <div className="bubble user">
+                  {t.spoken && <span className="bubble-mic" aria-label={tr(lang, 'chat.mic')}>{Icon.mic()}</span>}
+                  {t.q}
+                </div>
+                <div className={`bubble bot${sel === t.id ? ' sel' : ''}`}>
+                  {t.state === 'search' && <span className="muted typing">{tr(lang, 'ask.searching')}</span>}
+                  {t.state === 'write' && !t.a && <span className="muted typing">{tr(lang, 'ask.writing')}</span>}
+                  {t.a && <p>{renderAnswer(t)}</p>}
+                  {t.state === 'offline' && <p className="muted">{tr(lang, 'ask.offline')}</p>}
+                  {t.state === 'error' && <p className="muted">{tr(lang, 'ask.error', { e: t.err ?? '' })}</p>}
+                  {t.state === 'person' && (
+                    <>
+                      <p>{tr(lang, 'ask.person')}</p>
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                        {t.people!.map((p) => (
+                          <button key={p.id} type="button" className="btn small" onClick={() => app.openClient(p.id)}>
+                            {p.name} · {p.id} · {p.sw} →
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                  {res && t.charts.length > 0 && (
+                    <div className="inline-charts">
+                      {t.charts.map((c, i) => {
+                        const d = chartData(c, app, res);
+                        return d ? <ChartView key={i} data={d} lang={lang} compact /> : null;
+                      })}
+                      <span className="tag good" style={{ alignSelf: 'flex-start' }}>{tr(lang, 'chat.computed')}</span>
                     </div>
-                  ))}
+                  )}
+                  {(t.charts.length > 0 || t.passages.length > 0) && (
+                    <div className="bubble-actions">
+                      {(t.charts.length > 0 || t.passages.length > 0) && (
+                        <button type="button" className={`chip-btn${sel === t.id ? ' on' : ''}`} onClick={() => setSel(t.id)}>
+                          {Icon.chart()} {t.charts.length ? tr(lang, 'chat.charts', { n: t.charts.length }) : tr(lang, 'ask.sources', { n: t.passages.length })}
+                        </button>
+                      )}
+                      {t.a && (t.state === 'done' || t.state === 'write') && (
+                        <button
+                          type="button"
+                          className="icon-btn small"
+                          aria-label={voice.speaking === t.id ? tr(lang, 'ask.stop') : tr(lang, 'ask.read')}
+                          title={voice.speaking === t.id ? tr(lang, 'ask.stop') : tr(lang, 'ask.read')}
+                          onClick={() => (voice.speaking === t.id ? voice.stop() : void say(t.id, t.a))}
+                        >
+                          {voice.speaking === t.id ? Icon.stop() : Icon.speaker()}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {(err || voice.note) && (
+            <div className="note" role="status" style={{ margin: '0 16px 8px' }}>
+              {err ?? tr(lang, `ask.note.${voice.note}` as UiKey)}
+            </div>
+          )}
+
+          <form
+            className="composer"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void submit();
+            }}
+          >
+            <textarea
+              className="composer-input"
+              rows={1}
+              placeholder={voice.phase === 'listening' ? tr(lang, 'chat.listening') : tr(lang, 'chat.placeholder')}
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  void submit();
+                }
+              }}
+              aria-label={tr(lang, 'chat.placeholder')}
+            />
+            <div className="composer-bar">
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <button
+                  type="button"
+                  className={`icon-btn${autoSpeak ? ' on' : ''}`}
+                  aria-pressed={autoSpeak}
+                  title={tr(lang, autoSpeak ? 'chat.speaker.on' : 'chat.speaker.off')}
+                  aria-label={tr(lang, autoSpeak ? 'chat.speaker.on' : 'chat.speaker.off')}
+                  onClick={() => setAutoSpeak(!autoSpeak)}
+                >
+                  {autoSpeak ? Icon.speaker() : Icon.speakerOff()}
+                </button>
+                <div style={{ position: 'relative' }}>
+                  <button type="button" className={`icon-btn${settings ? ' on' : ''}`} aria-expanded={settings} title={tr(lang, 'chat.settings')} aria-label={tr(lang, 'chat.settings')} onClick={() => setSettings(!settings)}>
+                    {Icon.gear()}
+                  </button>
+                  {settings && (
+                    <div className="popover" role="dialog" aria-label={tr(lang, 'chat.settings')}>
+                      <span className="sec-title">{tr(lang, 'chat.settings')}</span>
+                      <label className="radio">
+                        <input type="radio" name="voice" checked={voice.mode === 'elevenlabs'} disabled={voice.cloud === false} onChange={() => voice.setMode('elevenlabs')} />
+                        {tr(lang, 'chat.voice.eleven')}
+                      </label>
+                      <label className="radio">
+                        <input type="radio" name="voice" checked={voice.mode === 'local'} onChange={() => voice.setMode('local')} />
+                        {tr(lang, 'chat.voice.local')}
+                      </label>
+                      <span className="muted" style={{ fontSize: 12 }}>{tr(lang, 'chat.privacy.mic')}</span>
+                      <span className="muted" style={{ fontSize: 12 }}>{tr(lang, 'chat.privacy.voice')}</span>
+                      <span className="muted" style={{ fontSize: 12 }}>{tr(lang, 'chat.privacy.local')}</span>
+                    </div>
+                  )}
+                </div>
+                {phaseText && <span className="muted" style={{ fontSize: 12 }}>{phaseText}</span>}
+              </div>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <button
+                  type="button"
+                  className={`icon-btn${convo ? ' rec' : ''}`}
+                  title={convo ? tr(lang, 'chat.convo.on') : `${tr(lang, 'chat.convo')}: ${tr(lang, 'chat.convo.hint')}`}
+                  aria-label={convo ? tr(lang, 'chat.convo.on') : tr(lang, 'chat.convo')}
+                  disabled={voice.cloud === false && !convo}
+                  onClick={() => (convo ? endConvo() : void startConvo())}
+                >
+                  {Icon.wave()}
+                </button>
+                <button
+                  type="button"
+                  className={`icon-btn${voice.phase === 'listening' && !convo ? ' rec' : ''}`}
+                  title={voice.phase === 'listening' ? tr(lang, 'chat.mic.stop') : tr(lang, 'chat.mic')}
+                  aria-label={voice.phase === 'listening' ? tr(lang, 'chat.mic.stop') : tr(lang, 'chat.mic')}
+                  disabled={convo || voice.cloud === false || voice.phase === 'transcribing'}
+                  onClick={() => void mic()}
+                >
+                  {Icon.mic()}
+                </button>
+                <button type="submit" className="icon-btn send" disabled={!q.trim() || busy} aria-label={tr(lang, 'chat.send')} title={tr(lang, 'chat.send')}>
+                  {Icon.send()}
+                </button>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <aside className="panel canvas" aria-label={tr(lang, 'chat.canvas')}>
+          <div className="panel-head">
+            <span className="panel-title">{tr(lang, 'chat.canvas')}</span>
+            {selTurn && <span className="muted" style={{ fontSize: 12, maxWidth: 320, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selTurn.q}</span>}
+          </div>
+          <div className="canvas-body">
+            {!selTurn && <p className="muted">{tr(lang, 'chat.canvas.empty')}</p>}
+            {selTurn && res && selTurn.charts.length > 0 && (
+              <>
+                {selTurn.charts.map((s, i) => {
+                  const d = chartData(s, app, res);
+                  return d ? <ChartView key={i} data={d} lang={lang} /> : null;
+                })}
+                <span className="tag good" style={{ alignSelf: 'flex-start' }}>{tr(lang, 'chat.computed')}</span>
+              </>
+            )}
+            {selTurn && selTurn.passages.length > 0 && (
+              <div className="canvas-sources">
+                <span className="sec-title">{tr(lang, 'ask.sources', { n: selTurn.passages.length })}</span>
+                {selTurn.passages.map((p, i) => (
+                  <details key={p.id}>
+                    <summary>
+                      <strong>[{i + 1}]</strong> {p.source} · <span className="muted">{p.title}</span>
+                    </summary>
+                    <p>{p.text.length > 600 ? `${p.text.slice(0, 600)} …` : p.text}</p>
+                  </details>
+                ))}
+                <span className="tag ai" style={{ alignSelf: 'flex-start', whiteSpace: 'normal' }}>{tr(lang, 'ask.tag')}</span>
               </div>
             )}
-            {x.state !== 'person' && (
-              <span className="tag ai" style={{ alignSelf: 'flex-start', whiteSpace: 'normal' }}>
-                {tr(lang, 'ask.tag')}
-              </span>
-            )}
           </div>
-        </section>
-      ))}
+        </aside>
+      </div>
+
+      {convo && (
+        <div className="voice-orb" role="status" aria-live="polite">
+          <div className={`orb ${voice.phase}`} style={{ ['--lvl' as string]: String(voice.level) }}>
+            <span />
+          </div>
+          <span className="orb-text">{phaseText || tr(lang, 'chat.listening')}</span>
+          <button type="button" className="btn small" onClick={endConvo}>
+            {Icon.stop()} {tr(lang, 'chat.convo.on')}
+          </button>
+        </div>
+      )}
       {!res && <div className="note info">{tr(lang, 'ask.norun')}</div>}
     </>
   );

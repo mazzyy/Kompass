@@ -95,8 +95,9 @@ ai:
   use_cached_results_when_offline: true  # demo safety; UI must label cached results
   embed_model: "nomic-embed-text"        # local search for "Frag das Cockpit" (rules, brief, docs; no client data)
 
-voice:                                   # reading answers aloud in "Frag das Cockpit"
-  default: local                         # local = the computer's own voice, offline | elevenlabs = cloud voice, only for answers without client data
+voice:                                   # voice conversation in the assistant
+  default: elevenlabs                    # elevenlabs = cloud voice, only for answers without names or numbers (else the computer voice) | local = the computer's own voice, offline
+  stt_model: "scribe_v1"                 # ElevenLabs Speech to Text for the microphone (chosen by the team; spoken questions go to ElevenLabs)
   elevenlabs_model: "eleven_multilingual_v2"   # speaks German and English
   elevenlabs_voice_id: "Xb7hH8MSUJpSbSDYk0k2"  # "Alice" (ElevenLabs premade voice). The API key stays in .env.local on this computer
 

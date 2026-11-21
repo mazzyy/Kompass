@@ -52,7 +52,7 @@ export interface Rules {
   patterns: { min_group_size: number; confidence: number; method: string };
   dq: { date_tolerance_days: number; employer_match_threshold: number; legal_forms_to_strip: string[] };
   ai: { provider: string; endpoint: string; model: string; temperature: number; use_cached_results_when_offline: boolean; embed_model?: string };
-  voice?: { default: 'local' | 'elevenlabs'; elevenlabs_model: string; elevenlabs_voice_id: string };
+  voice?: { default: 'local' | 'elevenlabs'; elevenlabs_model: string; elevenlabs_voice_id: string; stt_model?: string };
   i18n: { default_language: 'de' | 'en' };
 }
 

@@ -58,7 +58,7 @@ function keyword(q: string, i: number): number {
 }
 
 export async function embedQuery(q: string, endpoint: string, model: string): Promise<number[]> {
-  const r = await fetch(`${endpoint}/api/embed`, { method: 'POST', body: JSON.stringify({ model, input: [`search_query: ${q}`] }) });
+  const r = await fetch(`${endpoint}/api/embed`, { method: 'POST', body: JSON.stringify({ model, input: [`search_query: ${q}`], keep_alive: '30m' }) });
   if (!r.ok) throw new Error(`embed ${r.status}`);
   return ((await r.json()) as { embeddings: number[][] }).embeddings[0];
 }
@@ -76,7 +76,7 @@ export function retrieve(q: string, qv: number[] | undefined, k = 5): Passage[] 
     .slice(0, k);
 }
 
-export function buildMessages(lang: 'de' | 'en', question: string, passages: Passage[], totals: string) {
+export function buildMessages(lang: 'de' | 'en', question: string, passages: Passage[], totals: string, history: { q: string; a: string }[] = [], charts = '') {
   const de = lang === 'de'
   const sys = de
     ? 'Du bist der Hilfe-Assistent im Integrations-Cockpit des Asylsozialdienstes der Stadt Bern. Du erklärst Regeln und Zahlen in ganzen, klaren Sätzen auf Deutsch. Du stützt dich nur auf die Quellen und Kennzahlen, die du bekommst. Du bewertest keine einzelnen Personen und machst keine Prognosen für Einzelpersonen: Die Ampeln setzen die Regeln.'
@@ -86,10 +86,16 @@ export function buildMessages(lang: 'de' | 'en', question: string, passages: Pas
     ? `Beantworte jetzt die Frage in 2 bis 5 ganzen Sätzen. Setze die Nummer der Quelle in eckigen Klammern ans Ende des Satzes, so: «Aussage [2].» Wiederhole keine Beispiele, beantworte nur diese Frage. Für Zahlen aus den Kennzahlen schreibe [K] und übernimm die Zahlen genau, ohne selbst zu rechnen. Steht die Antwort nicht in den Quellen, schreibe: «Dazu finde ich in den Unterlagen nichts.» Bei Fragen zu einer einzelnen Person: verweise auf ihre Seite im Cockpit.`
     : `Now answer the question in 2 to 5 full sentences. Put the source number in square brackets at the end of the sentence, like this: "Statement [2]." Do not repeat examples; answer only this question. For numbers from the key figures write [K] and copy the numbers exactly, without calculating yourself. If the answer is not in the sources, write: "I can't find this in the documents." For questions about a single person: point to their page in the cockpit.`
   const user = `${de ? 'Quellen' : 'Sources'}:\n${ctx}\n\n[K] ${de ? 'Kennzahlen dieses Monatslaufs (ohne Namen)' : "Key figures of this month's run (no names)"}:\n${totals || '-'}\n\n${de ? 'Frage' : 'Question'}: ${question}\n\n${task}`
-  return [
-    { role: 'system', content: sys },
-    { role: 'user', content: user },
-  ]
+  const chartNote = charts
+    ? de
+      ? `\n\n[G] Gezeigte Grafiken (die Person sieht sie neben deiner Antwort; Zahlen vom Regelwerk):\n${charts}\nBeschreibe in 2 bis 4 Sätzen, was die Grafik zeigt: das Wichtigste zuerst, mit den genauen Zahlen, Quelle [G]. Nenne keine Namen von Personen.`
+      : `\n\n[G] Charts shown (the person sees them next to your answer; numbers from the rules engine):\n${charts}\nDescribe in 2 to 4 sentences what the chart shows: the most important point first, with the exact numbers, source [G]. Do not name any person.`
+    : ''
+  const past = history.slice(-3).flatMap((h) => [
+    { role: 'user', content: h.q },
+    { role: 'assistant', content: h.a },
+  ])
+  return [{ role: 'system', content: sys }, ...past, { role: 'user', content: user + chartNote }]
 }
 
 /** Streams the local model's answer; calls onToken with the text so far. */
@@ -103,7 +109,7 @@ export async function streamAnswer(
   const r = await fetch(`${endpoint}/api/chat`, {
     method: 'POST',
     signal,
-    body: JSON.stringify({ model, messages, stream: true, options: { temperature: 0, num_ctx: 4096 } }),
+    body: JSON.stringify({ model, messages, stream: true, keep_alive: '30m', options: { temperature: 0, num_ctx: 4096 } }),
   })
   if (!r.ok || !r.body) throw new Error(`chat ${r.status}`)
   const reader = r.body.getReader()
