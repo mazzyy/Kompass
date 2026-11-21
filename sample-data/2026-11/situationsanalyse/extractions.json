@@ -144,5 +144,291 @@
     ]
    }
   ]
+ },
+ "SA_D12_7092.txt": {
+  "file": "SA_D12_7092.txt",
+  "model": "qwen2.5:7b-instruct",
+  "at": "2026-11-21T00:40:36.659Z",
+  "persons": [
+   {
+    "zemis": "35053658",
+    "name": "Habtom Mehari",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisiert in der Muttersprache und in lateinischer Schrift."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Deutsch mündlich A0."
+     },
+     "learning_pace": {
+      "value": "medium",
+      "status": "stated",
+      "evidence": "Er lernt in einem durchschnittlichen Tempo."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Keine gesundheitlichen Einschränkungen bekannt."
+     },
+     "availability_for_work_or_education": {
+      "value": "partial",
+      "status": "stated",
+      "evidence": "Verfügbarkeit für Arbeit oder Bildung: teilweise."
+     },
+     "work_experience_years_origin": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Diplome: nein."
+     },
+     "driving_licence": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "career_wish": {
+      "value": "Kinderbetreuung",
+      "status": "stated",
+      "evidence": "Berufliche Perspektive (Sicht Klient/in): Kinderbetreuung."
+     }
+    },
+    "ms": 36259,
+    "modelInput": [
+     "Keine gesundheitlichen Einschränkungen bekannt.",
+     "Muttersprache Tigrinya.",
+     "Alphabetisiert in der Muttersprache und in lateinischer Schrift.",
+     "Deutsch mündlich A0.",
+     "Er lernt in einem durchschnittlichen Tempo.",
+     "Diplome: nein.",
+     "Verfügbarkeit für Arbeit oder Bildung: teilweise.",
+     "Berufliche Perspektive (Sicht Klient/in): Kinderbetreuung.",
+     "Wirkt motiviert."
+    ]
+   },
+   {
+    "zemis": "43849096",
+    "name": "Rahel Mehari",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisierung Zielsprache: ja."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Versteht kein Schweizerdeutsch."
+     },
+     "learning_pace": {
+      "value": "good",
+      "status": "stated",
+      "evidence": "Lerntempo gut."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit."
+     },
+     "availability_for_work_or_education": {
+      "value": "partial",
+      "status": "stated",
+      "evidence": "Sie ist nur teilzeitlich verfügbar."
+     },
+     "work_experience_years_origin": {
+      "value": 10,
+      "status": "stated",
+      "evidence": "Sie hat 10 Jahre im Herkunftsland gearbeitet."
+     },
+     "diplomas": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Ein Berufsdiplom aus dem Herkunftsland ist vorhanden."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Kein Führerschein."
+     },
+     "career_wish": {
+      "value": "Sie ist nur teilzeitlich verfügbar.",
+      "status": "stated",
+      "evidence": "Sie ist nur teilzeitlich verfügbar."
+     }
+    },
+    "ms": 46965,
+    "modelInput": [
+     "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit.",
+     "Muttersprache Tigrinya.",
+     "Alphabetisierung Zielsprache: ja.",
+     "Deutsch mündlich A1.",
+     "Versteht kein Schweizerdeutsch.",
+     "Lerntempo gut.",
+     "Sie hat 10 Jahre im Herkunftsland gearbeitet.",
+     "Ein Berufsdiplom aus dem Herkunftsland ist vorhanden.",
+     "Kein Führerschein.",
+     "Sie ist nur teilzeitlich verfügbar.",
+     "Sie wünscht sich eine Stelle in Transport / Chauffeur."
+    ]
+   },
+   {
+    "zemis": "28281522",
+    "name": "Saba Mehari",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Sie liest und schreibt lateinische Schrift."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Versteht kein Schweizerdeutsch."
+     },
+     "learning_pace": {
+      "value": "slow",
+      "status": "stated",
+      "evidence": "Sie lernt langsam."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Keine gesundheitlichen Einschränkungen bekannt."
+     },
+     "availability_for_work_or_education": {
+      "value": "full",
+      "status": "stated",
+      "evidence": "Verfügbar für Arbeit oder Ausbildung: vollzeit."
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Bisher keine Arbeitserfahrung."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Keine Diplome."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Kein Führerschein."
+     },
+     "career_wish": {
+      "value": "im Bereich Detailhandel arbeiten",
+      "status": "stated",
+      "evidence": "Möchte im Bereich Detailhandel arbeiten."
+     }
+    },
+    "ms": 44902,
+    "modelInput": [
+     "Keine gesundheitlichen Einschränkungen bekannt.",
+     "Muttersprache Tigrinya.",
+     "Sie liest und schreibt lateinische Schrift.",
+     "Deutsch mündlich A1.",
+     "Versteht kein Schweizerdeutsch.",
+     "Sie lernt langsam.",
+     "Bisher keine Arbeitserfahrung.",
+     "Keine Diplome.",
+     "Kein Führerschein.",
+     "Verfügbar für Arbeit oder Ausbildung: vollzeit.",
+     "Möchte im Bereich Detailhandel arbeiten.",
+     "Motiviert und zuverlässig."
+    ]
+   },
+   {
+    "zemis": "46759362",
+    "name": "Yonas Mehari",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisierung Zielsprache: ja."
+     },
+     "understands_swiss_german": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Versteht Schweizerdeutsch im Alltag recht gut."
+     },
+     "learning_pace": {
+      "value": "good",
+      "status": "stated",
+      "evidence": "Lerntempo gut."
+     },
+     "health_limits_work": {
+      "value": "some",
+      "status": "stated",
+      "evidence": "Rückenbeschwerden schränken körperlich schwere Arbeit ein."
+     },
+     "availability_for_work_or_education": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Bisher keine Arbeitserfahrung."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Keine Diplome."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Kein Führerschein."
+     },
+     "career_wish": {
+      "value": "Coiffeur",
+      "status": "stated",
+      "evidence": "Berufliche Perspektive (Sicht Klient/in): Coiffeur."
+     }
+    },
+    "ms": 31176,
+    "modelInput": [
+     "Rückenbeschwerden schränken körperlich schwere Arbeit ein.",
+     "Muttersprache Tigrinya.",
+     "Alphabetisierung Zielsprache: ja.",
+     "Deutsch mündlich A0.",
+     "Versteht Schweizerdeutsch im Alltag recht gut.",
+     "Lerntempo gut.",
+     "Bisher keine Arbeitserfahrung.",
+     "Keine Diplome.",
+     "Kein Führerschein.",
+     "Berufliche Perspektive (Sicht Klient/in): Coiffeur.",
+     "Wirkt motiviert."
+    ]
+   }
+  ]
  }
 }

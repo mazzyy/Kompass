@@ -6,6 +6,7 @@ import { ExportScreen } from './ui/screens/Export';
 import { OverviewScreen } from './ui/screens/Overview';
 import { QualityScreen } from './ui/screens/Quality';
 import { RulesDrawer } from './ui/screens/Rules';
+import { PatternsScreen } from './ui/screens/Patterns';
 import { RunScreen } from './ui/screens/Run';
 import { SituationScreen } from './ui/screens/Situation';
 import { tr, type UiKey } from './ui/strings';
@@ -79,6 +80,7 @@ export default function App() {
             <NavItem app={app} id="overview" label="nav.overview" icon={Icon.overview} disabled={noRun} />
             <NavItem app={app} id="calls" label="nav.calls" icon={Icon.calls} count={callCount} red disabled={noRun} />
             <NavItem app={app} id="clients" label="nav.clients" icon={Icon.clients} count={app.visible?.persons.length} disabled={noRun} />
+            <NavItem app={app} id="patterns" label="nav.patterns" icon={Icon.patterns} disabled={noRun} />
           </div>
           <div className="nav-group">
             <span className="overline">{tr(lang, 'nav.data')}</span>
@@ -174,6 +176,7 @@ export default function App() {
               {app.screen === 'clients' && <ClientsScreen app={app} />}
               {app.screen === 'quality' && <QualityScreen app={app} />}
               {app.screen === 'export' && <ExportScreen app={app} />}
+              {app.screen === 'patterns' && <PatternsScreen app={app} />}
               {app.screen === 'situation' && <SituationScreen app={app} aiOnline={ai === 'online'} />}
             </div>
           </div>

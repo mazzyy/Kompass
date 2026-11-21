@@ -7,6 +7,7 @@ import { buildHouseholds, computeGoal3 } from './goal3';
 import type { FileAnalysis, ParsedTables } from './import/detect';
 import { TABLES, TABLE_BY_ID, type TableId } from './import/signatures';
 import { day, srcRef, type Alert, type GoalId, type Msg, type Person, type RunResult } from './model';
+import { features as personFeatures } from './patterns';
 import { buildPerson, isCurrent } from './population';
 import type { Rules } from './rules';
 import { personUnits, totalsFor } from './totals';
@@ -92,6 +93,7 @@ export function run({ parsed, rules, stichtag, inputs = [] }: RunInput): RunResu
       socialWorkers: [],
       alerts,
       claimable: [],
+      features: {},
       inputs,
     };
   }
@@ -177,6 +179,7 @@ export function run({ parsed, rules, stichtag, inputs = [] }: RunInput): RunResu
     socialWorkers,
     alerts,
     claimable,
+    features: Object.fromEntries(persons.map((p) => [p.id, personFeatures(p, ctx)])),
     inputs,
   };
 }

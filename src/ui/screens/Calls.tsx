@@ -128,15 +128,41 @@ export function CallsScreen({ app }: { app: App }) {
                 </div>
                 <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55 }}>{msg(lang, sel.lead)}</p>
                 {(() => {
+                  // Situationsanalyse barriers: confirmed ones, and model proposals (labelled) that a person can confirm here.
                   const c = app.sa.confirmed[p.zemis];
-                  const b = SA_FIELDS.filter((f) => c?.[f.id]?.status === 'confirmed' && BARRIER[f.id]?.(c[f.id].value));
-                  if (!b.length) return null;
-                  return (
-                    <div style={{ fontSize: 13, color: 'var(--ink-2)', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'baseline' }}>
-                      <span className="tag ai">{tr(lang, 'calls.saConfirmed')}</span>
-                      {b.map((f) => `${lang === 'de' ? f.de : f.en}: ${saValue(lang, f.id, c![f.id].value)}`).join(' · ')}
+                  let ext: (typeof app.sa.extr)[string]['persons'][number] | undefined;
+                  let file = '';
+                  for (const [f, r] of Object.entries(app.sa.extr)) {
+                    const hit = r.persons.find((x) => x.zemis === p.zemis);
+                    if (hit) {
+                      ext = hit;
+                      file = f;
+                    }
+                  }
+                  const rows = SA_FIELDS.filter((f) => BARRIER[f.id]).flatMap((f) => {
+                    const cf = c?.[f.id];
+                    if (cf?.status === 'confirmed') return BARRIER[f.id](cf.value) ? [{ f, value: cf.value, evidence: cf.evidence, confirmed: true }] : [];
+                    if (cf) return [];
+                    const e = ext?.fields[f.id];
+                    return e && e.status === 'stated' && BARRIER[f.id](e.value) ? [{ f, value: e.value, evidence: e.evidence, confirmed: false }] : [];
+                  });
+                  if (!rows.length) return null;
+                  return rows.map((r) => (
+                    <div key={r.f.id} style={{ fontSize: 13, color: 'var(--ink-2)', display: 'flex', flexDirection: 'column', gap: 4, padding: '8px 10px', borderRadius: 6, background: r.confirmed ? '#F6FAF7' : '#FBFBFA', border: '1px solid var(--divider)' }}>
+                      <span style={{ fontWeight: 500, color: 'var(--ink)' }}>
+                        {lang === 'de' ? r.f.de : r.f.en}: {saValue(lang, r.f.id, r.value)}
+                      </span>
+                      <span style={{ background: '#FFF6D6', alignSelf: 'flex-start' }} lang="de">«{r.evidence}»</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <span className="tag ai" style={{ whiteSpace: 'normal' }}>{r.confirmed ? tr(lang, 'sa.aiTag') : tr(lang, 'calls.saProposal')}</span>
+                        {!r.confirmed && ext && (
+                          <button type="button" className="btn small" onClick={() => app.sa.setField(p.zemis, r.f.id, ext!.fields[r.f.id], file, 'confirmed')}>
+                            {tr(lang, 'calls.confirm')}
+                          </button>
+                        )}
+                      </span>
                     </div>
-                  );
+                  ));
                 })()}
                 {sel.reasons.filter((r) => JSON.stringify(r) !== JSON.stringify(sel.lead)).length > 0 && (
                   <div style={{ fontSize: 13, color: 'var(--ink-2)' }}>
