@@ -50,3 +50,16 @@ describe('What-if 2027 (TW)', () => {
     expect(Object.keys(w.delta)).toEqual(['2', '3']);
   });
 });
+
+describe('Payment forecast (§10)', () => {
+  it('counts running jobs and free households by quarter of projected completion', () => {
+    const fx = new Fx();
+    const p = addPerson(fx, { ze: '30.06.2027', dossier: 'D12.9100', zb: '01.01.2024' });
+    job(fx, p, '01.10.2026', 60); // completes 31.03.2027 -> Q1 2027
+    support(fx, 'D12.9100', 'Sozialhilfe', '01.01.2024', '31.05.2026'); // free since 01.06.2026 -> 31.05.2027 -> Q2 2027
+    const q = fx.run().forecast;
+    expect(q.map((x) => x.label)).toEqual(['Q4 2026', 'Q1 2027', 'Q2 2027', 'Q3 2027']);
+    expect(q[1].goal2).toBe(1);
+    expect(q[2].goal3).toBe(1);
+  });
+});

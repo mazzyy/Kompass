@@ -164,6 +164,7 @@ export interface RunResult {
   alerts: Alert[];
   claimable: Claimable[];
   whatIf?: import('./whatif').WhatIfResult;
+  forecast: import('./forecast').Quarter[];
   /** per-person facts for group patterns only (never shown or exported per person) */
   features: Record<string, import('./patterns').Features>;
   inputs: { fileName: string; table?: TableId; rows: number }[];

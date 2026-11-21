@@ -9,6 +9,7 @@ import { TABLES, TABLE_BY_ID, type TableId } from './import/signatures';
 import { day, srcRef, type Alert, type GoalId, type Msg, type Person, type RunResult } from './model';
 import { features as personFeatures } from './patterns';
 import { computeWhatIf } from './whatif';
+import { forecast } from './forecast';
 import { buildPerson, isCurrent } from './population';
 import type { Rules } from './rules';
 import { personUnits, totalsFor } from './totals';
@@ -94,6 +95,7 @@ export function run({ parsed, rules, stichtag, inputs = [] }: RunInput): RunResu
       socialWorkers: [],
       alerts,
       claimable: [],
+      forecast: [],
       features: {},
       inputs,
     };
@@ -180,6 +182,7 @@ export function run({ parsed, rules, stichtag, inputs = [] }: RunInput): RunResu
     socialWorkers,
     alerts,
     claimable,
+    forecast: forecast(persons, households, stichtag, rules.payment.forecast_quarters),
     whatIf: computed.includes(2) || computed.includes(3) ? computeWhatIf(persons, households, ctx) : undefined,
     features: Object.fromEntries(persons.map((p) => [p.id, personFeatures(p, ctx)])),
     inputs,

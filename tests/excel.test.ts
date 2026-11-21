@@ -34,7 +34,7 @@ describe('Excel output (TE)', () => {
     const f = await writeManagement(res, defaultRulesText);
     expect(f.name).toBe('Cockpit_2026-11-20.xlsx');
     const wb = await load(f.buffer);
-    expect(wb.worksheets.map((w) => w.name)).toEqual(['Übersicht', 'Ziel1_Personen', 'Ziel2_Personen', 'Anrufliste', 'Abrechenbar', 'Datenqualität', 'WhatIf_2027', 'Regeln', 'Lauf']);
+    expect(wb.worksheets.map((w) => w.name)).toEqual(['Übersicht', 'Ziel1_Personen', 'Ziel2_Personen', 'Anrufliste', 'Abrechenbar', 'Muster', 'Datenqualität', 'Prognose', 'WhatIf_2027', 'Regeln', 'Lauf']);
     const ws = wb.getWorksheet('Ziel1_Personen')!;
     expect(ws.getRow(1).getCell(1).value).toBe('Klientennummer');
     expect(ws.views[0]).toMatchObject({ state: 'frozen', ySplit: 1 });

@@ -248,6 +248,41 @@ export function OverviewScreen({ app }: { app: App }) {
         </section>
       )}
 
+      {!sw && res.forecast.length > 0 && (
+        <section className="panel" aria-label={tr(lang, 'fc.title')}>
+          <div className="panel-head" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+            <span className="panel-title">{tr(lang, 'fc.title')}</span>
+            <span className="muted" style={{ fontSize: 12 }}>{tr(lang, 'fc.sub', { n: res.claimable.length })}</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, height: 150, padding: '16px 20px 0' }}>
+            {(() => {
+              const max = Math.max(1, ...res.forecast.map((q) => q.goal1 + q.goal2 + q.goal3));
+              return res.forecast.map((q) => {
+                const tot = q.goal1 + q.goal2 + q.goal3;
+                return (
+                  <div key={q.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', gap: 6, height: '100%' }} title={`${tr(lang, 'goal.1')}: ${q.goal1} · ${tr(lang, 'goal.2')}: ${q.goal2} · ${tr(lang, 'goal.3')}: ${q.goal3}`}>
+                    <span className="num" style={{ fontSize: 12, fontWeight: 500 }}>{tot}</span>
+                    <div style={{ width: '60%', maxWidth: 56, height: `${(tot / max) * 100}px`, minHeight: 2, background: '#1A7F45', borderRadius: '4px 4px 0 0' }} />
+                  </div>
+                );
+              });
+            })()}
+          </div>
+          <div style={{ display: 'flex', gap: 16, padding: '6px 20px 10px', borderTop: '1px solid var(--divider)' }}>
+            {res.forecast.map((q) => (
+              <span key={q.label} className="muted num" style={{ flex: 1, textAlign: 'center', fontSize: 12 }}>
+                {q.label}
+                <br />
+                {q.goal1} · {q.goal2} · {q.goal3}
+              </span>
+            ))}
+          </div>
+          <div className="muted" style={{ padding: '8px 20px 12px', fontSize: 12, borderTop: '1px solid var(--divider)' }}>
+            G1 · G2 · G3. {tr(lang, 'fc.nochf')}
+          </div>
+        </section>
+      )}
+
       {t1 && !sw && (
         <section className="panel" aria-label={tr(lang, 'ov.bySw')}>
           <div className="panel-head">

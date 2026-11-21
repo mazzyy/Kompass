@@ -3,6 +3,7 @@ import { iso, toJsDate, type Day } from '../engine/dates';
 import { TABLE_BY_ID } from '../engine/import/signatures';
 import { BUCKETS, type Bucket, type GoalId, type GoalResult, type Person, type RunResult, type Status, type TotalsRow } from '../engine/model';
 import { flattenRules } from '../engine/rules';
+import { computePatterns } from '../engine/patterns';
 import { bucketOf } from '../engine/totals';
 import { msg } from '../i18n/messages';
 
@@ -316,6 +317,42 @@ function whatIfSheet(wb: ExcelJS.Workbook, res: RunResult) {
   ws.autoFilter = undefined as unknown as ExcelJS.AutoFilter;
 }
 
+function forecastSheet(wb: ExcelJS.Workbook, res: RunResult) {
+  const rows: Row[] = res.forecast.map((q) => [q.label, q.goal1, q.goal2, q.goal3, q.goal1 + q.goal2 + q.goal3]);
+  rows.push([], ['Jetzt abrechenbar (siehe Blatt Abrechenbar)', null, null, null, res.claimable.length]);
+  rows.push(['Ziel 1: laufender Kurs endet vor der Frist (setzt bestandene Prüfung voraus). Ziel 2/3: Abschluss im Quartal. Nur Anzahl; CHF erst mit Pauschalen in rules.yaml.']);
+  const ws = addSheet(wb, 'Prognose', ['Quartal', 'Ziel 1', 'Ziel 2', 'Ziel 3 (Haushalte)', 'Total'], rows, [44, 10, 10, 16, 10]);
+  ws.autoFilter = undefined as unknown as ExcelJS.AutoFilter;
+}
+
+const FACTOR_DE: Record<string, string> = {
+  latin: 'In lateinischer Schrift alphabetisiert',
+  hours: 'Deutschkurs im 1. Jahr mit mindestens 10 Std./Woche',
+  course6m: 'Kurs innert 6 Monaten nach Zuständigkeitsbeginn',
+  childcare: 'Kinderbetreuung ohne Kita-Platz (Situationsanalyse, bestätigt)',
+  health: 'Gesundheit schränkt Arbeit ein (Situationsanalyse, bestätigt)',
+  school: 'Schuljahre vor Einreise',
+  work: 'Jahre Arbeitserfahrung vor Einreise',
+  age: 'Alter bei Einreise',
+  gender: 'Geschlecht (Gleichbehandlung)',
+  nationality: 'Nationalität',
+};
+const GROUP_DE: Record<string, string> = { yes: 'ja', no: 'nein', ge10: '≥ 10 Std.', lt10: '< 10 Std.', w: 'Frauen', m: 'Männer' };
+
+function patternsSheet(wb: ExcelJS.Workbook, res: RunResult, minGroup: number) {
+  const pr = computePatterns(res.persons, new Map(Object.entries(res.features)), res.stichtag, minGroup);
+  const rows: Row[] = [[`Kohorte: ${pr.cohortSize} Klient:innen mit Ziel-1-Frist vor dem Stichtag; ${Math.round(pr.rate * 100)} % rechtzeitig erreicht. Nur Gruppen, nie ein Wert pro Person. Gruppen unter ${minGroup} ausgeblendet. Zusammenhänge, keine Ursachen.`], []];
+  for (const f of pr.factors) {
+    if (f.hidden) {
+      rows.push([FACTOR_DE[f.id], '(ausgeblendet: Gruppe unter ' + minGroup + ' oder keine Angaben)']);
+      continue;
+    }
+    for (const g of f.groups) rows.push([FACTOR_DE[f.id], GROUP_DE[g.label] ?? g.label, g.n, g.reached, Math.round(g.rate * 1000) / 10, Math.round(g.ci[0] * 1000) / 10, Math.round(g.ci[1] * 1000) / 10]);
+  }
+  const ws = addSheet(wb, 'Muster', ['Faktor', 'Gruppe', 'Personen', 'Erreicht', 'Quote %', '95 % von', '95 % bis'], rows, [56, 22, 10, 10, 10, 10, 10]);
+  ws.autoFilter = undefined as unknown as ExcelJS.AutoFilter;
+}
+
 function rulesSheet(wb: ExcelJS.Workbook, rulesText: string) {
   const rows: Row[] = flattenRules(rulesText).map((r) => [r.path, r.value, r.note]);
   addSheet(wb, 'Regeln', ['Einstellung', 'Wert', 'Hinweis'], rows, [42, 60, 60]);
@@ -370,7 +407,9 @@ export async function writeManagement(res: RunResult, rulesText: string, created
   }
   callSheet(wb, res);
   claimSheet(wb, res, lumpSums);
+  patternsSheet(wb, res, 10);
   dqSheet(wb, res);
+  forecastSheet(wb, res);
   whatIfSheet(wb, res);
   rulesSheet(wb, rulesText);
   runSheet(wb, res, createdIso);
