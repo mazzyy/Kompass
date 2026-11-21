@@ -785,5 +785,148 @@
     ]
    }
   ]
+ },
+ "SA_D12_3004.txt": {
+  "file": "SA_D12_3004.txt",
+  "model": "qwen2.5:7b-instruct",
+  "at": "2026-11-21T00:45:15.552Z",
+  "persons": [
+   {
+    "zemis": "20866750",
+    "name": "Aya Ibrahim",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Sie liest und schreibt lateinische Schrift."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Versteht kein Schweizerdeutsch."
+     },
+     "learning_pace": {
+      "value": "good",
+      "status": "stated",
+      "evidence": "Lerntempo gut."
+     },
+     "health_limits_work": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "availability_for_work_or_education": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Berufliche Perspektive (Sicht Klient/in): Transport / Chauffeur."
+     },
+     "diplomas": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Diplome: ja."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Kein Führerschein."
+     },
+     "career_wish": {
+      "value": "Transport / Chauffeur",
+      "status": "stated",
+      "evidence": "Berufliche Perspektive (Sicht Klient/in): Transport / Chauffeur."
+     }
+    },
+    "ms": 38666,
+    "modelInput": [
+     "Muttersprache Kurdisch.",
+     "Sie liest und schreibt lateinische Schrift.",
+     "Deutsch mündlich A0.",
+     "Versteht kein Schweizerdeutsch.",
+     "Lerntempo gut.",
+     "Diplome: ja.",
+     "Kein Führerschein.",
+     "Berufliche Perspektive (Sicht Klient/in): Transport / Chauffeur."
+    ]
+   },
+   {
+    "zemis": "23730662",
+    "name": "Mahmoud Ibrahim",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Er ist in lateinischer Schrift nicht alphabetisiert."
+     },
+     "understands_swiss_german": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "learning_pace": {
+      "value": "slow",
+      "status": "stated",
+      "evidence": "Er lernt langsam."
+     },
+     "health_limits_work": {
+      "value": "some",
+      "status": "stated",
+      "evidence": "Rückenbeschwerden schränken körperlich schwere Arbeit ein."
+     },
+     "availability_for_work_or_education": {
+      "value": "partial",
+      "status": "stated",
+      "evidence": "Er ist nur teilzeitlich verfügbar."
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Bisher keine Arbeitserfahrung."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Keine Diplome."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Führerschein: nein."
+     },
+     "career_wish": {
+      "value": "Reinigung",
+      "status": "stated",
+      "evidence": "Er wünscht sich eine Stelle in Reinigung."
+     }
+    },
+    "ms": 37554,
+    "modelInput": [
+     "Rückenbeschwerden schränken körperlich schwere Arbeit ein.",
+     "Muttersprache Kurdisch.",
+     "Er ist in lateinischer Schrift nicht alphabetisiert.",
+     "Deutsch mündlich A0.",
+     "Er lernt langsam.",
+     "Bisher keine Arbeitserfahrung.",
+     "Keine Diplome.",
+     "Führerschein: nein.",
+     "Er ist nur teilzeitlich verfügbar.",
+     "Er wünscht sich eine Stelle in Reinigung."
+    ]
+   }
+  ]
  }
 }
