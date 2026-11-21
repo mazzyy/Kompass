@@ -21,6 +21,11 @@
 
 Not built (as agreed): Leichte Sprache note, AI column-mapping suggestion (the column card says "suggested from column name and values", honestly).
 
+## Organisers' rule answers (21.11, applied in rules.yaml v1.4)
+
+Q2 age on Stichtag (unchanged), Q3 proof types (unchanged), Q4 only jobs with a contract (volunteering, unpaid, programme work excluded), Q5 Sek II/Tertiär counts on completion. min_pensum stays 60 (brief) and can be set to 0 if ASD confirms. Marked "Organisers' answer · awaiting ASD confirmation" in the Rules panel. Q1, Q6, Q7, Q8, Q9 still assumptions. 87 tests pass.
+Effect on the November data: call list, claimable (18) and goal 2 totals unchanged; 9 info alerts "proven but not reproducible" (goal 2 recorded at apprenticeship start).
+
 ## How to run the demo (Wi-Fi off)
 
 ```bash

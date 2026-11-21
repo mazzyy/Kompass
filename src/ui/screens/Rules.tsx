@@ -80,7 +80,9 @@ export function RulesDrawer({ app }: { app: App }) {
                     {r.value}
                   </td>
                   <td style={{ fontSize: 12 }}>
-                    {/ASSUMPTION/.test(r.note) && <span className="tag warn">{tr(lang, 'rules.assumption')}</span>} <span className="muted">{r.note.replace(/ASSUMPTION\s*/, '')}</span>
+                    {/ASSUMPTION/.test(r.note) && <span className="tag warn">{tr(lang, 'rules.assumption')}</span>}
+                    {/ORGANISERS/.test(r.note) && <span className="tag ai">{tr(lang, 'rules.organisers')}</span>}{' '}
+                    <span className="muted">{r.note.replace(/(ASSUMPTION|ORGANISERS)\s*/, '')}</span>
                   </td>
                 </tr>
               ))}

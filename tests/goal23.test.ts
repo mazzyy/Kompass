@@ -41,13 +41,53 @@ describe('Goal 2 (T2)', () => {
     job(fx, p, '02.04.2026', 100, '30.06.2026');
     expect(g(fx.run(), p.knr).goals[2]!.status).not.toBe('reached');
   });
-  it('T2-05 Sek II from 15.08.2026 -> reached 15.08.2026', () => {
+  it('T2-05 (organisers: counts on completion) Sek II 15.08.2026–31.07.2028 -> on track until completion', () => {
     const fx = new Fx();
     const p = addPerson(fx, { birth: '01.01.2008' });
     course(fx, p, 'Sek II', 'Lehre EBA', '15.08.2026', '31.07.2028');
     const r = g(fx.run(), p.knr).goals[2]!;
+    expect(r.status).toBe('on_track');
+    expect(r.reason).toMatchObject({ key: 'g2.on_track.education', p: { date: '31.07.2028' } });
+    expect(fmt(r.latestAction)).toBe('31.07.2028');
+    // the earlier default (counts from start) is still one setting away
+    const rules = defaultRules();
+    rules.goal2.education_counts_from = 'start';
+    expect(fmt(g(fx.run(rules), p.knr).goals[2]!.reachedDate)).toBe('15.08.2026');
+  });
+  it('T2-05b completed Sek II -> reached on the completion date', () => {
+    const fx = new Fx();
+    const p = addPerson(fx, { birth: '01.01.2005' });
+    course(fx, p, 'Sek II', 'Lehre EFZ', '01.08.2023', '30.06.2026');
+    const r = g(fx.run(), p.knr).goals[2]!;
     expect(r.status).toBe('reached');
-    expect(fmt(r.reachedDate)).toBe('15.08.2026');
+    expect(fmt(r.reachedDate)).toBe('30.06.2026');
+  });
+  it('T2-05c completion after the end of responsibility -> not on track via education', () => {
+    const fx = new Fx();
+    const p = addPerson(fx, { birth: '01.01.2005', ze: '30.06.2027' });
+    course(fx, p, 'Sek II', 'Lehre EFZ', '01.08.2025', '31.07.2028');
+    expect(g(fx.run(), p.knr).goals[2]!.reason.key).not.toBe('g2.on_track.education');
+  });
+  it('organisers Q4: volunteering / unpaid work never counts, exclusion shown in the trace', () => {
+    for (const bem of ['Freiwilligenarbeit', 'freiwilliger Einsatz', 'unbezahltes Praktikum', 'ehrenamtlich']) {
+      const fx = new Fx();
+      const p = addPerson(fx);
+      job(fx, p, '01.01.2025', 100, '31.12.2025', { bemerkungen: bem });
+      const r = g(fx.run(), p.knr).goals[2]!;
+      expect(r.status).not.toBe('reached');
+      expect(r.trace.some((t) => t.rule === 'g2.excluded')).toBe(true);
+    }
+  });
+  it('min_pensum 0 (if ASD confirms "contract matters"): any contract for 6 months counts, no job never does', () => {
+    const rules = defaultRules();
+    rules.goal2.min_pensum = 0;
+    const fx = new Fx();
+    const p = addPerson(fx);
+    job(fx, p, '01.01.2026', 20, '31.08.2026');
+    const q = addPerson(fx);
+    expect(g(fx.run(rules), p.knr).goals[2]!.status).toBe('reached');
+    expect(g(fx.run(rules), q.knr).goals[2]!.status).not.toBe('reached');
+    expect(g(fx.run(), p.knr).goals[2]!.status).not.toBe('reached'); // default 60 % unchanged
   });
   it('T2-06 Beschäftigungsprogramm is excluded and shown in the trace', () => {
     const fx = new Fx();

@@ -28,7 +28,8 @@ export function qualifyingSegments(jobs: { von: Day; bis?: Day; pensum: number }
   let cur: Seg | undefined;
   let gap = 0;
   for (let i = 0; i < n; i++) {
-    if (load[i] >= min) {
+    // a day only counts with an active job (contract) AND workload >= min (so min_pensum: 0 = "any contract")
+    if (load[i] > 0 && load[i] >= min) {
       if (cur) cur.end = from + i;
       else cur = { start: from + i, end: from + i, running: false, peak: 0 };
       cur.peak = Math.max(cur.peak, load[i]);
@@ -139,6 +140,18 @@ export function computeGoal2(p: Person, ctx: Ctx, alerts: Alert[]): GoalResult {
   // --- not reached ---
   const latestStart = addMonths(addDays(deadline, 1), -g.months_uninterrupted);
   const base = { goal: 2 as const, deadline, latestAction: latestStart, trace };
+  // Education Sek II / Tertiär still running (counts on completion): on track if it ends before the deadline.
+  if (g.education_counts_from === 'completion') {
+    const edu = ctx
+      .rowsFor('foerderung', p)
+      .filter((r) => includesAny(r.art, g.education_types) && day(r.start) !== undefined && day(r.start)! <= st && day(r.abschluss) !== undefined && day(r.abschluss)! > st)
+      .sort((a, b) => day(a.abschluss)! - day(b.abschluss)!)[0];
+    if (edu && day(edu.abschluss)! <= deadline) {
+      const reason = { key: 'g2.on_track.education', p: { art: str(edu.art), what: str(edu.bezeichnung) || str(edu.art), date: fmt(day(edu.abschluss)) } };
+      trace.push({ rule: 'g2.education_running', msg: reason, sources: [srcRef(edu)] });
+      return { ...base, latestAction: day(edu.abschluss)!, status: 'on_track', reason };
+    }
+  }
   const running = segs.find((s) => s.running);
   if (running) {
     const done = addDays(addMonths(running.start, g.months_uninterrupted), -1);

@@ -10083,7 +10083,7 @@
  "SA_D12_5813.txt": {
   "file": "SA_D12_5813.txt",
   "model": "qwen2.5:7b-instruct",
-  "at": "2026-11-21T08:58:12.640Z",
+  "at": "2026-11-21T09:09:12.311Z",
   "persons": [
    {
     "zemis": "52965167",
@@ -10140,7 +10140,7 @@
       "evidence": "Möchte im Bereich Gastronomie arbeiten."
      }
     },
-    "ms": 33417,
+    "ms": 53215,
     "modelInput": [
      "Keine gesundheitlichen Einschränkungen bekannt.",
      "Muttersprache Arabisch.",
@@ -10161,7 +10161,7 @@
  "SA_D12_3452.txt": {
   "file": "SA_D12_3452.txt",
   "model": "qwen2.5:7b-instruct",
-  "at": "2026-11-21T09:00:03.171Z",
+  "at": "2026-11-21T09:11:13.755Z",
   "persons": [
    {
     "zemis": "53753161",
@@ -10218,7 +10218,7 @@
       "evidence": "Berufliche Perspektive (Sicht Klient/in): Reinigung."
      }
     },
-    "ms": 32621,
+    "ms": 35303,
     "modelInput": [
      "Leichte gesundheitliche Einschränkungen, körperliche Arbeit nur teilweise möglich.",
      "Muttersprache Arabisch.",
@@ -10288,7 +10288,7 @@
       "evidence": "Berufliche Perspektive (Sicht Klient/in): Transport / Chauffeur."
      }
     },
-    "ms": 37981,
+    "ms": 43021,
     "modelInput": [
      "Muttersprache Arabisch.",
      "Alphabetisierung Zielsprache: nein, ein Alphabetisierungskurs ist nötig.",
@@ -10356,7 +10356,7 @@
       "evidence": "Möchte im Bereich Informatik arbeiten."
      }
     },
-    "ms": 39921,
+    "ms": 43107,
     "modelInput": [
      "Keine gesundheitlichen Einschränkungen bekannt.",
      "Muttersprache Kurdisch.",
