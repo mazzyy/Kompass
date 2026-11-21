@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { addYears, fmt } from '../../engine/dates';
 import type { GoalId, TotalsRow } from '../../engine/model';
 import { msg } from '../../i18n/messages';
@@ -28,7 +29,9 @@ export function StackBar({ r, lang }: { r: TotalsRow; lang: App['lang'] }) {
 
 export function OverviewScreen({ app }: { app: App }) {
   const { lang, result: res } = app;
+  const [whatIf, setWhatIf] = useState(false);
   if (!res) return <EmptyRun app={app} />;
+  const wi = whatIf ? res.whatIf : undefined;
   const sw = app.role.kind === 'sw' ? app.role.name : undefined;
   const t1 = res.totals[1];
   const row1: TotalsRow | undefined = t1 ? (sw ? t1.bySocialWorker.find((r) => r.group === sw) : t1.overall) : undefined;
@@ -42,7 +45,19 @@ export function OverviewScreen({ app }: { app: App }) {
           <h1>{tr(lang, 'ov.title')}</h1>
           <p className="sub">{sw ? tr(lang, 'ov.sub.sw', { date: fmt(res.stichtag), n: persons.length, sw }) : tr(lang, 'ov.sub', { date: fmt(res.stichtag), n: persons.length })}</p>
         </div>
+        {!sw && res.whatIf && (
+          <button type="button" className={`btn${whatIf ? ' primary' : ''}`} aria-pressed={whatIf} title={tr(lang, 'wi.tooltip')} onClick={() => setWhatIf(!whatIf)}>
+            {tr(lang, 'wi.toggle')}
+          </button>
+        )}
       </div>
+
+      {wi && (
+        <div className="note info" role="status" style={{ flexDirection: 'column' }}>
+          <span>{tr(lang, 'wi.info', { i: wi.interpretation, n: wi.affected })}</span>
+          <span style={{ fontSize: 12 }}>{tr(lang, 'wi.tooltip')}</span>
+        </div>
+      )}
 
       {res.notes.map((n, i) => (
         <div key={i} className="note">
@@ -143,6 +158,18 @@ export function OverviewScreen({ app }: { app: App }) {
                   </span>
                 )}
               </div>
+              {wi && (g === 2 || g === 3) && (
+                <span style={{ flex: '1 1 100%', display: 'flex', gap: 6, flexWrap: 'wrap', fontSize: 12 }}>
+                  {(['on_track', 'at_risk', 'missed'] as const)
+                    .filter((st) => wi.delta[g][st] !== 0)
+                    .map((st) => (
+                      <span key={st} className={`tag${st === 'missed' || st === 'at_risk' ? ' bad' : ''}`}>
+                        {wi.delta[g][st] > 0 ? '+' : ''}
+                        {wi.delta[g][st]} {statusLabel(lang, st)}
+                      </span>
+                    ))}
+                </span>
+              )}
               {r ? (
                 <>
                   <div style={{ flex: '2 1 300px', display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -182,6 +209,44 @@ export function OverviewScreen({ app }: { app: App }) {
           {tr(lang, 'ov.counted.help')}
         </div>
       </section>
+
+      {wi && (
+        <section className="panel" aria-label={tr(lang, 'wi.toggle')}>
+          <div className="panel-head">
+            <span className="panel-title">{tr(lang, 'wi.changed', { n: wi.changes.filter((c) => c.before[2] !== c.after[2] || c.before[3] !== c.after[3]).length })}</span>
+          </div>
+          <div className="scroll-x">
+            <table className="t" style={{ minWidth: 640 }}>
+              <thead>
+                <tr>
+                  <th scope="col">{tr(lang, 'cl.col.client')}</th>
+                  <th scope="col">{tr(lang, 'wi.col.end')}</th>
+                  <th scope="col">{tr(lang, 'goal.2')}</th>
+                  <th scope="col">{tr(lang, 'goal.3')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {wi.changes
+                  .filter((c) => c.before[2] !== c.after[2] || c.before[3] !== c.after[3])
+                  .map((c) => {
+                    const p = res.persons.find((x) => x.id === c.personId)!;
+                    return (
+                      <tr key={c.personId} className="click" onClick={() => { app.setSelected(p.id); app.setScreen('clients'); }}>
+                        <td>
+                          <div style={{ fontWeight: 500 }}>{p.displayName}</div>
+                          <div className="mono muted" style={{ fontSize: 12 }}>{p.klientNr} · {p.socialWorker}</div>
+                        </td>
+                        <td className="mono" style={{ fontSize: 12 }}>{fmt(c.oldEnd)} → {fmt(c.newEnd)}</td>
+                        <td>{statusLabel(lang, c.before[2])} → <strong>{statusLabel(lang, c.after[2])}</strong></td>
+                        <td>{statusLabel(lang, c.before[3])} → <strong>{statusLabel(lang, c.after[3])}</strong></td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
 
       {t1 && !sw && (
         <section className="panel" aria-label={tr(lang, 'ov.bySw')}>

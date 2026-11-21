@@ -123,8 +123,9 @@ export function SituationScreen({ app, aiOnline }: { app: App; aiOnline: boolean
         <div>
           <h1>{tr(lang, 'sa.title')}</h1>
           <p className="sub">{tr(lang, 'sa.sub')}</p>
-          <p style={{ margin: '8px 0 0', fontSize: 13 }}>
-            <span className="tag ai">{acc ? tr(lang, 'sa.accuracy', { pct: pct(acc.accuracy), n: acc.reports, model: acc.model, date: fdate(acc.measuredAt).slice(0, 10) }) : tr(lang, 'sa.accuracy.none')}</span>
+          <p style={{ margin: '8px 0 0', fontSize: 13, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <span className="tag ai" style={{ whiteSpace: 'normal' }}>{acc ? tr(lang, 'sa.accuracy', { pct: pct(acc.accuracy), n: acc.reports, model: acc.model, date: fdate(acc.measuredAt).slice(0, 10) }) : tr(lang, 'sa.accuracy.none')}</span>
+            <span className="tag ai" style={{ whiteSpace: 'normal' }}>{sa.accuracyHuman ? tr(lang, 'sa.accuracyHuman', { pct: pct(sa.accuracyHuman.accuracy), n: sa.accuracyHuman.reports }) : tr(lang, 'sa.accuracyHuman.none')}</span>
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>

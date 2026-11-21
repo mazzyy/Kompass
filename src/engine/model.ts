@@ -163,6 +163,7 @@ export interface RunResult {
   socialWorkers: string[];
   alerts: Alert[];
   claimable: Claimable[];
+  whatIf?: import('./whatif').WhatIfResult;
   /** per-person facts for group patterns only (never shown or exported per person) */
   features: Record<string, import('./patterns').Features>;
   inputs: { fileName: string; table?: TableId; rows: number }[];

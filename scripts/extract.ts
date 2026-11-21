@@ -16,6 +16,8 @@ const truth = JSON.parse(fs.readFileSync('sample-data/labels/report_truth.json',
 const cache: Record<string, ReportExtraction> = fs.existsSync(CACHE) ? JSON.parse(fs.readFileSync(CACHE, 'utf8')) : {};
 const save = () => fs.writeFileSync(CACHE, JSON.stringify(cache, null, 1));
 
+const human = fs.existsSync('sample-data/labels/human_truth.json') ? JSON.parse(fs.readFileSync('sample-data/labels/human_truth.json', 'utf8')) : {};
+
 async function runOne(file: string, force = false) {
   if (!force && cache[file]?.model === model) return cache[file];
   const text = fs.readFileSync(path.join(DIR, file), 'utf8');
@@ -47,17 +49,20 @@ async function main() {
     const pool = index.filter((x) => !x.persona && !x.newThisMonth);
     const k = Math.max(1, Math.floor(pool.length / n));
     files = pool.filter((_, i) => i % k === 0).slice(0, n).map((x) => x.file);
+  } else if (mode === 'human') {
+    files = Object.keys(JSON.parse(fs.readFileSync('sample-data/labels/human_truth.json', 'utf8'))).filter((k) => !k.startsWith('_'));
   } else if (mode === 'cache') {
     files = index.filter((x) => x.persona || x.newThisMonth || x.socialWorker === 'S. Keller').map((x) => x.file);
   } else files = [mode];
   const t0 = Date.now();
   let done = 0;
   for (const f of files) {
-    await runOne(f);
+    await runOne(f, mode === 'human'); // hand-written reports may have changed: always re-read
     done++;
     if (done % 5 === 0) console.log(`${done}/${files.length} reports, ${Math.round((Date.now() - t0) / 1000)} s`);
   }
-  if (mode === 'accuracy') {
+  if (mode === 'accuracy' || mode === 'human') {
+    const labels = mode === 'human' ? human : truth;
     let ok = 0;
     let total = 0;
     let stated = 0;
@@ -65,7 +70,7 @@ async function main() {
     const perField: Record<string, [number, number]> = {};
     for (const f of files) {
       for (const p of cache[f].persons) {
-        const want = truth[f]?.persons[p.zemis];
+        const want = labels[f]?.persons[p.zemis];
         if (!want) continue;
         for (const fd of SA_FIELDS) {
           const c = fieldCorrect(fd.id as SaFieldId, p.fields[fd.id], want[fd.id]);
@@ -91,9 +96,9 @@ async function main() {
       accuracy: ok / total,
       evidenceFoundRate: stated ? evOk / stated : null,
       perField: Object.fromEntries(Object.entries(perField).map(([k, [a, b]]) => [k, a / b])),
-      note: 'Synthetic reports drafted from generator ground truth; human-written reports measured separately.',
+      note: mode === 'human' ? 'Reports hand-written by a person, labelled by the writer.' : 'Synthetic reports drafted from generator ground truth.',
     };
-    fs.writeFileSync(path.join(DIR, 'accuracy.json'), JSON.stringify(acc, null, 1));
+    fs.writeFileSync(path.join(DIR, mode === 'human' ? 'accuracy_human.json' : 'accuracy.json'), JSON.stringify(acc, null, 1));
     console.log(acc);
   }
   console.log(`done: ${files.length} reports in ${Math.round((Date.now() - t0) / 1000)} s`);

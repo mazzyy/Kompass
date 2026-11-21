@@ -430,5 +430,360 @@
     ]
    }
   ]
+ },
+ "SA_D12_5588.txt": {
+  "file": "SA_D12_5588.txt",
+  "model": "qwen2.5:7b-instruct",
+  "at": "2026-11-21T00:43:59.329Z",
+  "persons": [
+   {
+    "zemis": "54578923",
+    "name": "Firas Ibrahim",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisiert in der Muttersprache und in lateinischer Schrift."
+     },
+     "understands_swiss_german": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Schweizerdeutsch wird verstanden."
+     },
+     "learning_pace": {
+      "value": "slow",
+      "status": "stated",
+      "evidence": "Lerntempo langsam, braucht viele Wiederholungen."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit."
+     },
+     "availability_for_work_or_education": {
+      "value": "full",
+      "status": "stated",
+      "evidence": "Verfügbar für Arbeit oder Ausbildung: vollzeit."
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Bisher keine Arbeitserfahrung."
+     },
+     "diplomas": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Ein Berufsdiplom aus dem Herkunftsland ist vorhanden."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Führerschein aus dem Herkunftsland, in der Schweiz nicht anerkannt."
+     },
+     "career_wish": {
+      "value": "Bau",
+      "status": "stated",
+      "evidence": "Er wünscht sich eine Stelle in Bau."
+     }
+    },
+    "ms": 42050,
+    "modelInput": [
+     "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit.",
+     "Muttersprache Arabisch.",
+     "Alphabetisiert in der Muttersprache und in lateinischer Schrift.",
+     "Deutsch mündlich A0.",
+     "Schweizerdeutsch wird verstanden.",
+     "Lerntempo langsam, braucht viele Wiederholungen.",
+     "Bisher keine Arbeitserfahrung.",
+     "Ein Berufsdiplom aus dem Herkunftsland ist vorhanden.",
+     "Führerschein aus dem Herkunftsland, in der Schweiz nicht anerkannt.",
+     "Verfügbar für Arbeit oder Ausbildung: vollzeit.",
+     "Er wünscht sich eine Stelle in Bau.",
+     "Motiviert und zuverlässig."
+    ]
+   },
+   {
+    "zemis": "33049934",
+    "name": "Rana Ibrahim",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisierung Zielsprache: ja."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Schweizerdeutsch versteht sie noch nicht."
+     },
+     "learning_pace": {
+      "value": "slow",
+      "status": "stated",
+      "evidence": "Lerntempo langsam, braucht viele Wiederholungen."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit."
+     },
+     "availability_for_work_or_education": {
+      "value": "full",
+      "status": "stated",
+      "evidence": "Verfügbar für Arbeit oder Ausbildung: vollzeit."
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Bisher keine Arbeitserfahrung."
+     },
+     "diplomas": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Führerschein: nein."
+     },
+     "career_wish": {
+      "value": "Coiffeur",
+      "status": "stated",
+      "evidence": "Sie wünscht sich eine Stelle in Coiffeur."
+     }
+    },
+    "ms": 50351,
+    "modelInput": [
+     "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit.",
+     "Muttersprache Arabisch.",
+     "Alphabetisierung Zielsprache: ja.",
+     "Deutsch mündlich A0.",
+     "Schweizerdeutsch versteht sie noch nicht.",
+     "Lerntempo langsam, braucht viele Wiederholungen.",
+     "Bisher keine Arbeitserfahrung.",
+     "Führerschein: nein.",
+     "Verfügbar für Arbeit oder Ausbildung: vollzeit.",
+     "Sie wünscht sich eine Stelle in Coiffeur."
+    ]
+   },
+   {
+    "zemis": "24199358",
+    "name": "Tarek Ibrahim",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisiert in der Muttersprache und in lateinischer Schrift."
+     },
+     "understands_swiss_german": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "learning_pace": {
+      "value": "good",
+      "status": "stated",
+      "evidence": "Lerntempo gut."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit."
+     },
+     "availability_for_work_or_education": {
+      "value": "full",
+      "status": "stated",
+      "evidence": "Verfügbar für Arbeit oder Ausbildung: vollzeit."
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Bisher keine Arbeitserfahrung."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Keine Diplome."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Führerschein: nein."
+     },
+     "career_wish": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     }
+    },
+    "ms": 46519,
+    "modelInput": [
+     "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit.",
+     "Muttersprache Kurdisch.",
+     "Alphabetisiert in der Muttersprache und in lateinischer Schrift.",
+     "Deutsch mündlich A0.",
+     "Lerntempo gut.",
+     "Bisher keine Arbeitserfahrung.",
+     "Keine Diplome.",
+     "Führerschein: nein.",
+     "Verfügbar für Arbeit oder Ausbildung: vollzeit.",
+     "Braucht Unterstützung bei der Stellensuche."
+    ]
+   },
+   {
+    "zemis": "38636788",
+    "name": "Aya Ibrahim",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisiert in der Muttersprache und in lateinischer Schrift."
+     },
+     "understands_swiss_german": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Versteht Schweizerdeutsch im Alltag recht gut."
+     },
+     "learning_pace": {
+      "value": "medium",
+      "status": "stated",
+      "evidence": "Sie lernt in einem durchschnittlichen Tempo."
+     },
+     "health_limits_work": {
+      "value": "none",
+      "status": "stated",
+      "evidence": "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit."
+     },
+     "availability_for_work_or_education": {
+      "value": "partial",
+      "status": "stated",
+      "evidence": "Sie ist nur teilzeitlich verfügbar."
+     },
+     "work_experience_years_origin": {
+      "value": 0,
+      "status": "stated",
+      "evidence": "Keine Berufserfahrung im Herkunftsland."
+     },
+     "diplomas": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Diplome: nein."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Kein Führerschein."
+     },
+     "career_wish": {
+      "value": "Detailhandel",
+      "status": "stated",
+      "evidence": "Sie wünscht sich eine Stelle in Detailhandel."
+     }
+    },
+    "ms": 33469,
+    "modelInput": [
+     "Gesundheitlich keine Einschränkung der Arbeitsfähigkeit.",
+     "Muttersprache Arabisch.",
+     "Alphabetisiert in der Muttersprache und in lateinischer Schrift.",
+     "Deutsch mündlich A0.",
+     "Versteht Schweizerdeutsch im Alltag recht gut.",
+     "Sie lernt in einem durchschnittlichen Tempo.",
+     "Keine Berufserfahrung im Herkunftsland.",
+     "Diplome: nein.",
+     "Kein Führerschein.",
+     "Sie ist nur teilzeitlich verfügbar.",
+     "Sie wünscht sich eine Stelle in Detailhandel.",
+     "Braucht Unterstützung bei der Stellensuche."
+    ]
+   },
+   {
+    "zemis": "22244952",
+    "name": "Hiba Ibrahim",
+    "fields": {
+     "childcare_duty_without_care": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "literate_latin_script": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Alphabetisierung Zielsprache: ja."
+     },
+     "understands_swiss_german": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Versteht kein Schweizerdeutsch."
+     },
+     "learning_pace": {
+      "value": "medium",
+      "status": "stated",
+      "evidence": "Sie lernt in einem durchschnittlichen Tempo."
+     },
+     "health_limits_work": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     },
+     "availability_for_work_or_education": {
+      "value": "full",
+      "status": "stated",
+      "evidence": "Sie ist voll verfügbar für Arbeit oder Bildung."
+     },
+     "work_experience_years_origin": {
+      "value": 18,
+      "status": "stated",
+      "evidence": "Sie hat 18 Jahre im Herkunftsland gearbeitet."
+     },
+     "diplomas": {
+      "value": "yes",
+      "status": "stated",
+      "evidence": "Ein Berufsdiplom aus dem Herkunftsland ist vorhanden."
+     },
+     "driving_licence": {
+      "value": "no",
+      "status": "stated",
+      "evidence": "Kein Führerschein."
+     },
+     "career_wish": {
+      "value": null,
+      "status": "not_stated",
+      "evidence": ""
+     }
+    },
+    "ms": 30276,
+    "modelInput": [
+     "Muttersprache Kurdisch.",
+     "Alphabetisierung Zielsprache: ja.",
+     "Deutsch mündlich A0.",
+     "Versteht kein Schweizerdeutsch.",
+     "Sie lernt in einem durchschnittlichen Tempo.",
+     "Sie hat 18 Jahre im Herkunftsland gearbeitet.",
+     "Ein Berufsdiplom aus dem Herkunftsland ist vorhanden.",
+     "Kein Führerschein.",
+     "Sie ist voll verfügbar für Arbeit oder Bildung."
+    ]
+   }
+  ]
  }
 }

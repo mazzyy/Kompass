@@ -55,6 +55,7 @@ export function useSa(ai: { endpoint: string; model: string }) {
   const [extr, setExtr] = useState<Record<string, Extraction>>({});
   const [confirmed, setConfirmed] = useState<Record<string, Record<string, Confirmed>>>(() => load('ic.sa.confirmed', {}));
   const [accuracy, setAccuracy] = useState<Accuracy | undefined>();
+  const [accuracyHuman, setAccuracyHuman] = useState<Accuracy | undefined>();
   const [busy, setBusy] = useState<string | undefined>(); // file being extracted live
   const [livePersons, setLivePersons] = useState<PersonExtraction[]>([]);
   const [error, setError] = useState<string | undefined>();
@@ -88,6 +89,8 @@ export function useSa(ai: { endpoint: string; model: string }) {
       }
       const a = await fetch(base + 'accuracy.json');
       if (a.ok && a.headers.get('content-type')?.includes('json')) setAccuracy(await a.json());
+      const ah = await fetch(base + 'accuracy_human.json');
+      if (ah.ok && ah.headers.get('content-type')?.includes('json')) setAccuracyHuman(await ah.json());
     } catch (e) {
       setError(String(e));
     }
@@ -157,7 +160,7 @@ export function useSa(ai: { endpoint: string; model: string }) {
     save('ic.sa.confirmed', undefined);
   };
 
-  return { reports, extr, confirmed, accuracy, busy, livePersons, error, current, setCurrent, loadSample, addFiles, ensureText, runLive, setField, clear };
+  return { reports, extr, confirmed, accuracy, accuracyHuman, busy, livePersons, error, current, setCurrent, loadSample, addFiles, ensureText, runLive, setField, clear };
 }
 
 export type Sa = ReturnType<typeof useSa>;

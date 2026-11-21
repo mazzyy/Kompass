@@ -1,0 +1,75 @@
+{
+ "_how_to": "One entry per hand-written report. For each person set every field to the value you WROTE in the report, or \"not_stated\" if you left it out. Then run: npx tsx scripts/extract.ts human",
+ "SA_D12_5813.txt": {
+  "persons": {
+   "52965167": {
+    "childcare_duty_without_care": "not_stated",
+    "literate_latin_script": "no",
+    "understands_swiss_german": "yes",
+    "learning_pace": "slow",
+    "health_limits_work": "none",
+    "availability_for_work_or_education": "full",
+    "work_experience_years_origin": 9,
+    "diplomas": "no",
+    "driving_licence": "no",
+    "career_wish": "Gastronomie"
+   }
+  }
+ },
+ "SA_D12_3452.txt": {
+  "persons": {
+   "53753161": {
+    "childcare_duty_without_care": "not_stated",
+    "literate_latin_script": "no",
+    "understands_swiss_german": "yes",
+    "learning_pace": "medium",
+    "health_limits_work": "some",
+    "availability_for_work_or_education": "full",
+    "work_experience_years_origin": 0,
+    "diplomas": "no",
+    "driving_licence": "no",
+    "career_wish": "Reinigung"
+   },
+   "47501280": {
+    "childcare_duty_without_care": "not_stated",
+    "literate_latin_script": "no",
+    "understands_swiss_german": "no",
+    "learning_pace": "slow",
+    "health_limits_work": "none",
+    "availability_for_work_or_education": "full",
+    "work_experience_years_origin": 15,
+    "diplomas": "no",
+    "driving_licence": "no",
+    "career_wish": "Transport / Chauffeur"
+   },
+   "53032745": {
+    "childcare_duty_without_care": "not_stated",
+    "literate_latin_script": "yes",
+    "understands_swiss_german": "no",
+    "learning_pace": "medium",
+    "health_limits_work": "none",
+    "availability_for_work_or_education": "partial",
+    "work_experience_years_origin": 0,
+    "diplomas": "no",
+    "driving_licence": "no",
+    "career_wish": "Informatik"
+   }
+  }
+ },
+ "SA_D12_9008.txt": {
+  "persons": {
+   "22340975": {
+    "childcare_duty_without_care": "not_stated",
+    "literate_latin_script": "no",
+    "understands_swiss_german": "yes",
+    "learning_pace": "good",
+    "health_limits_work": "none",
+    "availability_for_work_or_education": "full",
+    "work_experience_years_origin": 9,
+    "diplomas": "no",
+    "driving_licence": "no",
+    "career_wish": "Pflege (FaGe)"
+   }
+  }
+ }
+}

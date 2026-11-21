@@ -295,6 +295,27 @@ function claimSheet(wb: ExcelJS.Workbook, res: RunResult, lumpSums: Record<strin
   );
 }
 
+function whatIfSheet(wb: ExcelJS.Workbook, res: RunResult) {
+  const w = res.whatIf;
+  if (!w) return;
+  const byId = new Map(res.persons.map((p) => [p.id, p]));
+  const rows: Row[] = [
+    [`Simulation 2027-Regel, Auslegung ${w.interpretation}: ${w.affected} Klient:innen mit früherem Zuständigkeitsende. Ziel 1 unverändert.`],
+    ['Ab 1. Januar 2027 ist die Bundesabgeltung für alle Personen im Asyl- und Flüchtlingsbereich auf 5 Jahre begrenzt (Entlastungspaket 2027 des Bundes). Die Übergangsregeln des Kantons Bern können abweichen; einstellbar in rules.yaml.'],
+    [],
+    ['Veränderung je Status', 'Ziel 2 (Personen)', 'Ziel 3 (Haushalte)'],
+    ...(['on_track', 'at_risk', 'missed'] as const).map((st) => [STATUS_DE[st], w.delta[2][st], w.delta[3][st]] as Row),
+    [],
+    ['Klientennummer', 'Name', 'Fallführung', 'Zuständigkeitsende heute', 'Zuständigkeitsende neu', 'Ziel 2 heute', 'Ziel 2 neu', 'Ziel 3 heute', 'Ziel 3 neu'],
+    ...w.changes.map((c) => {
+      const p = byId.get(c.personId)!;
+      return [p.klientNr, p.displayName, p.socialWorker, dateCell(c.oldEnd), dateCell(c.newEnd), c.before[2] ? STATUS_DE[c.before[2]] : '', c.after[2] ? STATUS_DE[c.after[2]] : '', c.before[3] ? STATUS_DE[c.before[3]] : '', c.after[3] ? STATUS_DE[c.after[3]] : ''] as Row;
+    }),
+  ];
+  const ws = addSheet(wb, 'WhatIf_2027', ['Was wäre wenn: 2027-Regel', '', '', '', '', '', '', '', ''], rows, [40, 18, 14, 16, 16, 16, 16, 16, 16]);
+  ws.autoFilter = undefined as unknown as ExcelJS.AutoFilter;
+}
+
 function rulesSheet(wb: ExcelJS.Workbook, rulesText: string) {
   const rows: Row[] = flattenRules(rulesText).map((r) => [r.path, r.value, r.note]);
   addSheet(wb, 'Regeln', ['Einstellung', 'Wert', 'Hinweis'], rows, [42, 60, 60]);
@@ -350,6 +371,7 @@ export async function writeManagement(res: RunResult, rulesText: string, created
   callSheet(wb, res);
   claimSheet(wb, res, lumpSums);
   dqSheet(wb, res);
+  whatIfSheet(wb, res);
   rulesSheet(wb, rulesText);
   runSheet(wb, res, createdIso);
   const buffer = (await wb.xlsx.writeBuffer()) as ArrayBuffer;
