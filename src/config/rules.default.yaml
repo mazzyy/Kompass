@@ -1,10 +1,10 @@
-# Integrations-Cockpit rules configuration (draft v1.5, 21.11.2026)
+# Integrations-Cockpit rules configuration (draft v1.6, 21.11.2026)
 # Edit this file to change a rule; no code change needed.
 # Every value here is shown in the app's "Rules" panel. Values marked ASSUMPTION
 # are defaults until ASD answers the open questions (02_data/MISSING_AND_OPEN_QUESTIONS.md).
 # Values marked ORGANISERS follow the hackathon organisers' answers of 21.11.2026 (not yet confirmed by ASD directly).
 
-version: "1.5"
+version: "1.6"
 
 stichtag: auto                 # auto = export date; or "20.11.2026"
 at_risk_window_months: 6
@@ -14,8 +14,8 @@ population:
   exclude_handed_over: true              # Datum Übergang Gemeindezuständigkeit <= Stichtag -> not current (ASSUMPTION Q14)
 
 scope:
-  statuses: ["VA", "F-FL", "B-FL", "B-RSFL", "B-SL"]          # ASSUMPTION Q1
-  excluded_statuses: ["S", "N (Asylsuchende)", "VA+7", "F-FL+7", "B-FL+5", "B-RSFL+7", "B-SL+5"]   # ASSUMPTION Q9
+  statuses: ["VA", "F-FL", "B-FL", "B-RSFL", "B-SL"]          # ORGANISERS Q1: these five permits count
+  excluded_statuses: ["S", "N (Asylsuchende)", "VA+7", "F-FL+7", "B-FL+5", "B-RSFL+7", "B-SL+5"]   # "+5"/"+7" = federal payment period over (ORGANISERS Q9)
   min_age: 16
   age_reference: stichtag                # ORGANISERS Q2: age 16 on the Stichtag (options: stichtag | entry | deadline)
 
@@ -31,6 +31,11 @@ goal1:
   count_late_as_reached: false           # late = green with marker, not in payment (ASSUMPTION Q12)
   active_course_softens_risk: true
   language_course_keywords: ["Förderangebot Sprache", "Sprachkurs", "Deutsch", "Alphabetisierung", "A1", "fide", "telc"]   # matched in Art or Bezeichnung (template Art: "Förderangebot Sprache", "Sprachkurs im erweiterten Verfahren (N)")
+
+payment_period:                          # goals 2 and 3 must be reached within the federal payment period
+  years_by_status: { "VA": 7, "F-FL": 7, "B-FL": 5, "B-RSFL": 7, "B-SL": 5 }   # ORGANISERS Q9: 5 or 7 years depending on the permit; which is which is read from the template statuses VA+7, F-FL+7, B-FL+5, B-RSFL+7, B-SL+5
+  counted_from: entry                    # ASSUMPTION: from the entry date (Aufenthalt (Einreise)); the federal rule may count refugees from the asylum application, usually a few days later
+  # Deadline for goals 2 and 3 = the earlier of (entry + years) and Zuständigkeitsende. If they differ by more than dq.date_tolerance_days, Data quality shows it.
 
 goal2:
   min_pensum: 60                         # Brief: a job with a work contract, at least 60 %, for 6 months without a break
@@ -55,9 +60,8 @@ goal_mapping:                            # Integrationszielerreichung "Art (Ziel
 
 whatif_2027:
   switch_date: "01.01.2027"
-  statuses: ["VA", "F-FL"]
-  new_years_from_entry: 5
-  interpretation: A                      # ASSUMPTION Q7: A = all current clients; B = only entries from switch date
+  new_years_from_entry: 5                # from the switch date the payment period is 5 years for every permit
+  interpretation: B                      # ORGANISERS Q7: B = the rule applies to people arriving from 01.01.2027 (already in the deadlines); A = what-if: also for current 7-year clients
 
 payment:
   lump_sum_chf:

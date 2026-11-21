@@ -51,6 +51,12 @@ export interface Person {
   entryYear?: number;
   zBeginn?: Day;
   zEnde?: Day;
+  /** Federal payment period for the current status (5 or 7 years from entry, 5 for entries from 2027). */
+  payYears?: number;
+  payEnd?: Day;
+  pay2027?: boolean; // 5 years because of the 2027 rule (entry from the switch date)
+  /** Deadline for goals 2 and 3: the earlier of payEnd and zEnde. */
+  deadline?: Day;
   current: boolean;
   goals: Partial<Record<GoalId, GoalResult>>;
   lastActivity?: Day;
@@ -69,6 +75,7 @@ export type AlertCode =
   | 'status_mismatch'
   | 'missing_case_manager'
   | 'invalid_period'
+  | 'period_mismatch'
   | 'household_without_head'
   | 'overlapping_jobs_merged'
   | 'born_in_ch'
@@ -84,6 +91,7 @@ export const ALERT_META: Record<AlertCode, { severity: Severity; affects: string
   status_mismatch: { severity: 'medium', affects: 'scope' },
   missing_case_manager: { severity: 'medium', affects: 'calls' },
   invalid_period: { severity: 'medium', affects: 'all' },
+  period_mismatch: { severity: 'medium', affects: 'goal2' },
   household_without_head: { severity: 'medium', affects: 'goal3' },
   overlapping_jobs_merged: { severity: 'info', affects: 'goal2' },
   born_in_ch: { severity: 'info', affects: 'goal1' },

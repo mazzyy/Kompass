@@ -26,6 +26,8 @@ Not built (as agreed): Leichte Sprache note, AI column-mapping suggestion (the c
 Q2 age on Stichtag (unchanged), Q3 proof types (unchanged), Q4 only jobs with a contract (volunteering, unpaid, programme work excluded), Q5 Sek II/Tertiär counts on completion. Goal 2 = contract job ≥ 60 % for 6 months without a break, as in the brief (no conflict); adding up two contract jobs remains an assumption. Marked "Organisers' answer · awaiting ASD confirmation" in the Rules panel. Q1, Q6, Q7, Q8, Q9 still assumptions. 87 tests pass.
 Effect on the November data: call list, claimable (18) and goal 2 totals unchanged; 9 info alerts "proven but not reproducible" (goal 2 recorded at apprenticeship start).
 
+**Later answers (21.11, rules.yaml v1.6):** Q1 the five permits VA, F-FL, B-FL, B-RSFL, B-SL count. Q9 payment period by permit, read from ASD's status list: 7 years for VA, F-FL, B-RSFL; 5 years for B-FL, B-SL; `+5/+7` = period over. The deadline for goals 2/3 is the earlier of entry + period and Zuständigkeitsende; Data quality flags a gap of more than 31 days. Q7 the 2027 rule applies to people arriving from 01.01.2027 (5 years), built into the deadlines; the what-if says 0 current clients are affected. Numbers unchanged (goal 2: 90/214/6/12, claimable 18, S. Keller order the same). 101 tests pass. Still open: two contract jobs added up, Nothilfe / household deadline (Q6), lump sums (Q8), period counted from entry vs. asylum application.
+
 ## How to run the demo (Wi-Fi off)
 
 ```bash

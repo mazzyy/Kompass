@@ -3,7 +3,7 @@ import { includesAny, type Ctx } from './context';
 import type { Rec } from './import/detect';
 import { provenRows } from './goal1';
 import { day, srcRef, str, type Alert, type GoalResult, type Msg, type Person, type TraceStep } from './model';
-import { personScope } from './population';
+import { deadlineMsg, personScope } from './population';
 
 interface Seg {
   start: Day;
@@ -55,7 +55,7 @@ export function computeGoal2(p: Person, ctx: Ctx, alerts: Alert[]): GoalResult {
   const g = rules.goal2;
   const trace: TraceStep[] = [];
   const klientSrc = srcRef(p.klientRow, ['klientNr', 'zemis', 'status', 'geburtsdatum', 'zEnde']);
-  const deadline = p.zEnde;
+  const deadline = p.deadline;
   const ageRef = rules.scope.age_reference === 'entry' ? p.entry : rules.scope.age_reference === 'deadline' ? deadline : st;
   const scope = personScope(p, ctx, ageRef);
   if (!scope.inScope) {
@@ -67,7 +67,7 @@ export function computeGoal2(p: Person, ctx: Ctx, alerts: Alert[]): GoalResult {
     trace.push({ rule: 'g2.deadline', msg: reason, sources: [klientSrc] });
     return { goal: 2, status: 'no_data', reason, trace };
   }
-  trace.push({ rule: 'g2.deadline', msg: { key: 'g2.trace.deadline', p: { deadline: fmt(deadline) } }, sources: [klientSrc] });
+  trace.push({ rule: 'g2.deadline', msg: deadlineMsg(p), sources: [klientSrc] });
 
   // --- candidates for "reached" ---
   type Cand = { date: Day; via: string; src: Rec; msg: Msg };

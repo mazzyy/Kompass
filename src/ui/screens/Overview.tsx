@@ -54,7 +54,7 @@ export function OverviewScreen({ app }: { app: App }) {
 
       {wi && (
         <div className="note info" role="status" style={{ flexDirection: 'column' }}>
-          <span>{tr(lang, 'wi.info', { i: wi.interpretation, n: wi.affected })}</span>
+          <span>{tr(lang, wi.interpretation === 'B' ? 'wi.info.B' : 'wi.info', { i: wi.interpretation, n: wi.affected })}</span>
           <span style={{ fontSize: 12 }}>{tr(lang, 'wi.tooltip')}</span>
         </div>
       )}

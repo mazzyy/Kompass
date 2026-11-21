@@ -2,6 +2,7 @@ import { addDays, addMonths, fmt, type Day } from './dates';
 import type { Ctx } from './context';
 import type { Rec } from './import/detect';
 import { provenRows } from './goal1';
+import { deadlineMsg } from './population';
 import { day, srcRef, str, type Alert, type GoalResult, type Household, type Person, type TraceStep } from './model';
 
 const HEAD = 'Dossierträger/-in';
@@ -62,14 +63,16 @@ export function computeGoal3(h: Household, persons: Map<string, Person>, ctx: Ct
     trace.push({ rule: 'scope', msg: reason, sources: [headSrc] });
     return { goal: 3, status: 'not_applicable', reason, trace };
   }
-  const ends = members.map((m) => m.zEnde).filter((d): d is Day => d !== undefined);
-  const deadline = g.deadline_from === 'head' && head.zEnde !== undefined ? head.zEnde : g.deadline_from === 'earliest_member' ? Math.min(...ends) : ends.length ? Math.max(...ends) : undefined;
+  const ends = members.map((m) => m.deadline).filter((d): d is Day => d !== undefined);
+  const deadline = g.deadline_from === 'head' && head.deadline !== undefined ? head.deadline : g.deadline_from === 'earliest_member' ? Math.min(...ends) : ends.length ? Math.max(...ends) : undefined;
   if (deadline === undefined) {
     const reason = { key: 'g3.no_deadline' };
     trace.push({ rule: 'g3.deadline', msg: reason, sources: [headSrc] });
     return { goal: 3, status: 'no_data', reason, trace };
   }
-  trace.push({ rule: 'g3.deadline', msg: { key: 'g3.trace.deadline', p: { deadline: fmt(deadline), who: head.displayName } }, sources: [headSrc] });
+  const who = g.deadline_from === 'head' && head.deadline !== undefined ? head : members.find((m) => m.deadline === deadline) ?? head;
+  trace.push({ rule: 'g3.deadline', msg: { key: 'g3.trace.deadline', p: { deadline: fmt(deadline), who: who.displayName } }, sources: [headSrc] });
+  if (who.deadline === deadline) trace.push({ rule: 'g3.deadline', msg: deadlineMsg(who), sources: [srcRef(who.klientRow, ['klientNr', 'status', 'zEnde'])] });
 
   const starts = members.map((m) => m.zBeginn).filter((d): d is Day => d !== undefined);
   const hhStart = starts.length ? Math.min(...starts) : undefined;

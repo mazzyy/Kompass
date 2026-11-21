@@ -64,6 +64,11 @@ export function PersonFacts({ app, p }: { app: App; p: Person }) {
             </div>
           );
         })}
+        {p.payEnd !== undefined && (
+          <span className="muted" style={{ fontSize: 12 }}>
+            {tr(lang, p.pay2027 ? 'pf.pay2027' : 'pf.pay', { status: p.status, years: p.payYears ?? '', end: fmt(p.payEnd) })}
+          </span>
+        )}
       </div>
       <div className="detail-sec">
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>

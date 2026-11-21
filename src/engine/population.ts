@@ -1,4 +1,4 @@
-import { addYears, ageAt, fmt, type Day } from './dates';
+import { addYears, ageAt, fmt, parseDate, type Day } from './dates';
 import type { Ctx } from './context';
 import type { Rec } from './import/detect';
 import { TEMPLATE_VALUES } from './import/templateValues';
@@ -59,6 +59,18 @@ export function buildPerson(k: Rec, ctx: Ctx, alerts: Alert[]): Person {
       sources: [srcRef(k, ['klientNr', 'zemis', 'fallfuehrung'])],
     });
   }
+  const zEnde = day(k.zEnde);
+  const pay = paymentPeriod(status, entry, ctx);
+  const deadline = pay && zEnde !== undefined ? Math.min(pay.end, zEnde) : pay?.end ?? zEnde;
+  if (pay && zEnde !== undefined && Math.abs(pay.end - zEnde) > ctx.rules.dq.date_tolerance_days) {
+    alerts.push({
+      code: 'period_mismatch',
+      severity: 'medium',
+      personId: klientNr || zemis,
+      msg: { key: 'dq.period_mismatch', p: { ze: fmt(zEnde), status, years: pay.years, entry: fmt(entry), end: fmt(pay.end), deadline: fmt(deadline) } },
+      sources: [srcRef(k, ['klientNr', 'zemis', 'status', 'zEnde'])],
+    });
+  }
   return {
     id: klientNr || zemis,
     zemis,
@@ -72,11 +84,39 @@ export function buildPerson(k: Rec, ctx: Ctx, alerts: Alert[]): Person {
     entry,
     entryYear: entry !== undefined ? new Date(entry * 86400000).getUTCFullYear() : undefined,
     zBeginn: day(k.zBeginn),
-    zEnde: day(k.zEnde),
+    zEnde,
+    payYears: pay?.years,
+    payEnd: pay?.end,
+    pay2027: pay?.rule2027,
+    deadline,
     current: true,
     goals: {},
     klientRow: k,
   };
+}
+
+/**
+ * Federal payment period for a status (ORGANISERS Q9): years from entry, from rules.payment_period.
+ * From the 2027 switch date, arrivals get new_years_from_entry (ORGANISERS Q7, interpretation B).
+ * Status variants "+5"/"+7" are past the period and have none.
+ */
+export function paymentPeriod(status: string, entry: Day | undefined, ctx: Ctx): { years: number; end: Day; rule2027: boolean } | undefined {
+  const base = ctx.rules.payment_period?.years_by_status?.[status];
+  if (base === undefined || entry === undefined) return undefined;
+  const w = ctx.rules.whatif_2027;
+  const sw = parseDate(w.switch_date);
+  const rule2027 = w.interpretation === 'B' && sw !== undefined && entry >= sw && w.new_years_from_entry < base;
+  const years = rule2027 ? w.new_years_from_entry : base;
+  return { years, end: addYears(entry, years), rule2027 };
+}
+
+/** Trace line explaining where the deadline for goals 2/3 comes from. */
+export function deadlineMsg(p: Person): Msg {
+  if (p.deadline === undefined) return { key: 'dl.none' };
+  if (p.payEnd !== undefined && p.payEnd === p.deadline)
+    return { key: p.pay2027 ? 'dl.period2027' : 'dl.period', p: { deadline: fmt(p.deadline), status: p.status, years: p.payYears ?? '', entry: fmt(p.entry) } };
+  if (p.payEnd !== undefined) return { key: 'dl.ze_before', p: { deadline: fmt(p.deadline), pay: fmt(p.payEnd), status: p.status, years: p.payYears ?? '' } };
+  return { key: 'dl.ze', p: { deadline: fmt(p.deadline) } };
 }
 
 export interface ScopeResult {

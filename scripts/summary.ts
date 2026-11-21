@@ -20,6 +20,7 @@ for (const g of res.computedGoals) {
   out[`goal${g}`] = { counted: o.counted, reached: o.reached, late: o.counts.reached_late, on_track: o.counts.on_track, at_risk: o.counts.at_risk, missed: o.counts.missed, no_data: o.counts.no_data, na: o.counts.not_applicable };
 }
 out.claimable = { total: res.claimable.length, g1: res.claimable.filter((c) => c.goal === 1).length, g2: res.claimable.filter((c) => c.goal === 2).length, g3: res.claimable.filter((c) => c.goal === 3).length };
+out.period = { mismatch: res.alerts.filter((a) => a.code === 'period_mismatch').length, byYears: Object.entries(res.persons.reduce<Record<string, number>>((m, p) => { if (p.payYears) m[`${p.status} ${p.payYears}y`] = (m[`${p.status} ${p.payYears}y`] ?? 0) + 1; return m; }, {})).map(([k, v]) => `${k}: ${v}`).join(', '), whatIfAffected: res.whatIf?.affected };
 out.proven_not_reproduced = res.alerts.filter((a) => a.code === 'proven_not_reproduced').map((a) => `g${a.goal}`).join(',');
 const byId = new Map(res.persons.map((p) => [p.id, p]));
 out.keller = (res.callLists['S. Keller'] ?? []).slice(0, 12).map((c, i) => `${i + 1}. ${byId.get(c.personId)!.displayName} (${c.personId}) cat${c.category} ${fmt(c.keyDate)} ${c.lead.key}`);

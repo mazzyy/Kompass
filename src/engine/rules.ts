@@ -45,7 +45,8 @@ export interface Rules {
     goal3_keywords: string[];
     ignore_status_s_rows: boolean;
   };
-  whatif_2027: { switch_date: string; statuses: string[]; new_years_from_entry: number; interpretation: 'A' | 'B' };
+  payment_period: { years_by_status: Record<string, number>; counted_from: 'entry' };
+  whatif_2027: { switch_date: string; new_years_from_entry: number; interpretation: 'A' | 'B' };
   payment: { lump_sum_chf: { goal1: number | null; goal2: number | null; goal3: number | null }; forecast_quarters: number };
   calls: { top_n: number; inactive_months: number; transition_months: number; rank_by_payout: boolean };
   patterns: { min_group_size: number; confidence: number; method: string };

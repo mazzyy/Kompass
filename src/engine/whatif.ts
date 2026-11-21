@@ -1,4 +1,4 @@
-// What-if: 2027 rule (§8). Recomputes goals 2 and 3 with an earlier end of responsibility. Goal 1 is unaffected.
+// What-if: 2027 rule (§8). Recomputes goals 2 and 3 with an earlier deadline. Goal 1 is unaffected.
 import type { Ctx } from './context';
 import { addYears, parseDate, type Day } from './dates';
 import { computeGoal2 } from './goal2';
@@ -21,14 +21,18 @@ export interface WhatIfResult {
   delta: Record<2 | 3, Record<Status, number>>; // after - before, per status (goal 3 in households)
 }
 
+/**
+ * Interpretation B (organisers): the rule applies to arrivals from the switch date and is already part of
+ * every deadline (population.paymentPeriod), so nobody moves. Interpretation A (what-if): current clients
+ * with a longer period also end at max(entry + 5 years, switch date).
+ */
 export function newEnd(p: Person, ctx: Ctx): Day | undefined {
   const w = ctx.rules.whatif_2027;
+  if (w.interpretation === 'B') return undefined;
   const sw = parseDate(w.switch_date)!;
-  if (!w.statuses.includes(p.status) || p.entry === undefined || p.zEnde === undefined) return undefined;
-  const five = addYears(p.entry, w.new_years_from_entry);
-  if (w.interpretation === 'B') return p.entry >= sw ? Math.min(p.zEnde, five) : undefined;
-  const n = Math.min(p.zEnde, Math.max(five, sw));
-  return n < p.zEnde ? n : undefined;
+  if (p.entry === undefined || p.deadline === undefined || p.payYears === undefined || p.payYears <= w.new_years_from_entry) return undefined;
+  const n = Math.min(p.deadline, Math.max(addYears(p.entry, w.new_years_from_entry), sw));
+  return n < p.deadline ? n : undefined;
 }
 
 const zero = (): Record<Status, number> => ({ reached: 0, on_track: 0, at_risk: 0, missed: 0, not_applicable: 0, no_data: 0 });
@@ -41,7 +45,7 @@ export function computeWhatIf(persons: Person[], households: Household[], ctx: C
     const n = newEnd(p, ctx);
     if (n !== undefined) moved.set(p.id, n);
   }
-  const sim = new Map(persons.map((p) => [p.id, moved.has(p.id) ? { ...p, zEnde: moved.get(p.id)!, goals: { ...p.goals } } : p]));
+  const sim = new Map(persons.map((p) => [p.id, moved.has(p.id) ? { ...p, deadline: moved.get(p.id)!, payEnd: moved.get(p.id)!, payYears: w.new_years_from_entry, goals: { ...p.goals } } : p]));
   const delta: WhatIfResult['delta'] = { 2: zero(), 3: zero() };
   const changes: WhatIfChange[] = [];
   for (const p of persons) {
@@ -65,7 +69,7 @@ export function computeWhatIf(persons: Person[], households: Household[], ctx: C
     const s = sim.get(p.id)!;
     changes.push({
       personId: p.id,
-      oldEnd: p.zEnde!,
+      oldEnd: p.deadline!,
       newEnd: moved.get(p.id)!,
       before: { 2: p.goals[2]?.status, 3: p.goals[3]?.status },
       after: { 2: s.goals[2]?.status, 3: s.goals[3]?.status },
