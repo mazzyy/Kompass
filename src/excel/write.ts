@@ -425,7 +425,7 @@ export async function writeManagement(res: RunResult, rulesText: string, created
   rulesSheet(wb, rulesText);
   runSheet(wb, res, createdIso);
   const buffer = (await wb.xlsx.writeBuffer()) as ArrayBuffer;
-  return { name: `Cockpit_${iso(res.stichtag)}.xlsx`, audience: 'management', sheets: wb.worksheets.map((w) => w.name), buffer };
+  return { name: `Kompass_${iso(res.stichtag)}.xlsx`, audience: 'management', sheets: wb.worksheets.map((w) => w.name), buffer };
 }
 
 export async function writeSocialWorker(res: RunResult, sw: string, rulesText: string): Promise<OutFile> {

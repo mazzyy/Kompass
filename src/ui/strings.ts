@@ -2,8 +2,8 @@ import { fill, type Lang } from '../i18n/messages';
 import type { Status } from '../engine/model';
 
 const de = {
-  'app.name': 'Integrations-Cockpit',
-  'app.org': 'Asylsozialdienst Bern',
+  'app.name': 'Kompass',
+  'app.org': 'Integrationsziele · ASD Bern',
   'demo.strip': 'Beispieldaten geladen · synthetisch, keine echten Klient:innen',
   'own.strip': 'Eigene Exporte geladen',
   'demo.local': 'Alles läuft auf diesem Computer, nichts verlässt das Gerät',
@@ -560,8 +560,8 @@ const de = {
 type Key = keyof typeof de;
 
 const en: Record<Key, string> = {
-  'app.name': 'Integrations-Cockpit',
-  'app.org': 'Asylsozialdienst Bern',
+  'app.name': 'Kompass',
+  'app.org': 'Integrationsziele · ASD Bern',
   'demo.strip': 'Sample data loaded · synthetic, no real clients',
   'own.strip': 'Your own exports loaded',
   'demo.local': 'Everything runs on this computer, nothing leaves it',

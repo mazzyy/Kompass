@@ -1,0 +1,104 @@
+{
+  "title": "Kompass: know who needs you before the deadline does",
+  "note": "All numbers are from the synthetic November 2026 run in the app. Every scene shows 'Synthetic demo data'.",
+  "scenes": [
+    {
+      "id": "s01_cold",
+      "kind": "title",
+      "kicker": "Bern · Asylum Social Service",
+      "headline": "160 clients.\nThree goals each.\nOne deadline per goal.",
+      "vo": "In Bern, one caseworker supports around a hundred and sixty refugees. Every one of them has three goals, and every goal has a deadline.",
+      "sfx": "whoosh"
+    },
+    {
+      "id": "s02_problem",
+      "kind": "excel",
+      "kicker": "Today",
+      "headline": "11 Excel exports. Zero overview.",
+      "vo": "The city is only paid when a goal is reached in time: German at A1, a real job, a year without social assistance. But the answers are buried in eleven Excel exports, and nobody sees who is about to miss a deadline, until it is too late.",
+      "sfx": "whoosh"
+    },
+    {
+      "id": "s03_reveal",
+      "kind": "logo",
+      "headline": "Kompass",
+      "sub": "Integration goals, at a glance.",
+      "vo": "Meet Kompass.",
+      "sfx": "bell"
+    },
+    {
+      "id": "s04_run",
+      "kind": "screen",
+      "shot": "run",
+      "caption": "Drop the exports. Same clicks every month.",
+      "focus": [0.30, 0.18, 0.98, 0.95],
+      "vo": "Drop this month's exports. Kompass recognises every table by its columns, spots a renamed one, asks once, and remembers it. Next month: the same clicks.",
+      "sfx": "whoosh"
+    },
+    {
+      "id": "s05_overview",
+      "kind": "screen",
+      "shot": "overview",
+      "caption": "18 goals reached, never billed.",
+      "focus": [0.18, 0.20, 0.98, 0.62],
+      "vo": "Seconds later, the whole service at a glance. Every goal, every deadline, and eighteen goals that were reached but never billed. Money on the table, found automatically.",
+      "sfx": "whoosh",
+      "wow": true
+    },
+    {
+      "id": "s06_calls",
+      "kind": "screen",
+      "shot": "calls",
+      "caption": "Who do I call this week, and why?",
+      "focus": [0.18, 0.14, 0.99, 0.98],
+      "vo": "Each caseworker gets a call list for the week, ranked by urgency, never by money. Amina: her A1 deadline is in a hundred and twelve days. Why is she stuck? Her intake report says it: two small children, and no daycare place.",
+      "sfx": "whoosh"
+    },
+    {
+      "id": "s07_ai",
+      "kind": "screen",
+      "shot": "situation",
+      "caption": "Local AI reads the report. A person confirms.",
+      "focus": [0.18, 0.12, 0.99, 0.98],
+      "vo": "That insight comes from free-text reports, read by an AI model running on this laptop. Names are removed first, every field shows the sentence it came from, and a social worker confirms it.",
+      "sfx": "whoosh"
+    },
+    {
+      "id": "s08_patterns",
+      "kind": "screen",
+      "shot": "patterns",
+      "caption": "78 vs 29 in 100. Groups, never a score per person.",
+      "focus": [0.18, 0.18, 0.66, 0.78],
+      "vo": "Across the caseload, Kompass shows what works. People who can read Latin script reach A1 almost three times as often. That is where literacy courses pay off. Always groups, never a score for a person.",
+      "sfx": "whoosh",
+      "wow": true
+    },
+    {
+      "id": "s09_assistant",
+      "kind": "screen",
+      "shot": "assistant",
+      "caption": "Just ask. The rules compute, the AI explains.",
+      "focus": [0.18, 0.12, 0.99, 0.98],
+      "vo": "And you can simply ask. Visualise goal two. The rules compute the numbers, the AI explains them, and it answers out loud.",
+      "sfx": "whoosh"
+    },
+    {
+      "id": "s10_out",
+      "kind": "screen",
+      "shot": "export",
+      "caption": "Excel in. Excel out. One computer, no cloud for client data.",
+      "focus": [0.18, 0.12, 0.99, 0.90],
+      "vo": "Everything goes back out as Excel, one file per caseworker. And it runs on one computer: client data never goes to the cloud, names are removed before the AI, and groups under ten stay hidden.",
+      "sfx": "whoosh"
+    },
+    {
+      "id": "s11_close",
+      "kind": "end",
+      "headline": "Kompass",
+      "sub": "Know who needs you, before the deadline does.",
+      "credits": "Built at AI for Access, Bern 2026 · Challenge: Asylsozialdienst Stadt Bern · Synthetic demo data\nMusic: \"Inspired\" by Kevin MacLeod (incompetech.com), CC BY 4.0 · Sound effects: SSE Library (USC), CC0",
+      "vo": "Kompass. Know who needs you, before the deadline does.",
+      "sfx": "bell"
+    }
+  ]
+}

@@ -24,3 +24,9 @@ dist-ssr
 *.sw?
 public/sample-data
 public/sample-data.zip
+
+# video production (local tools, renders)
+video/.venv*
+video/out/
+video/frames/
+video/audio/

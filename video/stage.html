@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: 'OS'; src: url('../node_modules/@fontsource/open-sans/files/open-sans-latin-400-normal.woff2') format('woff2'); font-weight: 400; }
+  @font-face { font-family: 'OS'; src: url('../node_modules/@fontsource/open-sans/files/open-sans-latin-600-normal.woff2') format('woff2'); font-weight: 600; }
+  @font-face { font-family: 'OS'; src: url('../node_modules/@fontsource/open-sans/files/open-sans-latin-700-normal.woff2') format('woff2'); font-weight: 700; }
+  @font-face { font-family: 'OS'; src: url('../node_modules/@fontsource/open-sans/files/open-sans-latin-800-normal.woff2') format('woff2'); font-weight: 800; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #07080b; font-family: 'OS', system-ui, sans-serif; color: #fff; }
+  #bg { position: absolute; inset: 0; background: radial-gradient(1200px 800px at 50% 40%, #121722 0%, #07080b 70%); }
+  .blob { position: absolute; width: 900px; height: 900px; border-radius: 50%; filter: blur(140px); opacity: .35; }
+  #b1 { background: #d50025; } #b2 { background: #285f8f; } #b3 { background: #1a7f45; opacity: .18; }
+  #grain { position: absolute; inset: 0; opacity: .07; mix-blend-mode: overlay; pointer-events: none; }
+  .scene { position: absolute; inset: 0; opacity: 0; }
+  .kicker { position: absolute; left: 160px; top: 230px; font-size: 22px; letter-spacing: .32em; text-transform: uppercase; color: #9aa4b5; font-weight: 600; }
+  .lines { position: absolute; left: 160px; top: 300px; }
+  .line { font-size: 104px; font-weight: 800; line-height: 1.12; letter-spacing: -.02em; white-space: nowrap; }
+  .line.accent { color: #ff3b57; }
+  .ghost { position: absolute; right: 110px; top: 120px; font-size: 520px; font-weight: 800; color: rgba(255,255,255,.035); letter-spacing: -.04em; }
+  /* excel */
+  .sheet { position: absolute; width: 520px; background: #fff; color: #1a1a1a; border-radius: 10px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.55); font-size: 13px; }
+  .sheet .tab { background: #1d6f42; color: #fff; font-weight: 700; padding: 8px 12px; font-size: 14px; }
+  .sheet table { border-collapse: collapse; width: 100%; }
+  .sheet td { border: 1px solid #e3e3e3; padding: 4px 6px; white-space: nowrap; overflow: hidden; max-width: 90px; text-overflow: ellipsis; }
+  .sheet tr:first-child td { background: #f2f2f2; font-weight: 700; }
+  .sheet td.hot { background: #ffd9de !important; color: #b0001e; font-weight: 700; }
+  .center-title { position: absolute; left: 0; right: 0; top: 440px; text-align: center; font-size: 96px; font-weight: 800; letter-spacing: -.02em; text-shadow: 0 10px 60px rgba(0,0,0,.9); }
+  .center-kicker { position: absolute; left: 0; right: 0; top: 380px; text-align: center; font-size: 22px; letter-spacing: .32em; text-transform: uppercase; color: #ff8a9b; font-weight: 700; }
+  .stamp { position: absolute; left: 50%; top: 610px; transform: translateX(-50%); padding: 14px 30px; border: 4px solid #ff3b57; color: #ff3b57; font-weight: 800; font-size: 34px; letter-spacing: .12em; border-radius: 10px; text-transform: uppercase; background: rgba(20,0,5,.55); }
+  /* logo */
+  .mark { position: absolute; left: 50%; top: 400px; width: 180px; height: 180px; margin-left: -90px; border-radius: 34px; background: #d50025; display: flex; align-items: center; justify-content: center; font-size: 120px; font-weight: 800; box-shadow: 0 0 120px rgba(213,0,37,.55); }
+  .wordmark { position: absolute; left: 0; right: 0; top: 620px; text-align: center; font-size: 120px; font-weight: 800; letter-spacing: -.03em; }
+  .sub { position: absolute; left: 0; right: 0; top: 780px; text-align: center; font-size: 34px; color: #b8c0cc; font-weight: 400; }
+  .sweep { position: absolute; top: 0; bottom: 0; width: 260px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent); transform: skewX(-18deg); }
+  .credits { position: absolute; left: 0; right: 0; bottom: 70px; text-align: center; font-size: 19px; line-height: 1.7; color: #8d97a6; white-space: pre-line; }
+  /* screen */
+  .win { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1120px; margin-left: -960px; margin-top: -560px; border-radius: 22px; overflow: hidden; background: #fff; box-shadow: 0 60px 140px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.08); transform-origin: 50% 50%; }
+  .win .bar { height: 40px; background: #1b1d22; display: flex; align-items: center; gap: 9px; padding: 0 18px; }
+  .win .bar i { width: 13px; height: 13px; border-radius: 50%; display: inline-block; }
+  .win .url { margin-left: 18px; height: 24px; flex: 0 0 520px; border-radius: 7px; background: #2a2d34; color: #aab2bf; font-size: 14px; display: flex; align-items: center; padding: 0 12px; }
+  .win .view { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+  .win .view img { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+  .spot { position: absolute; border-radius: 16px; box-shadow: 0 0 0 4000px rgba(5,8,14,.42); border: 3px solid rgba(255,59,87,.95); }
+  .tag { position: absolute; left: 90px; top: 56px; display: flex; align-items: center; gap: 14px; font-size: 20px; letter-spacing: .26em; text-transform: uppercase; color: #e6eaf0; font-weight: 700; padding: 8px 18px 8px 8px; border-radius: 12px; background: rgba(10,12,18,.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.1); }
+  .tag b { background: #d50025; color: #fff; border-radius: 8px; padding: 4px 10px; letter-spacing: .05em; }
+  .cap { position: absolute; left: 90px; bottom: 86px; max-width: 1240px; padding: 22px 30px 22px 34px; border-radius: 18px; background: rgba(10,12,18,.78); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.1); font-size: 44px; font-weight: 700; line-height: 1.2; letter-spacing: -.01em; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+  .cap::before { content: ''; position: absolute; left: 0; top: 18px; bottom: 18px; width: 6px; border-radius: 6px; background: #ff3b57; }
+  .cap span { display: inline-block; }
+  #badge { position: absolute; right: 34px; bottom: 26px; font-size: 15px; color: rgba(255,255,255,.55); letter-spacing: .08em; text-transform: uppercase; }
+  #fade { position: absolute; inset: 0; background: #000; opacity: 0; }
+</style>
+</head>
+<body>
+  <div id="bg"><div class="blob" id="b1"></div><div class="blob" id="b2"></div><div class="blob" id="b3"></div></div>
+  <div id="stage"></div>
+  <canvas id="grain" width="960" height="540"></canvas>
+  <div id="badge">Synthetic demo data · no real clients</div>
+  <div id="fade"></div>
+<script>
+// Deterministic renderer: window.render(t) draws the frame at time t (seconds). No CSS animations.
+const ease = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : 1 - Math.pow(1 - x, 3));
+const easeIO = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, x) => a + (b - a) * x;
+let CFG, EXCEL, scenes = [];
+const $ = (h) => { const d = document.createElement('div'); d.innerHTML = h.trim(); return d.firstChild; };
+
+window.setup = (cfg, excel) => {
+  CFG = cfg; EXCEL = excel;
+  const stage = document.getElementById('stage');
+  for (const s of cfg.scenes) {
+    const el = $(`<div class="scene" id="${s.id}"></div>`);
+    if (s.kind === 'title') {
+      el.innerHTML = `<div class="ghost">160</div><div class="kicker">${s.kicker}</div><div class="lines">${s.headline.split('\n').map((l, i, a) => `<div class="line${i === a.length - 1 ? ' accent' : ''}">${l}</div>`).join('')}</div>`;
+    } else if (s.kind === 'excel') {
+      const sheets = EXCEL.map((t, i) => {
+        const rows = t.rows.map((r, ri) => `<tr>${r.map((c, ci) => `<td class="${ri > 0 && (ri + ci + i) % 7 === 0 ? 'hot' : ''}">${c}</td>`).join('')}</tr>`).join('');
+        return `<div class="sheet" data-i="${i}"><div class="tab">${t.name}.xlsx</div><table>${rows}</table></div>`;
+      }).join('');
+      el.innerHTML = `${sheets}<div class="center-kicker">${s.kicker}</div><div class="center-title">${s.headline}</div><div class="stamp">Deadline missed</div>`;
+    } else if (s.kind === 'logo' || s.kind === 'end') {
+      el.innerHTML = `<div class="mark">K</div><div class="wordmark">${s.headline}</div><div class="sub">${s.sub}</div><div class="sweep"></div>${s.credits ? `<div class="credits">${s.credits}</div>` : ''}`;
+    } else {
+      el.innerHTML = `<div class="win"><div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><div class="url">localhost · Kompass</div></div><div class="view">${s.shots.map((sh) => `<img src="shots/${sh}.png">`).join('')}<div class="spot"></div></div></div><div class="tag"><b>${String(s.n).padStart(2, '0')}</b>${s.label}</div><div class="cap">${s.caption.split(' ').map((w) => `<span>${w}&nbsp;</span>`).join('')}</div>`;
+    }
+    stage.appendChild(el);
+    scenes.push({ s, el });
+  }
+  // film grain (static noise)
+  const g = document.getElementById('grain').getContext('2d');
+  const img = g.createImageData(960, 540);
+  let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  for (let i = 0; i < img.data.length; i += 4) { const v = rnd() * 255; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+  g.putImageData(img, 0, 0);
+  return true;
+};
+
+window.render = (t) => {
+  // ambient light
+  const b = (id, x, y) => (document.getElementById(id).style.transform = `translate(${x}px, ${y}px)`);
+  b('b1', 1150 + Math.sin(t * 0.21) * 260, -300 + Math.cos(t * 0.17) * 160);
+  b('b2', -350 + Math.cos(t * 0.15) * 240, 420 + Math.sin(t * 0.19) * 180);
+  b('b3', 700 + Math.sin(t * 0.11) * 300, 650 + Math.cos(t * 0.13) * 120);
+  const X = 0.55; // crossfade seconds
+  for (const { s, el } of scenes) {
+    const lt = t - s.start;
+    const vis = lt > -X && lt < s.dur + X;
+    if (!vis) { el.style.opacity = 0; el.style.display = 'none'; continue; }
+    el.style.display = 'block';
+    const fin = clamp((lt + X) / X), fout = clamp((s.dur + X - lt) / X);
+    el.style.opacity = Math.min(fin, fout);
+    const p = clamp(lt / s.dur);
+    if (s.kind === 'title') {
+      el.querySelector('.kicker').style.cssText = `opacity:${ease(lt / 0.8)};transform:translateY(${(1 - ease(lt / 0.8)) * 20}px)`;
+      el.querySelectorAll('.line').forEach((l, i) => {
+        const x = ease((lt - 0.4 - i * 0.75) / 0.9);
+        l.style.cssText = `opacity:${x};transform:translateY(${(1 - x) * 70}px);filter:blur(${(1 - x) * 18}px)`;
+      });
+      el.querySelector('.ghost').style.cssText = `opacity:${ease(lt / 2)};transform:translateX(${-lt * 12}px) scale(${1 + lt * 0.01})`;
+    } else if (s.kind === 'excel') {
+      el.querySelectorAll('.sheet').forEach((sh, i) => {
+        const a = (i / 11) * Math.PI * 2;
+        const x = 960 + Math.cos(a + lt * 0.05) * (560 + (i % 3) * 120) - 260;
+        const y = 470 + Math.sin(a + lt * 0.05) * (300 + (i % 2) * 80) - 120;
+        const k = ease((lt - i * 0.12) / 1.1);
+        sh.style.cssText = `left:${x}px;top:${y}px;opacity:${k * 0.92};transform:perspective(1400px) rotateY(${Math.sin(a) * 28}deg) rotateZ(${Math.cos(a * 2) * 6}deg) scale(${0.62 + k * 0.18 + (i % 4) * 0.03});filter:blur(${(i % 3) * 0.6}px)`;
+        sh.querySelectorAll('td.hot').forEach((c) => (c.style.opacity = 0.55 + 0.45 * Math.abs(Math.sin(lt * 3 + i))));
+      });
+      const k = ease((lt - 1.2) / 1);
+      el.querySelector('.center-kicker').style.opacity = k;
+      el.querySelector('.center-title').style.cssText = `opacity:${k};transform:scale(${0.94 + 0.06 * k})`;
+      const st = ease((lt - s.dur * 0.62) / 0.35);
+      el.querySelector('.stamp').style.cssText = `opacity:${st};transform:translateX(-50%) rotate(-6deg) scale(${1.8 - 0.8 * st})`;
+    } else if (s.kind === 'logo' || s.kind === 'end') {
+      const m = ease(lt / 0.9);
+      el.querySelector('.mark').style.cssText = `opacity:${m};transform:scale(${0.6 + 0.4 * m}) rotate(${(1 - m) * -12}deg);box-shadow:0 0 ${80 + 60 * Math.sin(lt * 2)}px rgba(213,0,37,.6)`;
+      const w = ease((lt - 0.5) / 0.9);
+      el.querySelector('.wordmark').style.cssText = `opacity:${w};letter-spacing:${(-0.03 + (1 - w) * 0.25).toFixed(3)}em;filter:blur(${(1 - w) * 10}px)`;
+      const su = ease((lt - 1.1) / 0.9);
+      el.querySelector('.sub').style.cssText = `opacity:${su};transform:translateY(${(1 - su) * 20}px)`;
+      el.querySelector('.sweep').style.left = `${lerp(-400, 2300, clamp((lt - 0.6) / 1.4))}px`;
+      const cr = el.querySelector('.credits');
+      if (cr) cr.style.opacity = ease((lt - 2) / 1);
+    } else {
+      // browser window: tilted 3D entry -> flat -> slow zoom into the focus area, spotlight, caption
+      const win = el.querySelector('.win');
+      const e = easeIO(lt / 1.4);
+      const [x0, y0, x1, y1] = s.focus;
+      const fw = (x1 - x0) * 1920, fh = (y1 - y0) * 1080;
+      const target = Math.min(1.75, Math.max(0.78, Math.min(1500 / fw, 860 / fh) * 0.62));
+      const z = ease((lt - 1.2) / Math.max(2, s.dur - 1.6));
+      const base = 0.7;
+      const sc = lerp(base, target, z) * lerp(0.78, 1, e);
+      const cx = ((x0 + x1) / 2 - 0.5) * 1920, cy = ((y0 + y1) / 2 - 0.5) * 1080 + 20;
+      win.style.transform = `perspective(2200px) rotateX(${(1 - e) * 16}deg) rotateY(${(1 - e) * -22}deg) translate(${-cx * z * sc * 0.9}px, ${-cy * z * sc * 0.9 + (1 - e) * 120}px) scale(${sc})`;
+      const imgs = el.querySelectorAll('.view img');
+      imgs.forEach((im, i) => {
+        if (imgs.length === 1) return (im.style.opacity = 1);
+        const sw = s.dur * 0.5;
+        im.style.opacity = i === 0 ? 1 - clamp((lt - sw) / 0.6) : clamp((lt - sw) / 0.6);
+      });
+      const spot = el.querySelector('.spot');
+      const sp = ease((lt - 1.9) / 0.7) * (1 - ease((lt - s.dur + 0.4) / 0.4));
+      spot.style.cssText = `left:${x0 * 1920 - 10}px;top:${y0 * 1080 - 10}px;width:${fw + 20}px;height:${fh + 20}px;opacity:${sp}`;
+      const tg = el.querySelector('.tag');
+      tg.style.cssText = `opacity:${ease((lt - 0.3) / 0.8)};transform:translateY(${(1 - ease((lt - 0.3) / 0.8)) * -16}px)`;
+      const cap = el.querySelector('.cap');
+      const c = ease((lt - 0.9) / 0.7);
+      cap.style.cssText = `opacity:${c};transform:translateY(${(1 - c) * 40}px)`;
+      cap.querySelectorAll('span').forEach((w, i) => {
+        const k = ease((lt - 1.0 - i * 0.07) / 0.45);
+        w.style.cssText = `opacity:${k};transform:translateY(${(1 - k) * 18}px)`;
+      });
+    }
+  }
+  // fade from black at the start, to black at the end
+  const T = CFG.total;
+  document.getElementById('fade').style.opacity = Math.max(1 - clamp(t / 0.8), clamp((t - (T - 1.2)) / 1.2));
+};
+</script>
+</body>
+</html>

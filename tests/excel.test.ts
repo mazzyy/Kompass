@@ -42,7 +42,7 @@ describe('Excel output (TE)', () => {
   it('TE-01 management workbook: sheets, German headers, frozen header, autofilter, fills', async () => {
     const res = sample();
     const f = await writeManagement(res, defaultRulesText);
-    expect(f.name).toBe('Cockpit_2026-11-20.xlsx');
+    expect(f.name).toBe('Kompass_2026-11-20.xlsx');
     const wb = await load(f.buffer);
     expect(wb.worksheets.map((w) => w.name)).toEqual(['Übersicht', 'Ziel1_Personen', 'Ziel2_Personen', 'Anrufliste', 'Abrechenbar', 'Muster', 'Datenqualität', 'Prognose', 'WhatIf_2027', 'Regeln', 'Lauf']);
     const ws = wb.getWorksheet('Ziel1_Personen')!;

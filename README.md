@@ -1,4 +1,4 @@
-# Integrations-Cockpit (Asylsozialdienst Stadt Bern)
+# Kompass · Integrations-Cockpit (Asylsozialdienst Stadt Bern)
 
 AI for Access hackathon, Bern, 20–21 Nov 2026. **All data in this repo is synthetic. No real people.**
 

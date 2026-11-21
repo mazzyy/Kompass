@@ -74,7 +74,7 @@ export default function App() {
         <nav className="sidebar" aria-label="Main">
           <div className="brand">
             <div className="brand-mark" aria-hidden="true">
-              IC
+              K
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
               <span className="brand-name">{tr(lang, 'app.name')}</span>

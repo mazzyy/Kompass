@@ -1,0 +1,99 @@
+{
+ "engines": [
+  "eleven",
+  "kokoro"
+ ],
+ "total": 144.115,
+ "scenes": [
+  {
+   "id": "s01_cold",
+   "start": 0,
+   "dur": 11.475,
+   "voStart": 0.45,
+   "sfx": "whoosh",
+   "kind": "title"
+  },
+  {
+   "id": "s02_problem",
+   "start": 11.475,
+   "dur": 18.9,
+   "voStart": 11.925,
+   "sfx": "whoosh",
+   "kind": "excel"
+  },
+  {
+   "id": "s03_reveal",
+   "start": 30.375,
+   "dur": 3.4,
+   "voStart": 30.825,
+   "sfx": "bell",
+   "kind": "logo"
+  },
+  {
+   "id": "s04_run",
+   "start": 33.775,
+   "dur": 13.275,
+   "voStart": 34.225,
+   "sfx": "whoosh",
+   "kind": "screen"
+  },
+  {
+   "id": "s05_overview",
+   "start": 47.05,
+   "dur": 13.075,
+   "voStart": 47.5,
+   "sfx": "whoosh",
+   "wow": true,
+   "kind": "screen"
+  },
+  {
+   "id": "s06_calls",
+   "start": 60.125,
+   "dur": 17.74,
+   "voStart": 60.575,
+   "sfx": "whoosh",
+   "kind": "screen"
+  },
+  {
+   "id": "s07_ai",
+   "start": 77.865,
+   "dur": 15.55,
+   "voStart": 78.315,
+   "sfx": "whoosh",
+   "kind": "screen"
+  },
+  {
+   "id": "s08_patterns",
+   "start": 93.415,
+   "dur": 15.975,
+   "voStart": 93.865,
+   "sfx": "whoosh",
+   "wow": true,
+   "kind": "screen"
+  },
+  {
+   "id": "s09_assistant",
+   "start": 109.39,
+   "dur": 10.2,
+   "voStart": 109.84,
+   "sfx": "whoosh",
+   "kind": "screen"
+  },
+  {
+   "id": "s10_out",
+   "start": 119.59,
+   "dur": 15.9,
+   "voStart": 120.04,
+   "sfx": "whoosh",
+   "kind": "screen"
+  },
+  {
+   "id": "s11_close",
+   "start": 135.49,
+   "dur": 8.625,
+   "voStart": 135.94,
+   "sfx": "bell",
+   "kind": "end"
+  }
+ ]
+}
