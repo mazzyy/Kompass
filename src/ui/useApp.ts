@@ -4,7 +4,7 @@ import { defaultRulesText } from '../engine/defaultRules';
 import { analyzeFiles, mappingKey, parseTables, runBlocked, type FileAnalysis, type MappingSuggestion, type RawTable, type SavedMappings } from '../engine/import/detect';
 import { readWorkbook } from '../engine/import/read';
 import { TABLES } from '../engine/import/signatures';
-import type { RunResult } from '../engine/model';
+import type { GoalId, RunResult } from '../engine/model';
 import { parseRules, type Rules } from '../engine/rules';
 import { resolveStichtag, run } from '../engine/run';
 import { writeAll, type OutFile } from '../excel/write';
@@ -12,7 +12,7 @@ import type { Lang } from '../i18n/messages';
 import { tr } from './strings';
 import { useSa } from './useSa';
 
-export type Screen = 'run' | 'overview' | 'calls' | 'clients' | 'quality' | 'export' | 'situation' | 'patterns';
+export type Screen = 'run' | 'overview' | 'goal' | 'calls' | 'clients' | 'quality' | 'export' | 'situation' | 'patterns';
 export type Role = { kind: 'mgmt' } | { kind: 'sw'; name: string };
 export interface LogLine {
   t: string;
@@ -67,6 +67,7 @@ export function useApp() {
   const [callsSw, setCallsSw] = useState<string | undefined>();
   const [dqOpen, setDqOpen] = useState<string | undefined>();
   const [inScopeOnly, setInScopeOnly] = useState(false);
+  const [goalId, setGoalId] = useState<GoalId>(1);
 
   const setLang = (l: Lang) => {
     setLangState(l);
@@ -281,6 +282,13 @@ export function useApp() {
     setDqOpen,
     inScopeOnly,
     setInScopeOnly,
+    goalId,
+    setGoalId,
+    openGoal: (g: GoalId) => {
+      setGoalId(g);
+      setScreen('goal');
+      window.scrollTo?.(0, 0);
+    },
     sa,
   };
 }

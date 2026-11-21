@@ -57,6 +57,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 12px;
   min-height: 34px; padding: 8px 16px; background: var(--demo); color: #fff; font-size: 12px; font-weight: 500;
 }
+.demo-strip.own { background: var(--ink); }
 .layout { flex: 1; display: flex; flex-wrap: wrap; align-items: stretch; }
 
 /* sidebar */
@@ -208,3 +209,6 @@ table.t tr.sel td { background: var(--accent-tint); }
 .lang-toggle { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; height: 30px; }
 .lang-toggle button { border: 0; background: #fff; padding: 0 10px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--muted); }
 .lang-toggle button[aria-pressed='true'] { background: var(--ink); color: #fff; }
+
+.goal-row { cursor: pointer; }
+.goal-row:hover { background: #fafaf8; }

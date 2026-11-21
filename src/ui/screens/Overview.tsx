@@ -146,7 +146,12 @@ export function OverviewScreen({ app }: { app: App }) {
           const t = res.totals[g];
           const r = t ? (sw ? t.bySocialWorker.find((x) => x.group === sw) : t.overall) : undefined;
           return (
-            <div key={g} style={{ display: 'flex', flexWrap: 'wrap', gap: '12px 24px', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--divider)' }}>
+            <div
+              key={g}
+              className={r ? 'goal-row' : undefined}
+              onClick={r ? () => app.openGoal(g) : undefined}
+              style={{ display: 'flex', flexWrap: 'wrap', gap: '12px 24px', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--divider)' }}
+            >
               <div style={{ flex: '1 1 220px', display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <span style={{ fontWeight: 600, color: r ? 'var(--ink)' : 'var(--muted)' }}>{tr(lang, `goal.${g}` as 'goal.1')}</span>
                 <span className="muted" style={{ fontSize: 12 }}>
@@ -196,6 +201,9 @@ export function OverviewScreen({ app }: { app: App }) {
                       </div>
                     ))}
                   </div>
+                  <button type="button" className="btn small" aria-label={tr(lang, 'gp.open.aria', { goal: tr(lang, `goal.${g}` as 'goal.1') })} onClick={(e) => { e.stopPropagation(); app.openGoal(g); }}>
+                    {tr(lang, 'gp.open')}
+                  </button>
                 </>
               ) : (
                 <span className="muted" style={{ flex: '3 1 400px', fontSize: 13 }}>
@@ -305,6 +313,8 @@ export function OverviewScreen({ app }: { app: App }) {
         </section>
       )}
 
+      {!sw && <Caseload app={app} />}
+
       {t1 && (
         <section className="panel" aria-label={tr(lang, 'ov.byYear')}>
           <div className="panel-head">
@@ -360,7 +370,7 @@ function yearRowsFor(app: App, sw: string): TotalsRow[] {
     .sort((a, b) => a.group.localeCompare(b.group));
 }
 
-function TotalsTable({ app, rows, first, onPick }: { app: App; rows: TotalsRow[]; first: string; onPick?: (g: string) => void }) {
+export function TotalsTable({ app, rows, first, onPick }: { app: App; rows: TotalsRow[]; first: string; onPick?: (g: string) => void }) {
   const { lang } = app;
   return (
     <table className="t num" style={{ minWidth: 560 }}>
@@ -420,5 +430,67 @@ function TotalsTable({ app, rows, first, onPick }: { app: App; rows: TotalsRow[]
         ))}
       </tbody>
     </table>
+  );
+}
+
+/** Caseload per social worker across all goals (management). */
+function Caseload({ app }: { app: App }) {
+  const { lang, result: res } = app;
+  if (!res) return null;
+  const rows = res.socialWorkers.map((name) => {
+    const ps = res.persons.filter((p) => p.socialWorker === name);
+    const hh = res.households.filter((h) => h.socialWorker === name);
+    const red = ps.filter((p) => p.goals[1]?.status === 'at_risk' || p.goals[2]?.status === 'at_risk').length + hh.filter((h) => h.goal3?.status === 'at_risk').length;
+    const missed = ps.filter((p) => p.goals[1]?.status === 'missed' || p.goals[2]?.status === 'missed').length + hh.filter((h) => h.goal3?.status === 'missed').length;
+    const ids = new Set(ps.map((p) => p.id));
+    return { name, clients: ps.length, hh: hh.length, red, missed, calls: res.callLists[name]?.length ?? 0, dq: res.alerts.filter((a) => a.personId && ids.has(a.personId)).length };
+  });
+  const max = Math.max(1, ...rows.map((r) => r.clients));
+  return (
+    <section className="panel" aria-label={tr(lang, 'gp.caseload')}>
+      <div className="panel-head">
+        <span className="panel-title">{tr(lang, 'gp.caseload')}</span>
+        <span className="muted" style={{ fontSize: 12 }}>{tr(lang, 'gp.caseload.sub')}</span>
+      </div>
+      <div className="scroll-x">
+        <table className="t num" style={{ minWidth: 640 }}>
+          <thead>
+            <tr>
+              <th scope="col">{tr(lang, 'ov.col.sw')}</th>
+              <th scope="col" style={{ width: 200 }}>{tr(lang, 'gp.cl.clients')}</th>
+              <th scope="col" className="r">{tr(lang, 'gp.cl.households')}</th>
+              <th scope="col" className="r">{tr(lang, 'gp.cl.red')}</th>
+              <th scope="col" className="r">{tr(lang, 'gp.cl.missed')}</th>
+              <th scope="col" className="r">{tr(lang, 'gp.cl.calls')}</th>
+              <th scope="col" className="r">{tr(lang, 'gp.cl.dq')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.name}>
+                <td>
+                  <button type="button" className="btn link" onClick={() => { app.setCallsSw(r.name); app.setScreen('calls'); }}>
+                    {r.name}
+                  </button>
+                </td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ flex: 1, height: 6, borderRadius: 999, background: 'var(--divider)', overflow: 'hidden' }}>
+                      <div style={{ width: `${(r.clients / max) * 100}%`, height: '100%', background: 'var(--ink-2)' }} />
+                    </div>
+                    <span style={{ width: 36, textAlign: 'right' }}>{r.clients}</span>
+                  </div>
+                </td>
+                <td className="r">{r.hh}</td>
+                <td className="r" style={{ color: 'var(--risk)', fontWeight: 500 }}>{r.red}</td>
+                <td className="r" style={{ color: 'var(--missed)', fontWeight: 500 }}>{r.missed}</td>
+                <td className="r">{r.calls}</td>
+                <td className="r">{r.dq}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }

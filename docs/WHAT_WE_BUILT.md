@@ -35,7 +35,7 @@ Nothing leaves the computer.
 | Local AI | Ollama on `localhost:11434`, model `qwen2.5:7b-instruct` | `src/ai/extract.ts` |
 | PDF reading | pdf.js, bundled locally | `src/ai/pdf.ts` |
 | Synthetic data | Node + Python scripts, seeded (same input → same files) | `scripts/`, `sample-data/` |
-| Tests | Vitest, 101 tests | `tests/` |
+| Tests | Vitest, 102 tests | `tests/` |
 
 Single source of truth: one run produces one `RunResult`; every screen and every Excel sheet is drawn from it, so screen and Excel can never disagree. No number is hard-coded.
 
@@ -56,7 +56,7 @@ Single source of truth: one run produces one `RunResult`; every screen and every
 
 - **Current client**: end of responsibility ≥ Stichtag and not handed over to the municipality.
 - **Scope goals 1–2**: status VA, F-FL, B-FL, B-RSFL, B-SL; age ≥ 16 on the Stichtag; S, N and `+5/+7` statuses not applicable (with the reason: federal payment period over).
-- **Payment period** (organisers): goals 2 and 3 only pay if reached within the federal payment period, which depends on the permit: **7 years** for VA, F-FL, B-RSFL and **5 years** for B-FL, B-SL, counted from entry. Which permit has which period is read from ASD's own status list (`VA+7`, `F-FL+7`, `B-RSFL+7`, `B-FL+5`, `B-SL+5`); a test checks that rules.yaml matches it. People arriving from 01.01.2027 get 5 years for every permit (2027 rule). Deadline for goals 2 and 3 = the earlier of the payment-period end and Zuständigkeitsende; if the two differ by more than 31 days, Data quality shows it. The client detail shows "Federal payment: VA → 7 years from entry, until …".
+- **Payment period** (brief + organisers): goals 2 and 3 only pay if reached within the federal payment period, which depends on the permit, exactly as in the brief: **7 years from entry** for VA and F-FL, **5 years from the asylum application** for B-FL, B-RSFL and B-SL (application = first Asylgeschäftsdaten event starting with "Asylgesuch"; if there is none, the entry date is used and the trace says so). People arriving from 01.01.2027 get 5 years for every permit (2027 rule). Deadline for goals 2 and 3 = the earlier of the payment-period end and Zuständigkeitsende; if the two differ by more than 31 days, Data quality shows it. The client detail shows e.g. "Federal payment: VA → 7 years from entry, until …". Open point: ASD's status list contains `B-RSFL+7`, which contradicts the brief's 5 years; the brief is applied.
 - **Goal 1**: entry = `Aufenthalt (Einreise)`; deadline = entry + 3 years. Reached by a proven row, an accepted A1 proof (certificate telc/fide, mother tongue, Swiss schooling, completed education), or German mother tongue. A1 with a course attendance note does not count → alert "A1 without accepted proof" (fixable). Reached after the deadline = green with a "late" marker. A running course ending before the deadline softens "at risk" to "on track". No entry date → not counted, shown in a note.
 - **Goal 2**: job with a work contract, ≥ 60 %, 6 months without a break (two contract jobs add up: assumption). Volunteering, unpaid work, programme and placement jobs excluded by keyword; the exclusion is shown in the trace. Sek II / Tertiär counts on completion; a running apprenticeship is "on track" until it ends. "At risk" names the latest date a 60 % job must start.
 - **Goal 3**: per household (Dossier-Nr.); free intervals between social-assistance periods; "at risk" names the date social assistance must end. Shown on every member, counted once per household.
@@ -67,6 +67,19 @@ Single source of truth: one run produces one `RunResult`; every screen and every
 - Order: (1) at risk, soonest action date first; (2) deadline missed but fixable by a data fix; (3) no activity recorded for ≥ 6 months, longest first; (4) a course or job ends within 9 months with nothing after it. **Never ranked by money** (the setting cannot be switched on).
 - Each client: one plain reason from the rule facts, the Situationsanalyse barrier with its **evidence sentence** (confirmed, or clearly labelled as a proposal with a Confirm button), the source rows, talking points.
 - S. Keller (demo): Reza (support must end in 25 days) → Fatima (60 % job must start in 42 days) → Amina (A1 deadline in 112 days; two small children, no Kita place) → … → Yonas (missed, fixable proof).
+
+### 4.4a Goal in detail ("Ziel im Detail")
+
+Click a goal on the Overview (or "Ziel im Detail" in the menu; tabs switch between goals 1, 2, 3). One page per goal, for management (all) or one social worker (their clients):
+- Key figures: counted, reached %, on track, at risk, missed, not applicable / no data.
+- **Who is lagging behind and why**: at risk + missed, grouped by the reason from the rules (e.g. goal 1: "deadline missed, no A1 proof" 53, "course finished, no exam" 11, "A1 proof does not count, fixable by a data correction" 6). Clicking a reason filters the list.
+- Barriers from the Situationsanalyse among the people lagging behind (childcare without daycare, not literate in Latin script, slow learning pace, health, availability): counts only, confirmed and model proposals shown separately; they explain, they never set a light.
+- Lagging behind per social worker (share and most common reason).
+- The list: client, status, deadline with days left / overdue, the rule reason, last activity, Situationsanalyse barriers; click opens the client.
+- Deadlines in the next 12 months (red = already at risk), by social worker and by entry year, and why people are not counted.
+- The Overview also has **Caseload per social worker** (clients, households, red, missed, on call list, data-quality items).
+
+The banner says "Sample data loaded · synthetic" only when the built-in sample data is loaded; with your own exports it says "Your own exports loaded". Both say everything runs on this computer.
 
 ### 4.4 Overview, Clients, Data quality
 
@@ -125,13 +138,13 @@ Speed: about 15 s per person on this laptop. Results for 85 reports are cached a
 
 ## 7. Rule decisions
 
-`rules.yaml` v1.6 (payment period 5/7 years by permit, 2027 rule for new arrivals; A1 proof and language courses use the template values: `Zertifizierung`, `Muttersprache`, `Beendigung obligatorische Schulzeit`, `Beendigung Ausbildung` count, `Weiteres` does not; language courses = `Förderangebot Sprache`). In the Rules panel every value carries its status:
+`rules.yaml` v1.6 (payment period 7 years from entry for VA / F-FL, 5 years from the asylum application for B-*, 2027 rule for new arrivals; A1 proof and language courses use the template values: `Zertifizierung`, `Muttersprache`, `Beendigung obligatorische Schulzeit`, `Beendigung Ausbildung` count, `Weiteres` does not; language courses = `Förderangebot Sprache`). In the Rules panel every value carries its status:
 - **Organisers' answer, awaiting ASD confirmation**: the five permits VA, F-FL, B-FL, B-RSFL, B-SL (Q1), age on the Stichtag (Q2), accepted A1 proof (Q3), only contract jobs count (Q4), Sek II / Tertiär on completion (Q5), 2027 rule for arrivals from 2027 (Q7), payment period 5 or 7 years by permit and `+5/+7` = period over (Q9).
 - **Brief**: goal 2 = contract job ≥ 60 % for 6 months without a break.
-- **Assumption**: payment period counted from the entry date, two contract jobs add up (Q4), Nothilfe counts as support and the household deadline is the head's (Q6), lump sums unknown (Q8), and the smaller ones (Q10–Q14).
+- **Assumption**: two contract jobs add up (Q4), Nothilfe counts as support and the household deadline is the head's (Q6), lump sums unknown (Q8), and the smaller ones (Q10–Q14).
 After regenerating the synthetic data in the template format (apprenticeships recorded on completion), November shows: goal 2 counted 322, reached 90, on track 214, at risk 6, overdue 12; claimable 18. S. Keller's call list is unchanged (Reza → Fatima → Amina). The payment-period rule (v1.6) changed none of these numbers: the synthetic Zuständigkeitsende already matched the period, except B-RSFL, which the generator now writes as 7 years (0 mismatches).
 
-## 8. Tests (101, all passing: `npm test`)
+## 8. Tests (102, all passing: `npm test`)
 
 | Area | Tests |
 |---|---|
@@ -144,7 +157,7 @@ After regenerating the synthetic data in the template format (apprenticeships re
 | Call list | TC-01 (full order Reza → Fatima → Amina → Yonas → Mohammad → Sara), TC-02, social-worker separation |
 | Excel | TE-01..04 + Abrechenbar sheet |
 | Patterns | TP-01..05 (Wilson 8/10 ≈ 49–94 %, suppression, confirmed-only, no per-person values) |
-| Payment period | TZ-01..07 (5/7 years per permit match ASD's `+5/+7` statuses, deadline follows the period, earlier Zuständigkeitsende kept + Data quality, 2027 rule for arrivals from 2027, `+7` not counted) |
+| Payment period | TZ-01..07 (brief: 7 years from entry for VA/F-FL, 5 years from application for B-*; fallback to entry without application; deadline follows the period; earlier Zuständigkeitsende kept + Data quality; 2027 rule for arrivals from 2027; `+7` not counted) |
 | What-if / forecast | TW-01..05 (TW-01..03, 05 with interpretation A; TW-04 default B) + quarterly forecast |
 | AI guardrails | report splitting, PDF line wrapping, evidence by sentence number, "not stated", **no names/IDs/dates reach the prompt** |
 | i18n | every message exists in German and English |

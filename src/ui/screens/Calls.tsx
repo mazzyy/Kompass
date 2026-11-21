@@ -11,7 +11,7 @@ import { SA_FIELDS } from '../../ai/extract';
 import { saValue } from './Situation';
 
 // Confirmed Situationsanalyse facts that can explain a flag (shown, never used to set a light).
-const BARRIER: Record<string, (v: unknown) => boolean> = {
+export const BARRIER: Record<string, (v: unknown) => boolean> = {
   childcare_duty_without_care: (v) => v === 'yes',
   literate_latin_script: (v) => v === 'no',
   health_limits_work: (v) => v === 'some' || v === 'strong',

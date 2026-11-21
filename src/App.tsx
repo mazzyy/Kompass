@@ -3,6 +3,7 @@ import { Icon } from './ui/icons';
 import { CallsScreen } from './ui/screens/Calls';
 import { ClientsScreen } from './ui/screens/Clients';
 import { ExportScreen } from './ui/screens/Export';
+import { GoalScreen } from './ui/screens/Goal';
 import { OverviewScreen } from './ui/screens/Overview';
 import { QualityScreen } from './ui/screens/Quality';
 import { RulesDrawer } from './ui/screens/Rules';
@@ -47,6 +48,7 @@ export default function App() {
   const crumbKey: Record<Screen, UiKey> = {
     run: 'nav.run',
     overview: 'nav.overview',
+    goal: 'nav.goal',
     calls: 'nav.calls',
     clients: 'nav.clients',
     quality: 'nav.quality',
@@ -58,9 +60,9 @@ export default function App() {
 
   return (
     <div className="app">
-      {app.isDemo && (
-        <div className="demo-strip" role="status">
-          <span>{tr(lang, 'demo.strip')}</span>
+      {app.raws.length > 0 && (
+        <div className={`demo-strip${app.isDemo ? '' : ' own'}`} role="status">
+          <span>{tr(lang, app.isDemo ? 'demo.strip' : 'own.strip')}</span>
           <span style={{ opacity: 0.9 }}>{tr(lang, 'demo.local')}</span>
         </div>
       )}
@@ -78,6 +80,7 @@ export default function App() {
           <div className="nav-group">
             <span className="overline">{tr(lang, 'nav.cockpit')}</span>
             <NavItem app={app} id="overview" label="nav.overview" icon={Icon.overview} disabled={noRun} />
+            <NavItem app={app} id="goal" label="nav.goal" icon={Icon.target} disabled={noRun} />
             <NavItem app={app} id="calls" label="nav.calls" icon={Icon.calls} count={callCount} red disabled={noRun} />
             <NavItem app={app} id="clients" label="nav.clients" icon={Icon.clients} count={app.visible?.persons.length} disabled={noRun} />
             <NavItem app={app} id="patterns" label="nav.patterns" icon={Icon.patterns} disabled={noRun} />
@@ -172,6 +175,7 @@ export default function App() {
             <div className="page">
               {app.screen === 'run' && <RunScreen app={app} />}
               {app.screen === 'overview' && <OverviewScreen app={app} />}
+              {app.screen === 'goal' && <GoalScreen app={app} />}
               {app.screen === 'calls' && <CallsScreen app={app} />}
               {app.screen === 'clients' && <ClientsScreen app={app} />}
               {app.screen === 'quality' && <QualityScreen app={app} />}
