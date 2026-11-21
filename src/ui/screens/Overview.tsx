@@ -6,6 +6,8 @@ import { StatusIcon } from '../icons';
 import { pct, statusLabel, tr, type UiKey } from '../strings';
 import type { App } from '../useApp';
 import { EmptyRun } from './common';
+import { Ring } from './Patterns';
+import { SEG_COLOR } from '../charts';
 
 const SEG = [
   { key: 'reached', color: '#1A7F45' },
@@ -179,6 +181,7 @@ export function OverviewScreen({ app }: { app: App }) {
               )}
               {r ? (
                 <>
+                  <Ring value={r.rate ?? 0} size={64} font={14} />
                   <div style={{ flex: '2 1 300px', display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <StackBar r={r} lang={lang} />
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--muted)' }}>
@@ -525,7 +528,12 @@ function Forecast({ app }: { app: App }) {
           return (
             <div key={q.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', gap: 6, height: '100%' }} title={`${tr(lang, 'goal.1')}: ${q.goal1} · ${tr(lang, 'goal.2')}: ${q.goal2} · ${tr(lang, 'goal.3')}: ${q.goal3}`}>
               <span className="num" style={{ fontSize: 12, fontWeight: 500 }}>{set ? `CHF ${fmtChf(m)}` : m}</span>
-              <div style={{ width: '60%', maxWidth: 56, height: `${(m / max) * 100}px`, minHeight: 2, background: '#1A7F45', borderRadius: '4px 4px 0 0' }} />
+              <div style={{ width: '60%', maxWidth: 56, height: `${(m / max) * 100}px`, minHeight: 2, display: 'flex', flexDirection: 'column-reverse', borderRadius: '4px 4px 0 0', overflow: 'hidden' }}>
+                {([1, 2, 3] as const).map((g) => {
+                  const v = q[`goal${g}` as 'goal1'] * (set ? (val(g) ?? 0) : 1);
+                  return v > 0 ? <div key={g} style={{ flexGrow: v, background: SEG_COLOR[`g${g}` as 'g1'], animation: 'grow-up .6s ease-out' }} /> : null;
+                })}
+              </div>
             </div>
           );
         })}
@@ -540,7 +548,15 @@ function Forecast({ app }: { app: App }) {
         ))}
       </div>
       <div className="muted" style={{ padding: '8px 20px 12px', fontSize: 12, borderTop: '1px solid var(--divider)' }}>
-        G1 · G2 · G3. {set ? tr(lang, 'fc.chf', { total: fmtChf(total), n: res.forecast.length, now: fmtChf(now) }) : tr(lang, 'fc.nochf')}
+        <span className="chart-legend" style={{ display: 'inline-flex', marginRight: 12 }}>
+          {([1, 2, 3] as const).map((g) => (
+            <span key={g}>
+              <i style={{ background: SEG_COLOR[`g${g}` as 'g1'] }} />
+              {tr(lang, `goal.${g}` as 'goal.1').split('·')[0].trim()}
+            </span>
+          ))}
+        </span>
+        {set ? tr(lang, 'fc.chf', { total: fmtChf(total), n: res.forecast.length, now: fmtChf(now) }) : tr(lang, 'fc.nochf')}
       </div>
     </section>
   );
