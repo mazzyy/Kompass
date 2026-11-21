@@ -4,7 +4,7 @@ Write each one in natural German, like a real social worker (abbreviations, typo
 Keep the section numbers and headings of the template (1. Personalien … 3.1 Gesundheit, 3.2 Sprachliche Integration, 3.3 Berufliche Integration, 3.4 Potenzialeinschätzung; 4.x for the partner).
 Keep the line `N. Individuelle Potenzialerhebung <Rolle>: <Vorname Name> (Zemis-Nr. <number>)` exactly, so the tool can link the person.
 Mention the facts below in your own words. Leave out 1 or 2 facts on purpose (the model must then say *not stated*).
-Save as `<file>.txt` in `sample-data/2026-11/situationsanalyse/` (it replaces my draft) and tell me which facts you left out: that is the label for the accuracy test.
+Save as `<file>.txt` in `sample-data/2026-11/situationsanalyse/` (it replaces my draft). Then in `sample-data/labels/human_truth.json` set `"written_by_human": true` for that report and set the facts you left out to `"not_stated"`. Run `npx tsx scripts/extract.ts human`: it only measures reports marked as written by you.
 
 ## SA_D12_5813.txt  ·  Dossier D12.5813  ·  M. Rossi  (new this month)
 

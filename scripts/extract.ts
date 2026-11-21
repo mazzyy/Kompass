@@ -50,7 +50,14 @@ async function main() {
     const k = Math.max(1, Math.floor(pool.length / n));
     files = pool.filter((_, i) => i % k === 0).slice(0, n).map((x) => x.file);
   } else if (mode === 'human') {
-    files = Object.keys(JSON.parse(fs.readFileSync('sample-data/labels/human_truth.json', 'utf8'))).filter((k) => !k.startsWith('_'));
+    // Only reports a person actually wrote and marked as such (guards against measuring the generated drafts).
+    files = Object.entries(human)
+      .filter(([k, v]) => !k.startsWith('_') && (v as { written_by_human?: boolean }).written_by_human === true)
+      .map(([k]) => k);
+    if (!files.length) {
+      console.error('No report marked "written_by_human": true in sample-data/labels/human_truth.json. Nothing measured.');
+      process.exit(1);
+    }
   } else if (mode === 'cache') {
     files = index.filter((x) => x.persona || x.newThisMonth || x.socialWorker === 'S. Keller').map((x) => x.file);
   } else files = [mode];

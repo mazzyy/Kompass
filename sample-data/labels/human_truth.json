@@ -1,6 +1,7 @@
 {
- "_how_to": "One entry per hand-written report. For each person set every field to the value you WROTE in the report, or \"not_stated\" if you left it out. Then run: npx tsx scripts/extract.ts human",
+ "_how_to": "One entry per hand-written report. After you replaced the report text with your own, set \"written_by_human\": true and set every field to the value you WROTE, or \"not_stated\" if you left it out. Then run: npx tsx scripts/extract.ts human",
  "SA_D12_5813.txt": {
+  "written_by_human": false,
   "persons": {
    "52965167": {
     "childcare_duty_without_care": "not_stated",
@@ -17,6 +18,7 @@
   }
  },
  "SA_D12_3452.txt": {
+  "written_by_human": false,
   "persons": {
    "53753161": {
     "childcare_duty_without_care": "not_stated",
@@ -57,6 +59,7 @@
   }
  },
  "SA_D12_9008.txt": {
+  "written_by_human": false,
   "persons": {
    "22340975": {
     "childcare_duty_without_care": "not_stated",
