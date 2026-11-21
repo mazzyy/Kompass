@@ -154,7 +154,10 @@ window.render = (t) => {
       const base = 0.7;
       const sc = lerp(base, target, z) * lerp(0.78, 1, e);
       const cx = ((x0 + x1) / 2 - 0.5) * 1920, cy = ((y0 + y1) / 2 - 0.5) * 1080 + 20;
-      win.style.transform = `perspective(2200px) rotateX(${(1 - e) * 16}deg) rotateY(${(1 - e) * -22}deg) translate(${-cx * z * sc * 0.9}px, ${-cy * z * sc * 0.9 + (1 - e) * 120}px) scale(${sc})`;
+      // pan towards the focus, but never past the window edge (no background showing through when zoomed in)
+      const maxX = Math.max(0, (1920 * sc - 1920) / 2), maxY = Math.max(0, (1120 * sc - 1080) / 2);
+      const tx = clamp(-cx * z * sc * 0.9, -maxX, maxX), ty = clamp(-cy * z * sc * 0.9, -maxY, maxY);
+      win.style.transform = `perspective(2200px) rotateX(${(1 - e) * 16}deg) rotateY(${(1 - e) * -22}deg) translate(${tx}px, ${ty + (1 - e) * 120}px) scale(${sc})`;
       const imgs = el.querySelectorAll('.view img');
       imgs.forEach((im, i) => {
         if (imgs.length === 1) return (im.style.opacity = 1);

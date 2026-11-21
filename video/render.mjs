@@ -23,7 +23,7 @@ const LABEL = {
 };
 const SHOTS = {
   s04_run: { shots: ['run_mapping', 'run'], focus: [0.235, 0.1, 0.885, 0.72] },
-  s05_overview: { shots: ['overview', 'overview_goals'], focus: [0.235, 0.12, 0.885, 0.62] },
+  s05_overview: { shots: ['overview'], focus: [0.237, 0.185, 0.884, 0.345] },
   s06_calls: { shots: ['calls'], focus: [0.235, 0.2, 0.885, 0.5] },
   s07_ai: { shots: ['situation'], focus: [0.585, 0.26, 0.885, 0.62] },
   s08_patterns: { shots: ['patterns'], focus: [0.235, 0.2, 0.6, 0.68] },
