@@ -30,11 +30,11 @@ const BUCKET_DE: Record<Bucket, string> = {
 
 const FILL: Record<Status, { bg: string; fg: string }> = {
   reached: { bg: 'FFEAF5EE', fg: 'FF145F35' },
-  on_track: { bg: 'FFFBF0E0', fg: 'FF8A4700' },
+  on_track: { bg: 'FFFFF1B8', fg: 'FF5C4600' },
   at_risk: { bg: 'FFFDE3E1', fg: 'FFA3231A' },
-  missed: { bg: 'FF8A1C14', fg: 'FFFFFFFF' },
-  not_applicable: { bg: 'FFF1F0EC', fg: 'FF6B6B73' },
-  no_data: { bg: 'FFF1F0EC', fg: 'FF6B6B73' },
+  missed: { bg: 'FF7A1712', fg: 'FFFFFFFF' },
+  not_applicable: { bg: 'FFEFEFEF', fg: 'FF5F5F5F' },
+  no_data: { bg: 'FFEFEFEF', fg: 'FF5F5F5F' },
 };
 
 type Row = (string | number | Date | null | { formula: string; result: number })[];
@@ -47,8 +47,8 @@ function addSheet(wb: ExcelJS.Workbook, name: string, headers: string[], rows: R
   const ws = wb.addWorksheet(name, { views: [{ state: 'frozen', ySplit: 1 }] });
   ws.addRow(headers);
   const h = ws.getRow(1);
-  h.font = { bold: true, color: { argb: 'FF121212' } };
-  h.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F0EC' } };
+  h.font = { bold: true, color: { argb: 'FF1A1A1A' } };
+  h.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE3E3E3' } };
   h.alignment = { vertical: 'middle', wrapText: true };
   for (const r of rows) ws.addRow(r);
   headers.forEach((hd, i) => {

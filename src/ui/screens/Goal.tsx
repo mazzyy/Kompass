@@ -399,7 +399,7 @@ export function GoalScreen({ app }: { app: App }) {
                 <div key={m.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', height: '100%', gap: 4 }} title={`${statusLabel(lang, 'at_risk')}: ${m.risk} · ${statusLabel(lang, 'on_track')}: ${m.track}`}>
                   <span className="num" style={{ fontSize: 11 }}>{m.risk + m.track || ''}</span>
                   <div style={{ width: '70%', maxWidth: 40, display: 'flex', flexDirection: 'column-reverse' }}>
-                    <div style={{ height: (m.track / maxMonth) * 100, background: '#D9A25A', borderRadius: m.risk ? 0 : '3px 3px 0 0' }} />
+                    <div style={{ height: (m.track / maxMonth) * 100, background: 'var(--track-bar)', borderRadius: m.risk ? 0 : '3px 3px 0 0' }} />
                     <div style={{ height: (m.risk / maxMonth) * 100, background: 'var(--risk)', borderRadius: '3px 3px 0 0' }} />
                   </div>
                 </div>

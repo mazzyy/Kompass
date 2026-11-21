@@ -13,8 +13,8 @@ export function StatusIcon({ status, size = 15, label }: { status: Status | unde
     case 'on_track':
       return (
         <svg width={size} height={size} viewBox="0 0 16 16" {...a}>
-          <circle cx="8" cy="8" r="6.25" fill="none" stroke="#B35C00" strokeWidth="1.5" />
-          <path d="M8 4.5a3.5 3.5 0 0 1 0 7z" fill="#B35C00" />
+          <circle cx="8" cy="8" r="6.25" fill="none" stroke="#C99A00" strokeWidth="1.5" />
+          <path d="M8 4.5a3.5 3.5 0 0 1 0 7z" fill="#F2C200" stroke="#C99A00" strokeWidth="0.75" />
         </svg>
       );
     case 'at_risk':
@@ -78,7 +78,7 @@ export const Icon = {
     <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.2-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5z" /></svg>
   ),
   warn: () => (
-    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="#B35C00" /><path d="M8 4.5v4" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" /><circle cx="8" cy="11.2" r="0.9" fill="#fff" /></svg>
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="#C99A00" /><path d="M8 4.5v4" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" /><circle cx="8" cy="11.2" r="0.9" fill="#fff" /></svg>
   ),
   ok: () => (
     <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="#1A7F45" /><path d="M5 8.2l2 2 4-4.2" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>

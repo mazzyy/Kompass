@@ -98,6 +98,7 @@ export function useApp() {
   const [source, setSource] = useState<Source | undefined>(() => loadSource());
   const [folderWaiting, setFolderWaiting] = useState<string | undefined>(); // remembered folder that needs one click to allow reading
   const [autoRun, setAutoRun] = useState(false);
+  const [restoring, setRestoring] = useState(() => { const s = loadSource(); return !!s && s.kind !== 'files'; });
 
   const setScreen = useCallback((s: Screen, g?: GoalId) => {
     const goal = g ?? goalRef.current;
@@ -236,18 +237,24 @@ export function useApp() {
     restored.current = true;
     const src = loadSource();
     if (!src) return;
+    const stop = setTimeout(() => setRestoring(false), 20000); // never show "loading" forever
     void (async () => {
       if (src.kind === 'sample') {
         await loadSample(src.month);
         setAutoRun(true);
       } else if (src.kind === 'folder') {
         const h = await loadHandle();
-        if (!h) return;
+        if (!h) {
+          setRestoring(false);
+          return;
+        }
         if (await permission(h, false)) {
           if (await openFolder(h)) setAutoRun(true);
         } else setFolderWaiting(h.name);
       }
-    })();
+    })().finally(() => {
+      clearTimeout(stop);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -358,8 +365,11 @@ export function useApp() {
   useEffect(() => {
     if (!autoRun || !raws.length || running) return;
     setAutoRun(false);
-    if (!blocked) void doRun();
-    else setScreen('run'); // a renamed column needs a person to confirm it first
+    if (!blocked) void doRun().finally(() => setRestoring(false));
+    else {
+      setRestoring(false);
+      setScreen('run'); // a renamed column needs a person to confirm it first
+    }
   }, [autoRun, raws, blocked, running, doRun, setScreen]);
 
   // what the current role may see
@@ -430,6 +440,7 @@ export function useApp() {
     reopenFolder,
     openFolder,
     forgetSource,
+    restoring: restoring && !result && !folderWaiting && !error,
     sa,
   };
 }

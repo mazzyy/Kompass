@@ -9,7 +9,7 @@ import { EmptyRun } from './common';
 
 const SEG = [
   { key: 'reached', color: '#1A7F45' },
-  { key: 'on_track', color: '#D9A25A' },
+  { key: 'on_track', color: '#F2C200' },
   { key: 'at_risk', color: '#D12C1F' },
   { key: 'missed', color: '#8A1C14' },
 ] as const;

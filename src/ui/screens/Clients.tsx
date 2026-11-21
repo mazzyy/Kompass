@@ -97,7 +97,7 @@ export function ClientsScreen({ app }: { app: App }) {
                 >
                   <td>
                     <div style={{ fontWeight: 500 }}>{p.displayName}</div>
-                    <div className="mono muted" style={{ fontSize: 12 }}>
+                    <div className="mono muted" style={{ fontSize: 12, whiteSpace: 'nowrap' }}>
                       {p.klientNr} · {p.socialWorker}
                     </div>
                   </td>

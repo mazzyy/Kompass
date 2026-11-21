@@ -117,6 +117,7 @@ const de = {
   // empty
   'empty.noRun': 'Noch kein Lauf. Legen Sie im Monatslauf die Exporte ab und berechnen Sie.',
   'empty.toRun': 'Zum Monatslauf',
+  'empty.restoring': 'Gemerkte Daten werden geladen und berechnet …',
   // overview
   'ov.title': 'Übersicht',
   'ov.sub': 'Stand {date} · {n} aktuelle Klient:innen · alle Zahlen aus den hochgeladenen Exporten',
@@ -570,6 +571,7 @@ const en: Record<Key, string> = {
   'run.notes': 'Notes',
   'empty.noRun': 'No run yet. Drop the exports in Monthly run and press Run.',
   'empty.toRun': 'Go to Monthly run',
+  'empty.restoring': 'Loading and calculating the remembered data …',
   'ov.title': 'Overview',
   'ov.sub': 'As of {date} · {n} current clients · every number comes from the uploaded exports',
   'ov.sub.sw': 'As of {date} · {n} own clients of {sw}',

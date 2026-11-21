@@ -9,6 +9,12 @@ import { saValue } from './Situation';
 import type { App } from '../useApp';
 
 export function EmptyRun({ app }: { app: App }) {
+  if (app.restoring)
+    return (
+      <div className="empty loading" role="status">
+        <span>{tr(app.lang, 'empty.restoring')}</span>
+      </div>
+    );
   return (
     <div className="empty">
       <span>{tr(app.lang, 'empty.noRun')}</span>

@@ -5,7 +5,7 @@ import { tr, type UiKey } from '../strings';
 import type { App } from '../useApp';
 import { EmptyRun } from './common';
 
-const SEV_COLOR = { high: '#D12C1F', medium: '#B35C00', info: '#A1A1AA' };
+const SEV_COLOR = { high: '#D12C1F', medium: '#C99A00', info: '#A1A1AA' };
 const ORDER = { high: 0, medium: 1, info: 2 };
 
 export function QualityScreen({ app }: { app: App }) {
@@ -64,7 +64,7 @@ export function QualityScreen({ app }: { app: App }) {
                   </span>
                 </div>
                 {isOpen && (
-                  <div className="scroll-x" style={{ borderTop: '1px solid var(--divider)', background: '#fcfcfb' }}>
+                  <div className="scroll-x" style={{ borderTop: '1px solid var(--divider)', background: '#fafafa' }}>
                     <table className="t" style={{ minWidth: 640 }}>
                       <tbody>
                         {list.slice(0, 200).map((a, i) => {
