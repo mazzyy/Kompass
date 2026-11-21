@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { TABLE_BY_ID } from '../../engine/import/signatures';
 import { ALERT_META, type Alert, type AlertCode } from '../../engine/model';
 import { msg } from '../../i18n/messages';
@@ -11,7 +10,8 @@ const ORDER = { high: 0, medium: 1, info: 2 };
 
 export function QualityScreen({ app }: { app: App }) {
   const { lang, result: res } = app;
-  const [open, setOpen] = useState<AlertCode | undefined>();
+  const open = app.dqOpen as AlertCode | undefined;
+  const setOpen = app.setDqOpen;
   if (!res) return <EmptyRun app={app} />;
   const ids = new Set(app.visible!.persons.map((p) => p.id));
   const alerts = app.role.kind === 'mgmt' ? res.alerts : res.alerts.filter((a) => a.personId && ids.has(a.personId));

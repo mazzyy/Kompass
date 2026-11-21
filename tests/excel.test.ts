@@ -22,12 +22,19 @@ async function load(buf: ArrayBuffer) {
 }
 
 describe('Excel output (TE)', () => {
+  it('Claimable now: Abrechenbar sheet lists reached-but-not-recorded goals from our own rules', async () => {
+    const res = sample();
+    expect(res.claimable.length).toBe(res.alerts.filter((a) => a.code === 'reached_not_recorded').length);
+    const wb = await load((await writeManagement(res, defaultRulesText)).buffer);
+    expect(wb.getWorksheet('Abrechenbar')!.rowCount - 1).toBe(res.claimable.length);
+    expect(res.claimable.length).toBeGreaterThan(0);
+  });
   it('TE-01 management workbook: sheets, German headers, frozen header, autofilter, fills', async () => {
     const res = sample();
     const f = await writeManagement(res, defaultRulesText);
     expect(f.name).toBe('Cockpit_2026-11-20.xlsx');
     const wb = await load(f.buffer);
-    expect(wb.worksheets.map((w) => w.name)).toEqual(['Übersicht', 'Ziel1_Personen', 'Anrufliste', 'Datenqualität', 'Regeln', 'Lauf']);
+    expect(wb.worksheets.map((w) => w.name)).toEqual(['Übersicht', 'Ziel1_Personen', 'Ziel2_Personen', 'Anrufliste', 'Abrechenbar', 'Datenqualität', 'Regeln', 'Lauf']);
     const ws = wb.getWorksheet('Ziel1_Personen')!;
     expect(ws.getRow(1).getCell(1).value).toBe('Klientennummer');
     expect(ws.views[0]).toMatchObject({ state: 'frozen', ySplit: 1 });

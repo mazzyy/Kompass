@@ -129,6 +129,7 @@ export default function App() {
               <span className="dot" style={{ background: ai === 'online' ? '#1A7F45' : ai === 'offline' ? '#A1A1AA' : '#D6D4CF' }} aria-hidden="true" />
               <span>{tr(lang, ai === 'online' ? 'ai.online' : ai === 'offline' ? 'ai.offline' : 'ai.unknown')}</span>
             </div>
+            <p style={{ margin: 0, padding: '0 10px', fontSize: 11.5, lineHeight: 1.4, color: 'var(--muted)' }}>{tr(lang, 'privacy')}</p>
           </div>
         </nav>
 

@@ -40,6 +40,8 @@ export interface PersonExtraction {
   name: string;
   fields: Record<SaFieldId, Extracted>;
   ms: number;
+  /** Exactly what the model saw: numbered sentences with names and numbers replaced by placeholders. */
+  modelInput?: string[];
 }
 
 export interface ReportExtraction {
@@ -103,9 +105,63 @@ function schema() {
   return { type: 'object', properties: props, required: SA_FIELDS.map((f) => f.id) };
 }
 
+// ---------- de-identification: names and numbers never reach the model ----------
+
+/** Names written in the report's Personalien (Name / Vorname lines) plus the person's own name. */
+export function collectNames(household: string, p: PersonBlock): string[] {
+  const out = new Set<string>();
+  for (const m of household.matchAll(/(?:Name|Vorname):\s*([^·\n]+?)\s*(?=·|\n|$)/g)) for (const w of m[1].split(/\s+/)) if (w.length >= 2) out.add(w);
+  for (const w of p.name.split(/\s+/)) if (w.length >= 2) out.add(w);
+  return [...out].sort((a, b) => b.length - a.length);
+}
+
+export interface Masked {
+  masked: string[];
+  restore: (s: string) => string;
+  replaced: number;
+}
+
+const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/** Replace names, ID numbers, dates, phone numbers and e-mails with placeholders; keep a map to put them back. */
+export function pseudonymize(sents: string[], names: string[]): Masked {
+  const map = new Map<string, string>(); // original -> placeholder
+  const back = new Map<string, string>(); // placeholder -> original
+  let n = 0;
+  const ph = (orig: string, kind: string) => {
+    if (!map.has(orig)) {
+      const key = `[${kind}_${++n}]`;
+      map.set(orig, key);
+      back.set(key, orig);
+    }
+    return map.get(orig)!;
+  };
+  let replaced = 0;
+  const rules: [RegExp, string][] = [
+    [/[\w.+-]+@[\w-]+\.[\w.]+/g, 'EMAIL'],
+    [/\b756\.\d{4}\.\d{4}\.\d{2}\b/g, 'NR'],
+    [/\bD\d{2}\.\d{3,6}\b/g, 'NR'],
+    [/(?:\+41|\b0)\s?\d{2}\s?\d{3}\s?\d{2}\s?\d{2}\b/g, 'TEL'],
+    [/\b\d{1,2}\.\d{1,2}\.\d{2,4}\b/g, 'DATUM'],
+    [/\b\d{5,9}\b/g, 'NR'],
+  ];
+  const masked = sents.map((s0) => {
+    let s = s0;
+    for (const nm of names) {
+      const re = new RegExp(`(?<![\\wÄÖÜäöüß])${esc(nm)}(?![\\wÄÖÜäöüß])`, 'g');
+      s = s.replace(re, (m) => (replaced++, ph(m, 'PERSON')));
+    }
+    s = s.replace(/\b(Frau|Herr)\s+[A-ZÄÖÜ][\wäöüß-]*\.?/g, (m, t) => (replaced++, `${t} ${ph(m.slice(t.length + 1), 'PERSON')}`));
+    for (const [re, kind] of rules) s = s.replace(re, (m) => (replaced++, ph(m, kind)));
+    return s;
+  });
+  const restore = (s: string) => s.replace(/\[(PERSON|NR|DATUM|TEL|EMAIL)_\d+\]/g, (k) => back.get(k) ?? k);
+  return { masked, restore, replaced };
+}
+
 export function buildPrompt(p: PersonBlock, sents: string[]): string {
   const defs = SA_FIELDS.map((f) => `- ${f.id}: ${f.type === 'enum' ? f.values.join(' | ') : f.type}${f.hint ? ` (${f.hint})` : ''}`).join('\n');
-  return `Extract facts about ${p.name} from these numbered sentences of a German social-work report.
+  return `Extract facts about one person (role: ${p.role}) from these numbered sentences of a German social-work report. Names and numbers are replaced by placeholders such as [PERSON_1].
 For each field return the value and the number of the ONE sentence that states it.
 If no sentence clearly states the field, return value null and sentence null. Never guess or infer from other fields.
 
@@ -147,16 +203,17 @@ export interface OllamaOpts {
   signal?: AbortSignal;
 }
 
-export async function extractPerson(p: PersonBlock, o: OllamaOpts): Promise<PersonExtraction> {
+export async function extractPerson(p: PersonBlock, o: OllamaOpts, household = ''): Promise<PersonExtraction> {
   const t0 = Date.now();
   const sents = sentences(p.text);
+  const ps = pseudonymize(sents, collectNames(household, p));
   const res = await fetch(`${o.endpoint}/api/generate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     signal: o.signal,
     body: JSON.stringify({
       model: o.model,
-      prompt: buildPrompt(p, sents),
+      prompt: buildPrompt(p, ps.masked),
       format: schema(),
       stream: false,
       options: { temperature: 0, num_ctx: 2048, seed: 1 },
@@ -170,14 +227,17 @@ export async function extractPerson(p: PersonBlock, o: OllamaOpts): Promise<Pers
   } catch {
     raw = {};
   }
-  return { zemis: p.zemis, name: p.name, fields: postprocess(raw, sents), ms: Date.now() - t0 };
+  // Evidence is the ORIGINAL sentence (by number); placeholders in text values are put back locally.
+  const fields = postprocess(raw, sents);
+  for (const f of SA_FIELDS) if (typeof fields[f.id].value === 'string') fields[f.id].value = ps.restore(String(fields[f.id].value));
+  return { zemis: p.zemis, name: p.name, fields, ms: Date.now() - t0, modelInput: ps.masked };
 }
 
 export async function extractReport(file: string, text: string, o: OllamaOpts, onPerson?: (p: PersonExtraction) => void): Promise<ReportExtraction> {
   const sp = splitReport(text);
   const persons: PersonExtraction[] = [];
   for (const p of sp.persons) {
-    const r = await extractPerson(p, o);
+    const r = await extractPerson(p, o, sp.household);
     persons.push(r);
     onPerson?.(r);
   }

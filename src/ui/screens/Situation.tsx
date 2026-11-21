@@ -227,8 +227,19 @@ export function SituationScreen({ app, aiOnline }: { app: App; aiOnline: boolean
               )}
             </div>
             {p && SA_FIELDS.map((f) => <FieldRow key={f.id} app={app} p={p} f={f} e={p.fields[f.id]} file={cur.file} sel={field === f.id} onPick={() => setField(field === f.id ? undefined : f.id)} />)}
-            <div className="muted" style={{ padding: '10px 18px', fontSize: 12 }}>
-              <span className="tag ai">{tr(lang, 'sa.aiTag')}</span> {tr(lang, 'sa.private')}
+            {p?.modelInput && (
+              <details style={{ padding: '10px 18px', borderBottom: '1px solid var(--divider)', fontSize: 12.5 }}>
+                <summary style={{ cursor: 'pointer', fontWeight: 500 }}>{tr(lang, 'sa.modelSaw')}</summary>
+                <ol className="mono" style={{ margin: '8px 0 0', paddingLeft: 22, fontSize: 11.5, color: 'var(--ink-2)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {p.modelInput.map((x, k) => (
+                    <li key={k}>{x}</li>
+                  ))}
+                </ol>
+              </details>
+            )}
+            <div className="muted" style={{ padding: '10px 18px', fontSize: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <span className="tag ai" style={{ whiteSpace: 'normal' }}>{tr(lang, 'sa.aiTag')}</span>
+              <span>{tr(lang, 'sa.private')}</span>
             </div>
           </div>
         </div>

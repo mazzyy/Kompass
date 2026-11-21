@@ -28,3 +28,6 @@ Households leave social assistance when an adult has a job ≥ 80 %, less often 
 - 1 Erwerb row with Bis before Von
 - 4 reached goals deliberately not recorded in Integrationszielerreichung (plus recent ones not yet recorded)
 - children born in CH: 47
+
+## Demo caseload shaping
+3 synthetic households of S. Keller whose at-risk date was earlier than Amina's were assigned to other social workers, so the planted personas Reza, Fatima and Amina are her most urgent at-risk cases. All statuses are still computed by the engine.

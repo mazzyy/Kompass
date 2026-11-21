@@ -50,6 +50,7 @@ export interface PersonSpec {
   entry?: string | null; // null = no entry event
   birthEvent?: boolean;
   ze?: string;
+  zb?: string;
   uebergang?: string;
   sw?: string;
   muttersprache?: string;
@@ -67,6 +68,7 @@ export function addPerson(fx: Fx, s: PersonSpec = {}) {
     dossierNr: s.dossier ?? `D12.${5000 + seq}`,
     name: s.name,
     vorname: s.vorname,
+    zBeginn: s.zb ?? '01.01.2024',
     zEnde: s.ze ?? '31.12.2030',
     uebergang: s.uebergang,
     status: s.status ?? 'VA',
@@ -85,6 +87,11 @@ export const lang = (fx: Fx, p: { knr: string; zemis: string }, niveau: string, 
 
 export const course = (fx: Fx, p: { knr: string; zemis: string }, art: string, bezeichnung: string, start: string, abschluss?: string, stunden = 12) =>
   fx.add('foerderung', { zemis: p.zemis, klientNr: p.knr, art, bezeichnung, start, abschluss, stunden });
+
+export const job = (fx: Fx, p: { knr: string; zemis: string }, von: string, pensum: number, bis?: string, extra: Record<string, unknown> = {}) =>
+  fx.add('erwerb', { zemis: p.zemis, klientNr: p.knr, von, bis, pensum, arbeitgeber: 'Firma AG', erwerbsstatus: 'unselbstständig', ...extra });
+
+export const support = (fx: Fx, dossier: string, art: string, von: string, bis?: string) => fx.add('finanz', { dossierNr: dossier, art, von, bis });
 
 export const g = (res: ReturnType<Fx['run']>, knr: string) => {
   const p = res.persons.find((x) => x.klientNr === knr);

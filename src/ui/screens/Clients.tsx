@@ -19,13 +19,14 @@ export function ClientsScreen({ app }: { app: App }) {
     const s = q.trim().toLowerCase();
     return persons.filter((p) => {
       if (sw && p.socialWorker !== sw) return false;
+      if (app.inScopeOnly && !Object.values(p.goals).some((r) => r && r.status !== 'not_applicable')) return false;
       const g = p.goals[1];
       if (status === 'reached_late' && !(g?.status === 'reached' && g.late)) return false;
       if (status && status !== 'reached_late' && g?.status !== status) return false;
       if (s && ![p.displayName, p.klientNr, p.zemis, p.dossierNr].some((x) => x.toLowerCase().includes(s))) return false;
       return true;
     });
-  }, [persons, q, status, sw]);
+  }, [persons, q, status, sw, app.inScopeOnly]);
   if (!res) return <EmptyRun app={app} />;
   const sel = persons.find((p) => p.id === app.selected);
 
@@ -64,6 +65,10 @@ export function ClientsScreen({ app }: { app: App }) {
             </select>
           </div>
         )}
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, paddingBottom: 8, minHeight: 36 }}>
+          <input type="checkbox" checked={app.inScopeOnly} onChange={(e) => app.setInScopeOnly(e.target.checked)} style={{ width: 16, height: 16, accentColor: '#121212' }} />
+          {tr(lang, 'cl.inScopeOnly')}
+        </label>
         <span className="muted" style={{ fontSize: 13, paddingBottom: 8 }} role="status">
           {tr(lang, 'cl.count', { n: list.length, total: persons.length })}
         </span>

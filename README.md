@@ -46,6 +46,8 @@ Regenerate the synthetic data (deterministic): `npm run data`. Measure extractio
 
 ## Data protection
 
+Built for Bern's cantonal data protection law (KDSG): runs on one computer, no cloud, names and numbers removed before the AI step, groups under 10 hidden.
+
 Runs entirely in the browser. A Content-Security-Policy blocks every network request except the app itself and the local model on `localhost:11434`. Fonts are bundled. Browser storage holds only column mappings, call marks, confirmed report fields and the language; *Lokale Daten löschen* clears it. No per-person scores or predictions.
 
 MIT licence.

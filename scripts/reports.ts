@@ -148,7 +148,7 @@ function aminaSection(m: Member, idx: number, stated: Record<string, unknown>) {
 
 const reportTruth: Record<string, { dossier: string; persons: Record<string, Record<string, unknown>> }> = {};
 fs.mkdirSync(OUT, { recursive: true });
-for (const f of fs.readdirSync(OUT)) fs.unlinkSync(path.join(OUT, f));
+for (const f of fs.readdirSync(OUT)) if (/^SA_.*\.(txt|pdf)$/.test(f)) fs.unlinkSync(path.join(OUT, f)); // keep extractions.json / accuracy.json
 let n = 0;
 for (const hh of truth) {
   const head = hh.members.find((m) => m.role === 'head')!;

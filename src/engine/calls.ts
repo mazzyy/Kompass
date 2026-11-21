@@ -53,6 +53,7 @@ export function findTransition(p: Person, ctx: Ctx): Transition | undefined {
 }
 
 const goalOpen = (p: Person, g: GoalId) => {
+  if (g === 3 && !p.isHead) return false; // household goal: acted on via the head of the household
   const r = p.goals[g];
   return r !== undefined && r.status !== 'reached' && r.status !== 'not_applicable' && r.status !== 'no_data';
 };
@@ -90,7 +91,7 @@ export function buildCallLists(persons: Person[], ctx: Ctx, computed: GoalId[]):
     // 1. at risk
     for (const g of computed) {
       const r = p.goals[g];
-      if (r?.status !== 'at_risk') continue;
+      if (r?.status !== 'at_risk' || (g === 3 && !p.isHead)) continue;
       const k = r.latestAction ?? r.deadline!;
       reasons.push(r.reason);
       tps.push(...talkingPointsFor(p, g));

@@ -68,7 +68,7 @@ export function PersonFacts({ app, p }: { app: App; p: Person }) {
       <div className="detail-sec">
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
           <span className="sec-title">{tr(lang, 'sa.inClient')}</span>
-          <span className="tag ai">{tr(lang, 'sa.aiTag')}</span>
+          <span className="tag ai" style={{ whiteSpace: 'normal' }}>{tr(lang, 'sa.aiTag')}</span>
         </div>
         {(() => {
           const c = app.sa.confirmed[p.zemis];

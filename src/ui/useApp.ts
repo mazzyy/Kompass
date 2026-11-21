@@ -65,6 +65,8 @@ export function useApp() {
   const [rulesOpen, setRulesOpen] = useState(false);
   const [selected, setSelected] = useState<string | undefined>();
   const [callsSw, setCallsSw] = useState<string | undefined>();
+  const [dqOpen, setDqOpen] = useState<string | undefined>();
+  const [inScopeOnly, setInScopeOnly] = useState(false);
 
   const setLang = (l: Lang) => {
     setLangState(l);
@@ -199,7 +201,7 @@ export function useApp() {
       await step(tr(lang, 'run.log.goal1', { n: t1 ? t1.overall.counted + t1.overall.counts.no_data : 0 }));
       const flagged = Object.values(res.callLists).reduce((x, l) => x + l.length, 0);
       await step(tr(lang, 'run.log.calls', { n: flagged }));
-      const out = await writeAll(res, rulesTextWithWindow(rulesText, windowMonths), new Date().toISOString().slice(0, 16).replace('T', ' '));
+      const out = await writeAll(res, rulesTextWithWindow(rulesText, windowMonths), new Date().toISOString().slice(0, 16).replace('T', ' '), rules.payment.lump_sum_chf as Record<string, number | null>);
       await step(tr(lang, 'run.log.excel', { n: out.length }));
       push(tr(lang, 'run.log.done', { ms: Math.round(performance.now() - t0) }));
       lines.forEach((l) => (l.state = 'done'));
@@ -265,6 +267,10 @@ export function useApp() {
     setSelected,
     callsSw,
     setCallsSw,
+    dqOpen,
+    setDqOpen,
+    inScopeOnly,
+    setInScopeOnly,
     sa,
   };
 }

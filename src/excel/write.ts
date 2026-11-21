@@ -108,6 +108,7 @@ function personRows(persons: Person[], goal: GoalId): { rows: Row[]; statuses: S
       msg('de', r.reason),
       r.trace.map((t) => msg('de', t.msg)).join(' · '),
       sourcesText(r),
+      dateCell(r.status === 'reached' ? undefined : r.latestAction),
     ]);
     statuses.push(r.status);
   }
@@ -131,8 +132,41 @@ const PERSON_HEADERS = [
   'Begründung',
   'Herleitung',
   'Quellenzeilen',
+  'Spätester Handlungstermin',
 ];
-const PERSON_WIDTHS = [14, 13, 12, 18, 14, 14, 12, 12, 12, 16, 12, 10, 14, 60, 70, 40];
+const PERSON_WIDTHS = [14, 13, 12, 18, 14, 14, 12, 12, 12, 16, 12, 10, 14, 60, 70, 40, 16];
+
+function householdSheet(wb: ExcelJS.Workbook, res: RunResult, sw?: string) {
+  const byId = new Map(res.persons.map((p) => [p.id, p]));
+  const hhs = res.households.filter((h) => h.goal3 && (!sw || h.socialWorker === sw));
+  const rows: Row[] = hhs.map((h) => {
+    const r = h.goal3!;
+    const head = byId.get(h.head!)!;
+    return [
+      h.dossierNr,
+      `${head.displayName} (${head.klientNr})`,
+      h.members.length,
+      h.socialWorker,
+      dateCell(r.deadline),
+      dateCell(r.status === 'reached' ? undefined : r.latestAction),
+      statusWord(r),
+      dateCell(r.reachedDate),
+      r.status === 'reached' ? (r.late ? 'ja' : 'nein') : '',
+      r.source === 'proven' ? 'belegt' : r.source === 'computed' ? 'berechnet' : '',
+      msg('de', r.reason),
+      r.trace.map((t) => msg('de', t.msg)).join(' · '),
+      sourcesText(r),
+    ];
+  });
+  const ws = addSheet(
+    wb,
+    'Ziel3_Haushalte',
+    ['Dossier-Nr.', 'Dossierträger/-in', 'Personen', 'Fallführung', 'Frist', 'Spätestes Ende Sozialhilfe', 'Status', 'Erreicht am', 'Verspätet', 'Quelle (belegt/berechnet)', 'Begründung', 'Herleitung', 'Quellenzeilen'],
+    rows,
+    [12, 24, 9, 13, 12, 14, 16, 12, 10, 14, 60, 70, 40],
+  );
+  colorStatus(ws, 7, hhs.map((h) => h.goal3!.status));
+}
 
 function totalsRow(r: TotalsRow): Row {
   return [r.group, r.counted, ...BUCKETS.map((b) => r.counts[b]), r.total, r.rate === null ? null : Math.round(r.rate * 1000) / 10];
@@ -232,6 +266,35 @@ function dqSheet(wb: ExcelJS.Workbook, res: RunResult, sw?: string) {
   addSheet(wb, 'Datenqualität', ['Schwere', 'Code', 'Problem', 'Klientennummer', 'Fallführung', 'Tabelle', 'Zeile', 'Details'], rows, [10, 26, 70, 14, 13, 26, 8, 80]);
 }
 
+function claimSheet(wb: ExcelJS.Workbook, res: RunResult, lumpSums: Record<string, number | null>, sw?: string) {
+  const byId = new Map(res.persons.map((p) => [p.id, p]));
+  const list = res.claimable.filter((c) => !sw || byId.get(c.personId)?.socialWorker === sw);
+  const goalName = { 1: 'Ziel 1 · Sprache A1', 2: 'Ziel 2 · Arbeit / Ausbildung', 3: 'Ziel 3 · Ohne Sozialhilfe (Haushalt)' };
+  const rows: Row[] = list.map((c) => {
+    const p = byId.get(c.personId)!;
+    const chf = lumpSums[`goal${c.goal}`];
+    return [
+      goalName[c.goal],
+      p.klientNr,
+      p.zemis,
+      p.dossierNr,
+      p.displayName,
+      p.socialWorker,
+      dateCell(c.reachedDate),
+      msg('de', c.reason),
+      c.sources.map((s) => `${TABLE_BY_ID[s.table].name} Z. ${s.row}`).join('; '),
+      chf ?? null,
+    ];
+  });
+  addSheet(
+    wb,
+    'Abrechenbar',
+    ['Ziel', 'Klientennummer', 'Zemis Nummer', 'Dossier-Nr.', 'Name', 'Fallführung', 'Erreicht am', 'Begründung', 'Quellenzeilen', 'Pauschale CHF (rules.yaml)'],
+    rows,
+    [30, 14, 13, 12, 18, 13, 12, 60, 40, 14],
+  );
+}
+
 function rulesSheet(wb: ExcelJS.Workbook, rulesText: string) {
   const rows: Row[] = flattenRules(rulesText).map((r) => [r.path, r.value, r.note]);
   addSheet(wb, 'Regeln', ['Einstellung', 'Wert', 'Hinweis'], rows, [42, 60, 60]);
@@ -245,7 +308,8 @@ function runSheet(wb: ExcelJS.Workbook, res: RunResult, createdIso: string) {
     ['Erstellt', createdIso],
     ['Berechnete Ziele', res.computedGoals.join(', ')],
     ['Fehlende Tabellen', res.missingTables.map((t) => TABLE_BY_ID[t].name).join(', ') || '–'],
-    ['Datenschutz', 'Lokal im Browser berechnet. Keine Daten haben diesen Computer verlassen.'],
+    ['Datenschutz', 'Gebaut für das kantonale Datenschutzgesetz Bern (KDSG): läuft auf einem Computer, keine Cloud, Namen und Nummern werden vor dem KI-Schritt entfernt, Gruppen unter 10 werden ausgeblendet.'],
+    ['Daten', 'SYNTHETISCHE Beispieldaten, sofern die Beispieldateien verwendet wurden. Keine echten Personen.'],
     [],
     ['Eingabedatei', 'Tabelle', 'Zeilen'],
     ...res.inputs.map((i) => [i.fileName, i.table ? TABLE_BY_ID[i.table].name : 'nicht erkannt', i.rows] as Row),
@@ -271,16 +335,20 @@ function newWb(res: RunResult): ExcelJS.Workbook {
   return wb;
 }
 
-export async function writeManagement(res: RunResult, rulesText: string, createdIso = ''): Promise<OutFile> {
+export async function writeManagement(res: RunResult, rulesText: string, createdIso = '', lumpSums: Record<string, number | null> = {}): Promise<OutFile> {
   const wb = newWb(res);
   overviewSheet(wb, res);
   for (const g of res.computedGoals) {
-    if (g === 3) continue;
+    if (g === 3) {
+      householdSheet(wb, res);
+      continue;
+    }
     const { rows, statuses } = personRows(res.persons, g);
     const ws = addSheet(wb, `Ziel${g}_Personen`, PERSON_HEADERS, rows, PERSON_WIDTHS);
     colorStatus(ws, 10, statuses);
   }
   callSheet(wb, res);
+  claimSheet(wb, res, lumpSums);
   dqSheet(wb, res);
   rulesSheet(wb, rulesText);
   runSheet(wb, res, createdIso);
@@ -311,8 +379,8 @@ export async function writeSocialWorker(res: RunResult, sw: string, rulesText: s
   return { name: `Anrufliste_${safe}_${iso(res.stichtag)}.xlsx`, audience: sw, sheets: wb.worksheets.map((w) => w.name), buffer };
 }
 
-export async function writeAll(res: RunResult, rulesText: string, createdIso = ''): Promise<OutFile[]> {
-  const out = [await writeManagement(res, rulesText, createdIso)];
+export async function writeAll(res: RunResult, rulesText: string, createdIso = '', lumpSums: Record<string, number | null> = {}): Promise<OutFile[]> {
+  const out = [await writeManagement(res, rulesText, createdIso, lumpSums)];
   for (const sw of res.socialWorkers) out.push(await writeSocialWorker(res, sw, rulesText));
   return out;
 }

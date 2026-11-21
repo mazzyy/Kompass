@@ -37,3 +37,20 @@ describe('Situationsanalyse extraction (AI guardrails)', () => {
     expect(fieldCorrect('career_wish', { value: 'Textil oder Pflege', status: 'stated', evidence: 'x' }, 'Textil / Schneiderei oder Pflege')).toBe(true);
   });
 });
+
+import { buildPrompt, collectNames, pseudonymize } from '../src/ai/extract';
+
+describe('De-identification before the AI step', () => {
+  it('no names, ID numbers or dates reach the model; values are restored afterwards', () => {
+    const sp = splitReport(amina);
+    const p = sp.persons[0];
+    const extra = ['Frau Tesfay wohnt bei Amina Tesfay, Tel. 031 321 64 11, Zemis 37988676, geb. 05.05.1992.', 'Möchte wie Lidia in der Pflege arbeiten.'];
+    const ps = pseudonymize([...sentences(p.text), ...extra], collectNames(sp.household, p));
+    const prompt = buildPrompt(p, ps.masked);
+    for (const secret of ['Amina', 'Tesfay', 'Lidia', 'Filmon', '37988676', '05.05.1992', '031 321 64 11', p.zemis]) expect(prompt).not.toContain(secret);
+    expect(ps.replaced).toBeGreaterThan(5);
+    const masked = ps.masked[ps.masked.length - 1];
+    expect(ps.restore(masked)).toBe(extra[1]);
+    expect(prompt).toContain('Versteht kein Schweizerdeutsch.');
+  });
+});

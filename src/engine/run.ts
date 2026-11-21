@@ -2,6 +2,8 @@ import { buildCallLists, lastActivity } from './calls';
 import { Ctx } from './context';
 import { fmt, parseDate, type Day } from './dates';
 import { computeGoal1, provenRows } from './goal1';
+import { computeGoal2, zemisCheck } from './goal2';
+import { buildHouseholds, computeGoal3 } from './goal3';
 import type { FileAnalysis, ParsedTables } from './import/detect';
 import { TABLES, TABLE_BY_ID, type TableId } from './import/signatures';
 import { day, srcRef, type Alert, type GoalId, type Msg, type Person, type RunResult } from './model';
@@ -89,6 +91,7 @@ export function run({ parsed, rules, stichtag, inputs = [] }: RunInput): RunResu
       callLists: {},
       socialWorkers: [],
       alerts,
+      claimable: [],
       inputs,
     };
   }
@@ -111,6 +114,25 @@ export function run({ parsed, rules, stichtag, inputs = [] }: RunInput): RunResu
     if (!ctx.has('asylgeschaeftsdaten')) notes.push({ key: 'note.no_goal1_events' });
   }
 
+  // Goal 2
+  if (ctx.has('erwerb')) {
+    computed.push(2);
+    for (const p of persons) p.goals[2] = computeGoal2(p, ctx, alerts);
+    if (ctx.has('zemis')) for (const p of persons) zemisCheck(p, ctx, alerts);
+  } else notes.push({ key: 'note.no_goal2' });
+
+  // Goal 3 (per household)
+  const households = buildHouseholds(persons, ctx, alerts);
+  const byId = new Map(persons.map((p) => [p.id, p]));
+  for (const h of households) byId.get(h.head!)!.isHead = true;
+  if (ctx.has('finanz')) {
+    computed.push(3);
+    for (const h of households) {
+      h.goal3 = computeGoal3(h, byId, ctx, alerts);
+      for (const m of h.members) byId.get(m)!.goals[3] = h.goal3;
+    }
+  } else notes.push({ key: 'note.no_goal3' });
+
   for (const p of persons) {
     p.lastActivity = lastActivity(p, ctx);
     const cohortRow = [...provenRows(p, ctx, 1), ...provenRows(p, ctx, 2), ...provenRows(p, ctx, 3)].find(
@@ -121,10 +143,25 @@ export function run({ parsed, rules, stichtag, inputs = [] }: RunInput): RunResu
 
   const totals: RunResult['totals'] = {};
   if (computed.includes(1)) totals[1] = totalsFor(1, personUnits(persons, 1), 'persons');
+  if (computed.includes(2)) totals[2] = totalsFor(2, personUnits(persons, 2), 'persons');
+  if (computed.includes(3))
+    totals[3] = totalsFor(
+      3,
+      households.map((h) => ({ result: h.goal3, socialWorker: h.socialWorker, entryYear: byId.get(h.head!)!.entryYear })),
+      'households',
+    );
   const noEntry = persons.filter((p) => p.goals[1]?.status === 'no_data').length;
   if (noEntry) notes.push({ key: 'note.no_entry', p: { n: noEntry } });
 
   const callLists = buildCallLists(persons, ctx, computed);
+  const byPid = new Map(persons.map((p) => [p.id, p]));
+  const claimable: RunResult['claimable'] = alerts
+    .filter((a) => a.code === 'reached_not_recorded' && a.personId && a.goal)
+    .map((a) => {
+      const r = byPid.get(a.personId!)!.goals[a.goal!]!;
+      return { personId: a.personId!, goal: a.goal!, reachedDate: r.reachedDate!, reason: r.reason, sources: a.sources };
+    })
+    .sort((a, b) => a.goal - b.goal || a.reachedDate - b.reachedDate);
   const socialWorkers = [...new Set(persons.map((p) => p.socialWorker))].sort();
 
   return {
@@ -134,11 +171,12 @@ export function run({ parsed, rules, stichtag, inputs = [] }: RunInput): RunResu
     missingTables,
     notes,
     persons,
-    households: [],
+    households,
     totals,
     callLists,
     socialWorkers,
     alerts,
+    claimable,
     inputs,
   };
 }

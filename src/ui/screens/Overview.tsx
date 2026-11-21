@@ -88,6 +88,33 @@ export function OverviewScreen({ app }: { app: App }) {
         </section>
       )}
 
+      {(() => {
+        const ids = new Set(persons.map((p) => p.id));
+        const cl = res.claimable.filter((c) => ids.has(c.personId));
+        const by = (g: number) => cl.filter((c) => c.goal === g).length;
+        const ls = app.rules.payment.lump_sum_chf as Record<string, number | null>;
+        const chfSet = [1, 2, 3].every((g) => typeof ls[`goal${g}`] === 'number');
+        const chf = chfSet ? cl.reduce((s, c) => s + (ls[`goal${c.goal}`] ?? 0), 0) : undefined;
+        return (
+          <section className="panel" aria-label={tr(lang, 'ov.claim')}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px 24px', alignItems: 'center', padding: '16px 20px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: '0 0 auto' }}>
+                <span className="kpi-label">{tr(lang, 'ov.claim')}</span>
+                <span className="kpi-value" style={{ color: 'var(--reached-text)' }}>{cl.length}</span>
+              </div>
+              <div style={{ flex: '1 1 320px', display: 'flex', flexDirection: 'column', gap: 4, fontSize: 13 }}>
+                <span style={{ color: 'var(--ink-2)' }}>{tr(lang, 'ov.claim.sub')}</span>
+                <span className="num">{tr(lang, 'ov.claim.goals', { g1: by(1), g2: by(2), g3: by(3) })}</span>
+                <span className="muted" style={{ fontSize: 12 }}>{chf !== undefined ? tr(lang, 'ov.claim.chf', { chf: chf.toLocaleString('de-CH') }) : tr(lang, 'ov.claim.nochf')}</span>
+              </div>
+              <button type="button" className="btn" disabled={!cl.length} onClick={() => { app.setDqOpen('reached_not_recorded'); app.setScreen('quality'); }}>
+                {tr(lang, 'ov.claim.open')}
+              </button>
+            </div>
+          </section>
+        );
+      })()}
+
       <section className="panel" aria-label={tr(lang, 'ov.tva')}>
         <div className="panel-head">
           <span className="panel-title">{tr(lang, 'ov.tva')}</span>

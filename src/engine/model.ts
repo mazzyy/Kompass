@@ -55,6 +55,7 @@ export interface Person {
   goals: Partial<Record<GoalId, GoalResult>>;
   lastActivity?: Day;
   kohorte?: number;
+  isHead?: boolean; // head of the household (goal 3 is shown on everyone, acted on via the head)
   klientRow: Rec;
 }
 
@@ -140,6 +141,15 @@ export interface Household {
   goal3?: GoalResult;
 }
 
+/** Goal reached on time according to the data, but missing in Integrationszielerreichung (§6): may be claimable. */
+export interface Claimable {
+  personId: string;
+  goal: GoalId;
+  reachedDate: Day;
+  reason: Msg;
+  sources: SourceRef[];
+}
+
 export interface RunResult {
   stichtag: Day;
   rulesVersion: string;
@@ -152,6 +162,7 @@ export interface RunResult {
   callLists: Record<string, CallItem[]>;
   socialWorkers: string[];
   alerts: Alert[];
+  claimable: Claimable[];
   inputs: { fileName: string; table?: TableId; rows: number }[];
 }
 
