@@ -1,21 +1,17 @@
-# Kompass · video script
+# Kompass · pitch video script
 
-Length: about 160 s (2:40) (timed to the slowest voice). Voice-over in English, male; three versions: ElevenLabs ("George"), Kokoro ("am_michael"), Qwen3-TTS ("Ryan"). Music: "Inspired" by Kevin MacLeod (CC BY 4.0). Effects: SSE Library (USC), CC0. All app data shown is synthetic.
+About 65–78 s depending on the voice (each version is timed to its own voice, no gaps). Voices: ElevenLabs "George", Kokoro "am_michael", Qwen3-TTS "ryan"; the app's own answer is spoken by ElevenLabs "Alice", as in the real app. Music: "Inspired" by Kevin MacLeod (CC BY 4.0), arriving with the reveal. Effects: SSE Library (USC), CC0, plus synthesized ticks, drone and impact. All app data shown is synthetic.
 
-| # | Time | Picture | Voice-over | On screen | Sound |
-|---|---|---|---|---|---|
-| 1 | 0:00–0:13 | Dark cinematic stage, drifting red/blue light, film grain. A giant ghost "160" drifts behind; three lines rise out of a blur, the last in red. | In Bern, one caseworker supports around a hundred and sixty refugees. Every one of them has three goals, and every goal has a deadline. | 160 clients. / Three goals each. / One deadline per goal. | whoosh |
-| 2 | 0:13–0:33 | The 11 real (synthetic) Excel exports orbit in 3D, deadline cells pulsing red. "11 Excel exports. Zero overview." A red DEADLINE MISSED stamp slams in. | The city is only paid when a goal is reached in time: German at A1, a real job, a year without social assistance. But the answers are buried in eleven Excel exports, and nobody sees who is about to miss a deadline, until it is too late. | 11 Excel exports. Zero overview. | whoosh |
-| 3 | 0:33–0:37 | Red K mark scales in with a glow, "Kompass" tightens from wide spacing, a light sweep crosses. Glass bell. | Meet Kompass. | Kompass | glass bell |
-| 4 | 0:37–0:52 | App in a browser frame tilts flat from 3D. Renamed column found, then the run log. Slow zoom, spotlight, caption. | Drop this month's exports. Kompass recognises every table by its columns, spots a renamed one, asks once, and remembers it. Next month: the same clicks. | Drop the exports. Same clicks every month. | whoosh + clicks |
-| 5 | 0:52–1:07 | Overview: "Heute wichtig", claimable 18; then the three goal rings. Spotlight on claimable. Soft bell (wow 1). | Seconds later, the whole service at a glance. Every goal, every deadline, and eighteen goals that were reached but never billed. Money on the table, found automatically. | 18 goals reached, never billed. | whoosh + soft bell + clicks |
-| 6 | 1:07–1:27 | S. Keller's call list, Amina selected: 112 days, evidence sentence about the Kita place. | Each caseworker gets a call list for the week, ranked by urgency, never by money. Amina: her A1 deadline is in a hundred and twelve days. Why is she stuck? Her intake report says it: two small children, and no daycare place. | Who do I call this week, and why? | whoosh + clicks |
-| 7 | 1:27–1:43 | Amina's Situationsanalyse next to the AI's proposed fields, 97 % measured accuracy. | That insight comes from free-text reports, read by an AI model running on this laptop. Names are removed first, every field shows the sentence it came from, and a social worker confirms it. | Local AI reads the report. A person confirms. | whoosh + clicks |
-| 8 | 1:43–2:02 | Two 100-square grids, 78 vs 29, the 63 % ring, the "biggest difference" ranking. Soft bell (wow 2). | Across the caseload, Kompass shows what works. People who can read Latin script reach A1 almost three times as often. That is where literacy courses pay off. Always groups, never a score for a person. | 78 vs 29 in 100. Groups, never a score per person. | whoosh + soft bell + clicks |
-| 9 | 2:02–2:13 | Chat "Visualisiere Ziel 2" and the three charts computed by the rules engine. | And you can simply ask. Visualise goal two. The rules compute the numbers, the AI explains them, and it answers out loud. | Just ask. The rules compute, the AI explains. | whoosh + clicks |
-| 10 | 2:13–2:29 | Excel exports page; privacy promise as caption. | Everything goes back out as Excel, one file per caseworker. And it runs on one computer: client data never goes to the cloud, names are removed before the AI, and groups under ten stay hidden. | Excel in. Excel out. One computer, no cloud for client data. | whoosh + clicks |
-| 11 | 2:29–2:40 | K mark, "Kompass", tagline; credits (challenge, synthetic data, music and effects licences). Fade to black. | Kompass. Know who needs you, before the deadline does. | Kompass | glass bell |
+Arc: fear → pain → stakes → turn → one big hit → quick proof → the AI answers → relief → tagline.
 
-**Through-line:** problem (deadlines hidden in Excel) → reveal → the monthly run → what management sees → what a caseworker does this week → why (local AI with evidence) → what works (patterns) → just ask (assistant, voice) → privacy and Excel out → tagline.
-
-**Wow moments:** 18 goals reached but never billed (money found); 78 vs 29 in 100 (where literacy courses pay off); the assistant drawing charts on request.
+| # | Time (ElevenLabs cut) | Beat | Voice-over | On screen |
+|---|---|---|---|---|
+| 1 | 0:00–0:04 | Fear | Every month, a refugee's deadline can quietly run out. | 112 → 0 days · Deadline passed. |
+| 2 | 0:04–0:13 | Pain | Not because nobody cared. Their caseworker has a hundred and sixty clients, eleven spreadsheets, and no way to see who is running out of time. | 160 clients. 11 spreadsheets. |
+| 3 | 0:13–0:19 | Stakes | Once the deadline passes, the chance is gone, and so is the funding for the next person who needs help. | The chance is gone. / So is the funding. |
+| 4 | 0:19–0:22 | Turn | Until now. This is Kompass. | Kompass |
+| 5 | 0:22–0:28 | Big hit | Drop in the monthly exports, and every caseworker sees exactly who to call this week, and why. | Who to call this week, and why. |
+| 6 | 0:28–0:39 | Quick proof | A local AI reads the intake reports and spots what is holding people back. Kompass finds goals already reached but never billed, and shows what really works. | Local AI reads every intake report. / 18 goals reached, never billed. / What really works: 78 vs 29 in 100. |
+| 7 | 0:39–0:49 | The AI answers | And when you have a question, you simply ask. — *App voice:* “People are behind on goal 1 because they missed their deadlines without A1 proof: 53 cases.” | “Why are people behind on goal 1?” |
+| 8 | 0:49–0:58 | Relief | No more firefighting. The right call, at the right time. Goals reached, funding secured. And client records never leave the computer. | The right call, at the right time. / Goals reached. Funding secured. / Client records never leave the computer. |
+| 9 | 0:58–1:04 | Tagline | Kompass. Know who needs you, before the deadline does. | Kompass |

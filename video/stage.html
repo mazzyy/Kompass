@@ -50,6 +50,11 @@
   .cap span { display: inline-block; }
   #badge { position: absolute; right: 34px; bottom: 26px; font-size: 15px; color: rgba(255,255,255,.55); letter-spacing: .08em; text-transform: uppercase; }
   #fade { position: absolute; inset: 0; background: #000; opacity: 0; }
+  .vbar { position: absolute; left: 50%; bottom: 210px; transform: translateX(-50%); display: flex; align-items: center; gap: 18px; height: 84px; padding: 0 34px 0 26px; border-radius: 999px; background: #161616; box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08); opacity: 0; }
+  .vbar .k { width: 46px; height: 46px; border-radius: 12px; background: #d50025; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 28px; }
+  .vbar .bars { display: flex; align-items: center; gap: 6px; height: 50px; }
+  .vbar .bars i { width: 6px; border-radius: 6px; background: #fff; display: block; }
+  .vbar .lbl { font-size: 28px; font-weight: 700; }
   .cd-num { position: absolute; left: 0; right: 0; top: 250px; text-align: center; font-size: 330px; font-weight: 800; letter-spacing: -.04em; font-variant-numeric: tabular-nums; line-height: 1; }
   .cd-label { position: absolute; left: 0; right: 0; top: 610px; text-align: center; font-size: 34px; color: #b8c0cc; letter-spacing: .04em; }
   .cd-final { position: absolute; left: 0; right: 0; top: 700px; text-align: center; font-size: 86px; font-weight: 800; color: #ff3b57; letter-spacing: -.02em; }
@@ -98,7 +103,7 @@ window.setup = (cfg, excel) => {
     } else if (s.kind === 'logo' || s.kind === 'end') {
       el.innerHTML = `<div class="mark">K</div><div class="wordmark">${s.headline}</div><div class="sub">${s.sub}</div><div class="sweep"></div>${s.credits ? `<div class="credits">${s.credits}</div>` : ''}`;
     } else {
-      el.innerHTML = `<div class="win"><div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><div class="url">localhost · Kompass</div></div><div class="view">${s.shots.map((sh) => `<img src="shots/${sh}.png">`).join('')}<div class="spot"></div></div></div>${s.captions.map((c) => `<div class="cap">${c.split(' ').map((w) => `<span>${w}&nbsp;</span>`).join('')}</div>`).join('')}`;
+      el.innerHTML = `<div class="win"><div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><div class="url">localhost · Kompass</div></div><div class="view">${s.shots.map((sh) => `<img src="shots/${sh}.png">`).join('')}<div class="spot"></div></div></div>${s.app ? `<div class="vbar"><span class="k">K</span><span class="bars">${'<i></i>'.repeat(9)}</span><span class="lbl">Kompass is answering</span></div>` : ''}${s.captions.map((c) => `<div class="cap">${c.split(' ').map((w) => `<span>${w}&nbsp;</span>`).join('')}</div>`).join('')}`;
     }
     stage.appendChild(el);
     scenes.push({ s, el });
@@ -196,6 +201,13 @@ window.render = (t) => {
       const spot = el.querySelector('.spot');
       const sp = ease((st - (k === 0 ? 1.3 : 0.6)) / 0.5) * (1 - ease((st - seg + 0.3) / 0.3));
       spot.style.cssText = `left:${x0 * 1920 - 10}px;top:${y0 * 1080 - 10}px;width:${fw + 20}px;height:${fh + 20}px;opacity:${sp}`;
+      const vb = el.querySelector('.vbar');
+      if (vb) {
+        const on = t >= s.appStart - 0.2 && t <= s.appEnd + 0.2;
+        const o = on ? Math.min(ease((t - s.appStart + 0.2) / 0.3), ease((s.appEnd + 0.2 - t) / 0.3)) : 0;
+        vb.style.opacity = o;
+        vb.querySelectorAll('.bars i').forEach((b, i) => (b.style.height = `${8 + Math.abs(Math.sin(t * (7 + i * 1.3) + i)) * 36 * (on ? 1 : 0)}px`));
+      }
       el.querySelectorAll('.cap').forEach((cap, i) => {
         if (i !== k) return (cap.style.opacity = 0);
         const c = ease((st - (k === 0 ? 0.7 : 0.2)) / 0.5) * (1 - ease((st - seg + 0.25) / 0.25));

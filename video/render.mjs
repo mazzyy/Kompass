@@ -26,7 +26,7 @@ const scenes = script.scenes.map((s) => {
   if (s.kind === 'logo') d = Math.max(d, 2.8);
   if (s.kind === 'statement') d = Math.max(d, 2.4 + 0.6 * s.lines.length);
   if (s.kind === 'end') d = LEAD + vo + 3.2;
-  const out = { ...s, start: +t.toFixed(3), dur: +d.toFixed(3), voStart: +(t + LEAD).toFixed(3), appStart: app ? +(t + LEAD + vo + APP_GAP).toFixed(3) : undefined };
+  const out = { ...s, start: +t.toFixed(3), dur: +d.toFixed(3), voStart: +(t + LEAD).toFixed(3), appStart: app ? +(t + LEAD + vo + APP_GAP).toFixed(3) : undefined, appEnd: app ? +(t + LEAD + vo + APP_GAP + app).toFixed(3) : undefined };
   t += d;
   return out;
 });
