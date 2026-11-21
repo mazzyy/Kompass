@@ -85,6 +85,13 @@ Click a goal on the Overview (or "Ziel im Detail" in the menu; tabs switch betwe
 
 The banner says "Sample data loaded · synthetic" only when the built-in sample data is loaded; with your own exports it says "Your own exports loaded". Both say everything runs on this computer.
 
+### 4.4b Demo polish
+
+- **Heute wichtig** at the top of the Overview: calls this week, deadlines within 30 days, claimable now, urgent data-quality items; each opens the screen where the work is done (for a social worker: only their clients).
+- **Client page** (`#/client/<Klientennummer>`): facts (status, entry, age, federal payment until, last activity), the call-list entry with talking points, each goal with its reason and a "show how this was decided" trace with source rows, Situationsanalyse fields (model proposals marked "?"), household members, data-quality items. Opened from the goal page, the call list, the client list, data quality and the Situationsanalyse; "Zurück" returns to where you came from.
+- **Clients filter** by goal 1, 2 or 3 (status, deadline and reason columns follow the chosen goal).
+- **Demo von vorne** on Monatslauf: one click (with a confirmation) clears loaded data, remembered source, column mappings, call marks and confirmed report fields, so the demo starts exactly as for a first-time user.
+
 ### 4.4 Overview, Clients, Data quality
 
 - Overview: key figures, target vs actual for all three goals, **Jetzt abrechenbar** (18: goal 1: 11, goal 2: 4, goal 3: 3 households), goal 1 by social worker and entry year, forecast (management), what-if 2027 (management).

@@ -3,7 +3,7 @@ import { addYears, fmt } from '../../engine/dates';
 import type { GoalId, TotalsRow } from '../../engine/model';
 import { msg } from '../../i18n/messages';
 import { StatusIcon } from '../icons';
-import { pct, statusLabel, tr } from '../strings';
+import { pct, statusLabel, tr, type UiKey } from '../strings';
 import type { App } from '../useApp';
 import { EmptyRun } from './common';
 
@@ -58,6 +58,8 @@ export function OverviewScreen({ app }: { app: App }) {
           <span style={{ fontSize: 12 }}>{tr(lang, 'wi.tooltip')}</span>
         </div>
       )}
+
+      <Today app={app} />
 
       {res.notes.map((n, i) => (
         <div key={i} className="note">
@@ -239,7 +241,7 @@ export function OverviewScreen({ app }: { app: App }) {
                   .map((c) => {
                     const p = res.persons.find((x) => x.id === c.personId)!;
                     return (
-                      <tr key={c.personId} className="click" onClick={() => { app.setSelected(p.id); app.setScreen('clients'); }}>
+                      <tr key={c.personId} className="click" onClick={() => app.openClient(p.id)}>
                         <td>
                           <div style={{ fontWeight: 500 }}>{p.displayName}</div>
                           <div className="mono muted" style={{ fontSize: 12 }}>{p.klientNr} · {p.socialWorker}</div>
@@ -539,6 +541,49 @@ function Forecast({ app }: { app: App }) {
       </div>
       <div className="muted" style={{ padding: '8px 20px 12px', fontSize: 12, borderTop: '1px solid var(--divider)' }}>
         G1 · G2 · G3. {set ? tr(lang, 'fc.chf', { total: fmtChf(total), n: res.forecast.length, now: fmtChf(now) }) : tr(lang, 'fc.nochf')}
+      </div>
+    </section>
+  );
+}
+
+/** "Important today": four numbers that each open the screen where the work is done. */
+function Today({ app }: { app: App }) {
+  const { lang, result: res } = app;
+  if (!res) return null;
+  const sw = app.role.kind === 'sw' ? app.role.name : undefined;
+  const sws = sw ? [sw] : res.socialWorkers;
+  const top = app.rules.calls.top_n;
+  const calls = sws.reduce((s, n) => s + Math.min(top, res.callLists[n]?.length ?? 0), 0);
+  const flagged = sws.reduce((s, n) => s + (res.callLists[n]?.length ?? 0), 0);
+  const persons = app.visible!.persons;
+  const ids = new Set(persons.map((p) => p.id));
+  const soon = persons.filter((p) =>
+    ([1, 2, 3] as const).some((g) => {
+      const r = p.goals[g];
+      if (!r || r.status !== 'at_risk' || (g === 3 && !p.isHead)) return false;
+      const d = r.latestAction ?? r.deadline;
+      return d !== undefined && d - res.stichtag <= 30;
+    }),
+  ).length;
+  const claim = res.claimable.filter((c) => ids.has(c.personId)).length;
+  const dq = res.alerts.filter((a) => a.severity === 'high' && a.code !== 'reached_not_recorded' && (!a.personId || ids.has(a.personId))).length;
+  const tile = (label: UiKey, value: number, sub: string, color: string, go: () => void) => (
+    <button type="button" className="kpi today" onClick={go}>
+      <span className="kpi-label">{tr(lang, label)}</span>
+      <span className="kpi-value" style={{ color }}>{value}</span>
+      <span className="kpi-sub">{sub} →</span>
+    </button>
+  );
+  return (
+    <section className="panel" aria-label={tr(lang, 'hd.title')}>
+      <div className="panel-head">
+        <span className="panel-title">{tr(lang, 'hd.title')}</span>
+      </div>
+      <div className="kpis">
+        {tile('hd.calls', calls, tr(lang, 'hd.calls.sub', { n: top, all: flagged }), 'var(--ink)', () => app.setScreen('calls'))}
+        {tile('hd.soon', soon, tr(lang, 'hd.soon.sub'), 'var(--risk)', () => app.setScreen('calls'))}
+        {tile('hd.claim', claim, tr(lang, 'hd.claim.sub'), 'var(--reached-text)', () => { app.setDqOpen('reached_not_recorded'); app.setScreen('quality'); })}
+        {tile('hd.dq', dq, tr(lang, 'hd.dq.sub'), dq ? 'var(--risk)' : 'var(--ink)', () => app.setScreen('quality'))}
       </div>
     </section>
   );

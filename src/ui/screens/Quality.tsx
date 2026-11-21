@@ -76,8 +76,7 @@ export function QualityScreen({ app }: { app: App }) {
                               className={p ? 'click' : undefined}
                               onClick={() => {
                                 if (!p) return;
-                                app.setSelected(p.id);
-                                app.setScreen('clients');
+                                app.openClient(p.id);
                               }}
                             >
                               <td style={{ width: 180 }}>

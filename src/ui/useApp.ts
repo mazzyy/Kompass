@@ -13,16 +13,17 @@ import { tr } from './strings';
 import { useSa } from './useSa';
 import { canRememberFolder, clearHandle, loadHandle, loadSource, permission, pickFolder, readFolder, saveHandle, saveSource, type DirHandle, type Source } from './source';
 
-export type Screen = 'run' | 'overview' | 'goal' | 'calls' | 'clients' | 'quality' | 'export' | 'situation' | 'patterns';
-const SCREENS: Screen[] = ['run', 'overview', 'goal', 'calls', 'clients', 'quality', 'export', 'situation', 'patterns'];
+export type Screen = 'run' | 'overview' | 'goal' | 'calls' | 'clients' | 'client' | 'quality' | 'export' | 'situation' | 'patterns';
+const SCREENS: Screen[] = ['run', 'overview', 'goal', 'calls', 'clients', 'client', 'quality', 'export', 'situation', 'patterns'];
 
 /** Screens live in the URL hash (#/goal/2), so the browser's back and forward buttons move inside the app. */
-function parseHash(): { screen?: Screen; goal?: GoalId } {
-  const m = (typeof location !== 'undefined' ? location.hash : '').match(/^#\/(\w+)(?:\/([123]))?/);
+function parseHash(): { screen?: Screen; goal?: GoalId; client?: string } {
+  const m = (typeof location !== 'undefined' ? location.hash : '').match(/^#\/(\w+)(?:\/([^/?#]+))?/);
   const screen = m && SCREENS.includes(m[1] as Screen) ? (m[1] as Screen) : undefined;
-  return { screen, goal: m?.[2] ? (Number(m[2]) as GoalId) : undefined };
+  const p = m?.[2] ? decodeURIComponent(m[2]) : undefined;
+  return { screen, goal: screen === 'goal' && p && /^[123]$/.test(p) ? (Number(p) as GoalId) : undefined, client: screen === 'client' ? p : undefined };
 }
-const hashFor = (s: Screen, g: GoalId) => `#/${s}${s === 'goal' ? `/${g}` : ''}`;
+const hashFor = (s: Screen, g: GoalId, client?: string) => `#/${s}${s === 'goal' ? `/${g}` : s === 'client' && client ? `/${encodeURIComponent(client)}` : ''}`;
 export type Role = { kind: 'mgmt' } | { kind: 'sw'; name: string };
 export interface LogLine {
   t: string;
@@ -88,7 +89,7 @@ export function useApp() {
   const [called, setCalled] = useState<Record<string, boolean>>(() => load('ic.called', {}));
   const [loading, setLoading] = useState(false);
   const [rulesOpen, setRulesOpen] = useState(false);
-  const [selected, setSelected] = useState<string | undefined>();
+  const [selected, setSelected] = useState<string | undefined>(() => parseHash().client);
   const [callsSw, setCallsSw] = useState<string | undefined>();
   const [dqOpen, setDqOpen] = useState<string | undefined>();
   const [inScopeOnly, setInScopeOnly] = useState(false);
@@ -117,6 +118,7 @@ export function useApp() {
       const r = parseHash();
       setScreenState(r.screen ?? 'run');
       if (r.goal) setGoalIdState(r.goal);
+      if (r.client) setSelected(r.client);
     };
     window.addEventListener('popstate', on);
     return () => window.removeEventListener('popstate', on);
@@ -263,6 +265,31 @@ export function useApp() {
     const next = { ...saved, [mappingKey(s.table, s.fileHeader)]: s.colKey };
     setSaved(next);
     save('ic.mappings', next);
+  };
+
+  /** Full page for one client (its own address, so back returns to where you came from). */
+  const openClient = (id: string) => {
+    setSelected(id);
+    setScreenState('client');
+    const h = hashFor('client', goalRef.current, id);
+    if (location.hash !== h) history.pushState(null, '', h);
+    window.scrollTo?.(0, 0);
+  };
+
+  /** Back to the very start for a demo rehearsal: loaded data, remembered source, column mappings, marks and confirmed report fields. */
+  const resetDemo = () => {
+    clearLocal();
+    setRaws([]);
+    setIsDemo(false);
+    setResult(undefined);
+    setFiles([]);
+    setLog([]);
+    setProgress(0);
+    setError(undefined);
+    setStichtagOverride(undefined);
+    setSelected(undefined);
+    setRestoring(false);
+    setScreen('run');
   };
 
   const clearLocal = () => {
@@ -440,6 +467,8 @@ export function useApp() {
     reopenFolder,
     openFolder,
     forgetSource,
+    openClient,
+    resetDemo,
     restoring: restoring && !result && !folderWaiting && !error,
     sa,
   };

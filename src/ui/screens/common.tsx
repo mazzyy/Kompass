@@ -37,7 +37,7 @@ export function GoalPills({ app, p }: { app: App; p: Person }) {
   );
 }
 
-function srcLine(s: SourceRef): string {
+export function srcLine(s: SourceRef): string {
   return Object.entries(s.fields)
     .map(([k, v]) => `${k}: ${v}`)
     .join(' · ');

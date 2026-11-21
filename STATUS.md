@@ -55,3 +55,5 @@ Before the demo: *Lokale Daten löschen* on the Monatslauf screen so the column 
 **Integrationszielerreichung template received (in Downloads) and built in:** all 11 tables now match ASD's templates. The real `Art` values are `Sprachniveau A1`, `Aufnahme Ausbildung / Erwerbstätigkeit`, `Finanzielle Unabhängigkeit`, `Grundpauschale Integration` (ignored); goal 3's old keywords would not have matched "Finanzielle Unabhängigkeit", now fixed. Sample data regenerated in this format; numbers unchanged. 104 tests pass.
 
 **Lump sums (21.11 afternoon):** public sources confirm the payment structure (base lump sum per person + a different lump sum per reached goal, Leistungsvertrag GSI–Stadt Bern 2020) but not the amounts (contract prices). The forecast, claimable total and Excel Prognose show CHF as soon as ASD enters its amounts (Overview → Forecast). B-RSFL = 5 years marked ASSUMPTION. Two contract jobs adding up: left as is. 105 tests pass.
+
+**Demo polish (21.11 afternoon):** "Heute wichtig" strip, full client page, clients filter per goal, one-click "Demo von vorne" on Monatslauf (use it right before presenting). UI in City of Bern colours; yellow = on track.

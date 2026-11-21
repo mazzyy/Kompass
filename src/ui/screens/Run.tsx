@@ -122,7 +122,12 @@ export function RunScreen({ app }: { app: App }) {
           <h1>{tr(lang, 'run.title')}</h1>
           <p className="sub">{tr(lang, 'run.sub')}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          {(app.isDemo || app.source) && (
+            <button type="button" className="btn small" title={tr(lang, 'demo.reset.confirm')} onClick={() => window.confirm(tr(lang, 'demo.reset.confirm')) && app.resetDemo()}>
+              {tr(lang, 'demo.reset')}
+            </button>
+          )}
           <span className="muted" style={{ fontSize: 13 }}>
             {tr(lang, hint)}
           </span>

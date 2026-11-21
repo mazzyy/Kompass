@@ -1,6 +1,7 @@
 import { fmt } from './engine/dates';
 import { Icon } from './ui/icons';
 import { CallsScreen } from './ui/screens/Calls';
+import { ClientScreen } from './ui/screens/Client';
 import { ClientsScreen } from './ui/screens/Clients';
 import { ExportScreen } from './ui/screens/Export';
 import { GoalScreen } from './ui/screens/Goal';
@@ -51,6 +52,7 @@ export default function App() {
     goal: 'nav.goal',
     calls: 'nav.calls',
     clients: 'nav.clients',
+    client: 'cp.crumb',
     quality: 'nav.quality',
     export: 'nav.export',
     situation: 'nav.situation',
@@ -186,6 +188,7 @@ export default function App() {
               {app.screen === 'goal' && <GoalScreen app={app} />}
               {app.screen === 'calls' && <CallsScreen app={app} />}
               {app.screen === 'clients' && <ClientsScreen app={app} />}
+              {app.screen === 'client' && <ClientScreen app={app} />}
               {app.screen === 'quality' && <QualityScreen app={app} />}
               {app.screen === 'export' && <ExportScreen app={app} />}
               {app.screen === 'patterns' && <PatternsScreen app={app} />}

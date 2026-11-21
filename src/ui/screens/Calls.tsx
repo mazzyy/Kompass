@@ -116,6 +116,9 @@ export function CallsScreen({ app }: { app: App }) {
                   <span className="mono muted" style={{ fontSize: 12 }}>
                     {p.klientNr} · Zemis {p.zemis} · {p.dossierNr} · {p.status}
                   </span>
+                  <button type="button" className="btn link" style={{ alignSelf: 'flex-start', fontSize: 13, marginTop: 4 }} onClick={() => app.openClient(p.id)}>
+                    {tr(lang, 'cp.open')}
+                  </button>
                 </div>
                 <button type="button" className={`btn small${app.called[p.id] ? ' primary' : ''}`} aria-pressed={!!app.called[p.id]} onClick={() => app.toggleCalled(p.id)}>
                   {app.called[p.id] ? tr(lang, 'calls.called') : tr(lang, 'calls.markCalled')}

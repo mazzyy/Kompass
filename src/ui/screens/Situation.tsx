@@ -217,8 +217,7 @@ export function SituationScreen({ app, aiOnline }: { app: App; aiOnline: boolean
                       type="button"
                       className="btn small link"
                       onClick={() => {
-                        app.setSelected(client.id);
-                        app.setScreen('clients');
+                        app.openClient(client.id);
                       }}
                     >
                       {tr(lang, 'sa.openClient')} ({client.klientNr})

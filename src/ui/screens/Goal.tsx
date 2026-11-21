@@ -151,10 +151,7 @@ export function GoalScreen({ app }: { app: App }) {
     return n >= 0 ? tr(lang, 'gp.days.left', { n }) : tr(lang, 'gp.days.over', { n: -n });
   };
 
-  const openClient = (p: Person) => {
-    app.setSelected(p.id);
-    app.setScreen('clients');
-  };
+  const openClient = (p: Person) => app.openClient(p.id);
 
   const kpi = (label: UiKey, value: string | number, color?: string, sub?: string) => (
     <div className="kpi">
